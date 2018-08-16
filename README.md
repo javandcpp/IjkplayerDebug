@@ -1,2 +1,2 @@
 # IjkplayerDebug
-ijkplayer debug版本(底层调试)：  ijkplayer+openssl
+ijkplayer debug版本(native层调试)：  ijkplayer+openssl
