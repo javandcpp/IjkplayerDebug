@@ -3103,6 +3103,13 @@ static int read_thread(void *arg)
         av_dict_set(&ffp->format_opts, "scan_all_pmts", "1", AV_DICT_DONT_OVERWRITE);
         scan_all_pmts_set = 1;
     }
+    ////////////
+//    av_dict_set(&ffp->format_opts, "rtsp_transport", 0?"tcp" : "udp", 0); //设置tcp or udp，默认一般优先tcp再尝试udp
+//    av_dict_set(&ffp->format_opts, "stimeout", "3000000", 0);//设置超时3秒
+    av_dict_set(&ffp->format_opts, "timeout", "5000000", 0);//设置超时5秒
+    //////////
+
+
     if (av_stristart(is->filename, "rtmp", NULL) ||
         av_stristart(is->filename, "rtsp", NULL)) {
         // There is total different meaning for 'timeout' option in rtmp
