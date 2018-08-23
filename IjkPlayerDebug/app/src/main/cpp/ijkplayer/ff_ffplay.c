@@ -3126,6 +3126,7 @@ static int read_thread(void *arg)
         is->iformat = av_find_input_format(ffp->iformat_name);
     err = avformat_open_input(&ic, is->filename, is->iformat, &ffp->format_opts);
     if (err < 0) {
+        ALOGD("error info:%s",av_err2str(err));
         print_error(is->filename, err);
         ret = -1;
         goto fail;
