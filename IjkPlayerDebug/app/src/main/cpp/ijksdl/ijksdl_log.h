@@ -44,11 +44,11 @@
 #define IJK_LOG_SILENT      ANDROID_LOG_SILENT
 
 #ifdef EXTRA_LOG_PRINT
-#define VLOG(level, TAG, ...)    if(0){ffp_log_extra_vprint(level, TAG, __VA_ARGS__);}
-#define ALOG(level, TAG, ...)    if(0){ffp_log_extra_print(level, TAG, __VA_ARGS__);}
+#define VLOG(level, TAG, ...)    ffp_log_extra_vprint(level, TAG, __VA_ARGS__)
+#define ALOG(level, TAG, ...)    ffp_log_extra_print(level, TAG, __VA_ARGS__)
 #else
-#define VLOG(level, TAG, ...)    if(0){((void)__android_log_vprint(level, TAG, __VA_ARGS__));}
-#define ALOG(level, TAG, ...)    if(0){((void)__android_log_print(level, TAG, __VA_ARGS__));}
+#define VLOG(level, TAG, ...)    ((void)__android_log_vprint(level, TAG, __VA_ARGS__))
+#define ALOG(level, TAG, ...)    ((void)__android_log_print(level, TAG, __VA_ARGS__))
 #endif
 
 #else
@@ -71,17 +71,17 @@
 
 #define IJK_LOG_TAG "IJKMEDIA"
 
-#define VLOGV(...)  if(0){VLOG(IJK_LOG_VERBOSE,   IJK_LOG_TAG, __VA_ARGS__);}
-#define VLOGD(...)  if(0){VLOG(IJK_LOG_DEBUG,     IJK_LOG_TAG, __VA_ARGS__);}
-#define VLOGI(...)  if(0}{VLOG(IJK_LOG_INFO,      IJK_LOG_TAG, __VA_ARGS__);}
-#define VLOGW(...)  if(0){VLOG(IJK_LOG_WARN,      IJK_LOG_TAG, __VA_ARGS__);}
-#define VLOGE(...)  if(0){VLOG(IJK_LOG_ERROR,     IJK_LOG_TAG, __VA_ARGS__);}
+#define VLOGV(...)  VLOG(IJK_LOG_VERBOSE,   IJK_LOG_TAG, __VA_ARGS__)
+#define VLOGD(...)  VLOG(IJK_LOG_DEBUG,     IJK_LOG_TAG, __VA_ARGS__)
+#define VLOGI(...)  VLOG(IJK_LOG_INFO,      IJK_LOG_TAG, __VA_ARGS__)
+#define VLOGW(...)  VLOG(IJK_LOG_WARN,      IJK_LOG_TAG, __VA_ARGS__)
+#define VLOGE(...)  VLOG(IJK_LOG_ERROR,     IJK_LOG_TAG, __VA_ARGS__)
 
-#define ALOGV(...)  if(0){ALOG(IJK_LOG_VERBOSE,   IJK_LOG_TAG, __VA_ARGS__);}
-#define ALOGD(...)  if(0){ALOG(IJK_LOG_DEBUG,     IJK_LOG_TAG, __VA_ARGS__);}
-#define ALOGI(...)  if(0){ALOG(IJK_LOG_INFO,      IJK_LOG_TAG, __VA_ARGS__);}
-#define ALOGW(...)  if(0){ALOG(IJK_LOG_WARN,      IJK_LOG_TAG, __VA_ARGS__);}
-#define ALOGE(...)  if(0){ALOG(IJK_LOG_ERROR,     IJK_LOG_TAG, __VA_ARGS__);}
+#define ALOGV(...)  ALOG(IJK_LOG_VERBOSE,   IJK_LOG_TAG, __VA_ARGS__)
+#define ALOGD(...)  ALOG(IJK_LOG_DEBUG,     IJK_LOG_TAG, __VA_ARGS__)
+#define ALOGI(...)  ALOG(IJK_LOG_INFO,      IJK_LOG_TAG, __VA_ARGS__)
+#define ALOGW(...)  ALOG(IJK_LOG_WARN,      IJK_LOG_TAG, __VA_ARGS__)
+#define ALOGE(...)  ALOG(IJK_LOG_ERROR,     IJK_LOG_TAG, __VA_ARGS__)
 #define LOG_ALWAYS_FATAL(...)   do { ALOGE(__VA_ARGS__); exit(1); } while (0)
 
 #endif
