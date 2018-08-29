@@ -13,6 +13,9 @@ cmake_minimum_required(VERSION 3.4.1)
 set(include-ffmpegheaders ${CMAKE_SOURCE_DIR}/src/main/cpp/ffmpeg)
 include_directories(${include-ffmpegheaders})
 
+set(include-clheaders ${CMAKE_SOURCE_DIR}/src/main/cpp/CL)
+include_directories(${include-clheaders})
+
 set(include-opensslheaders ${CMAKE_SOURCE_DIR}/src/main/cpp/openssl)
 include_directories(${include-opensslheaders})
 
@@ -58,6 +61,14 @@ file(GLOB native_soundtouchother_srcs "src/main/cpp/ijksoundtouch/*.cpp")
 file(GLOB native_soundtouchotherother_srcs "src/main/cpp/ijksoundtouch/source/SoundTouch/*.cpp")
 file(GLOB native_ijkprofsrcs "src/main/cpp/ijkprof/*.c")
 
+file(GLOB ffmpeg_srcs "src/main/cpp/ffmpeg/*.c")
+file(GLOB ffmpeg_compat "src/main/cpp/compat/*.c")
+file(GLOB ffmpeg_avcodec "src/main/cpp/libavcodec/*.c")
+
+
+
+
+
 
 
 add_library(ffmpeg SHARED IMPORTED)
@@ -95,6 +106,10 @@ add_library( # Sets the name of the library.
              ${native_soundtouchotherother_srcs}
              ${native_ijkavutilcpp_srcs}
              ${native_ijkprofsrcs}
+
+             ${ffmpeg_srcs}
+             ${ffmpeg_compat}
+             ${ffmpeg_avcodec}
              )
 
 # Searches for a specified prebuilt library and stores the path as a
@@ -119,4 +134,4 @@ target_link_libraries( # Specifies the target library.
 
                        # Links the target library to the log library
                        # included in the NDK.
-                       ${log-lib} sdl ffmpeg log android)
+                       ${log-lib} sdl log android)

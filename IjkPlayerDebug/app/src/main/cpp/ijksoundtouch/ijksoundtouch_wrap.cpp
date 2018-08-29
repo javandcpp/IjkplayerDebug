@@ -20,6 +20,7 @@
  */
 
 #include "SoundTouch.h"
+#include <iostream>
 #include <ijksoundtouch_log.h>
 
 using namespace std;
