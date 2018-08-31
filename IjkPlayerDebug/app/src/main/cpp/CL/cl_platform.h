@@ -35,7 +35,7 @@
     /* Contains #defines for AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER below */
     #include <AvailabilityMacros.h>
 #else
-    #include <CL/cl_version.h>
+    #include "cl_version.h"
 #endif
 
 #ifdef __cplusplus

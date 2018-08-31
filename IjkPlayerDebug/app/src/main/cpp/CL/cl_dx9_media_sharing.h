@@ -31,8 +31,8 @@
 #ifndef __OPENCL_CL_DX9_MEDIA_SHARING_H
 #define __OPENCL_CL_DX9_MEDIA_SHARING_H
 
-#include <CL/cl.h>
-#include <CL/cl_platform.h>
+#include "cl.h"
+#include "cl_platform.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,7 +46,7 @@ typedef cl_uint             cl_dx9_media_adapter_type_khr;
 typedef cl_uint             cl_dx9_media_adapter_set_khr;
     
 #if defined(_WIN32)
-#include <d3d9.h>
+#include "d3d9.h"
 typedef struct _cl_dx9_surface_info_khr
 {
     IDirect3DSurface9 *resource;

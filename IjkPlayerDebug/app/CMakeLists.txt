@@ -10,11 +10,12 @@ cmake_minimum_required(VERSION 3.4.1)
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
-set(include-ffmpegheaders ${CMAKE_SOURCE_DIR}/src/main/cpp/ffmpeg)
-include_directories(${include-ffmpegheaders})
+
 
 set(include-clheaders ${CMAKE_SOURCE_DIR}/src/main/cpp/CL)
 include_directories(${include-clheaders})
+
+
 
 set(include-opensslheaders ${CMAKE_SOURCE_DIR}/src/main/cpp/openssl)
 include_directories(${include-opensslheaders})
@@ -24,6 +25,9 @@ include_directories(${include-ijkjheaders})
 
 set(include-ijkplayerheaders ${CMAKE_SOURCE_DIR}/src/main/cpp/ijkplayer)
 include_directories(${include-ijkplayerheaders})
+
+set(include-fdkaac ${CMAKE_SOURCE_DIR}/src/main/cpp/ijkplayer/fdk-aac)
+include_directories(${include-fdkaac})
 
 set(include-yuvheaders ${CMAKE_SOURCE_DIR}/src/main/cpp/libyuv)
 include_directories(${include-yuvheaders})
@@ -61,9 +65,12 @@ file(GLOB native_soundtouchother_srcs "src/main/cpp/ijksoundtouch/*.cpp")
 file(GLOB native_soundtouchotherother_srcs "src/main/cpp/ijksoundtouch/source/SoundTouch/*.cpp")
 file(GLOB native_ijkprofsrcs "src/main/cpp/ijkprof/*.c")
 
-file(GLOB ffmpeg_srcs "src/main/cpp/ffmpeg/*.c")
-file(GLOB ffmpeg_compat "src/main/cpp/compat/*.c")
-file(GLOB ffmpeg_avcodec "src/main/cpp/libavcodec/*.c")
+file(GLOB ffmpeg_avcodec "src/main/cpp/ijkplayer/libavcodec/*.c")
+file(GLOB ffmpeg_avformat "src/main/cpp/ijkplayer/libavformat/*.c")
+file(GLOB ffmpeg_avutil "src/main/cpp/ijkplayer/libavutil/*.c")
+file(GLOB ffmpeg_swrtesample "src/main/cpp/ijkplayer/libswresample/*.c")
+file(GLOB ffmpeg_avfilter "src/main/cpp/ijkplayer/libavfilter/*.c")
+
 
 
 
@@ -93,6 +100,11 @@ add_library( # Sets the name of the library.
              SHARED
 
              # Provides a relative path to your source file(s).
+             ${ffmpeg_avcodec}
+             ${ffmpeg_avformat}
+             ${ffmpeg_avutil}
+             ${ffmpeg_swrtesample}
+             ${ffmpeg_avfilter}
 
              ${native_ijkj_srcs}
              ${native_player_srcs}
@@ -107,10 +119,12 @@ add_library( # Sets the name of the library.
              ${native_ijkavutilcpp_srcs}
              ${native_ijkprofsrcs}
 
-             ${ffmpeg_srcs}
-             ${ffmpeg_compat}
-             ${ffmpeg_avcodec}
+
+
              )
+
+#aacps.c\aacdec_fixed.c\mpegaudiodec_template.c\aac_sbr_template.c\allcodecs.c\amfenc.h\amfenc.c
+#amfenc_h264.c  amfenc_hevc.c
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
