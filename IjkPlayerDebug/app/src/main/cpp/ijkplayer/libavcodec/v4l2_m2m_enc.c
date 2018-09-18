@@ -24,6 +24,7 @@
 #include <linux/videodev2.h>
 #include <sys/ioctl.h>
 #include <search.h>
+#include <libavutil/internal.h>
 #include "libavcodec/avcodec.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/pixfmt.h"

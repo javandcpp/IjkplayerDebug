@@ -20,6 +20,7 @@
  */
 
 #include <stdint.h>
+#include <libavutil/internal.h>
 
 #include "libavutil/intfloat.h"
 #include "libavutil/opt.h"

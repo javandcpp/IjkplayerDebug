@@ -54,7 +54,7 @@ enum HisteqAntibanding {
     HISTEQ_ANTIBANDING_NB,
 };
 
-typedef struct HisteqContext {
+typedef struct {
     const AVClass *class;
     float strength;
     float intensity;

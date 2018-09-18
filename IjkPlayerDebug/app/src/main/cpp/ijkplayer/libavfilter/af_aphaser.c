@@ -247,16 +247,14 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *inbuf)
     if (av_frame_is_writable(inbuf)) {
         outbuf = inbuf;
     } else {
-        outbuf = ff_get_audio_buffer(outlink, inbuf->nb_samples);
-        if (!outbuf) {
-            av_frame_free(&inbuf);
+        outbuf = ff_get_audio_buffer(inlink, inbuf->nb_samples);
+        if (!outbuf)
             return AVERROR(ENOMEM);
-        }
         av_frame_copy_props(outbuf, inbuf);
     }
 
     s->phaser(s, inbuf->extended_data, outbuf->extended_data,
-              outbuf->nb_samples, outbuf->channels);
+              outbuf->nb_samples, av_frame_get_channels(outbuf));
 
     if (inbuf != outbuf)
         av_frame_free(&inbuf);

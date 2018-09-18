@@ -26,6 +26,7 @@
  *   http://www.pcisys.net/~melanson/codecs/
  */
 
+#include <libavutil/internal.h>
 #include "avcodec.h"
 #include "hpeldsp.h"
 #include "me_cmp.h"

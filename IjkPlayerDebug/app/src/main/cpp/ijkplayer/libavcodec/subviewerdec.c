@@ -24,6 +24,7 @@
  * @see https://en.wikipedia.org/wiki/SubViewer
  */
 
+#include <libavutil/internal.h>
 #include "avcodec.h"
 #include "ass.h"
 #include "libavutil/bprint.h"

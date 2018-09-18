@@ -24,6 +24,7 @@
  * Silicon Graphics Movie demuxer
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/channel_layout.h"
 #include "libavutil/eval.h"
 #include "libavutil/intreadwrite.h"

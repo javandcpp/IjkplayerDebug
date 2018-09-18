@@ -18,16 +18,16 @@
 # include <string.h>
 # include <errno.h>
 
-# include <openssl/buffer.h>
-# include <openssl/comp.h>
-# include <openssl/bio.h>
-# include <openssl/rsa.h>
-# include <openssl/dsa.h>
-# include <openssl/err.h>
-# include <openssl/ssl.h>
-# include <openssl/async.h>
-# include <openssl/symhacks.h>
-# include <openssl/ct.h>
+# include "../include/openssl/buffer.h"
+# include "../include/openssl/comp.h"
+# include "../include/openssl/bio.h"
+# include "../include/openssl/rsa.h"
+# include "../include/openssl/dsa.h"
+# include "../include/openssl/err.h"
+# include "../include/openssl/ssl.h"
+# include "../include/openssl/async.h"
+# include "../include/openssl/symhacks.h"
+# include "../include/openssl/ct.h"
 # include "record/record.h"
 # include "statem/statem.h"
 # include "packet_locl.h"

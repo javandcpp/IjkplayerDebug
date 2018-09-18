@@ -17,6 +17,7 @@
  */
 
 #include <zlib.h>
+#include <libavutil/internal.h>
 
 #include "avcodec.h"
 #include "internal.h"

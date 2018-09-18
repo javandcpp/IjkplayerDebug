@@ -11,24 +11,26 @@
 #ifndef HEADER_X509_H
 # define HEADER_X509_H
 
-# include <openssl/e_os2.h>
-# include <openssl/ossl_typ.h>
-# include <openssl/symhacks.h>
-# include <openssl/buffer.h>
-# include <openssl/evp.h>
-# include <openssl/bio.h>
-# include <openssl/asn1.h>
-# include <openssl/safestack.h>
-# include <openssl/ec.h>
+# include "e_os2.h"
+# include "ossl_typ.h"
+# include "symhacks.h"
+# include "buffer.h"
+# include "evp.h"
+# include "bio.h"
+# include "asn1.h"
+# include "safestack.h"
+# include "ec.h"
 
 # if OPENSSL_API_COMPAT < 0x10100000L
-#  include <openssl/rsa.h>
-#  include <openssl/dsa.h>
-#  include <openssl/dh.h>
+
+#  include "rsa.h"
+#  include "dsa.h"
+#  include "dh.h"
+
 # endif
 
-# include <openssl/sha.h>
-# include <openssl/x509err.h>
+# include "sha.h"
+# include "x509err.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -103,7 +105,9 @@ DEFINE_STACK_OF(X509)
 typedef struct x509_trust_st {
     int trust;
     int flags;
-    int (*check_trust) (struct x509_trust_st *, X509 *, int);
+
+    int (*check_trust)(struct x509_trust_st *, X509 *, int);
+
     char *name;
     int arg1;
     void *arg2;
@@ -317,8 +321,8 @@ typedef struct SCRYPT_PARAMS_st {
 }
 #endif
 
-# include <openssl/x509_vfy.h>
-# include <openssl/pkcs7.h>
+# include "x509_vfy.h"
+# include "pkcs7.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -329,17 +333,17 @@ extern "C" {
 
 # define         X509_extract_key(x)     X509_get_pubkey(x)/*****/
 # define         X509_REQ_extract_key(a) X509_REQ_get_pubkey(a)
-# define         X509_name_cmp(a,b)      X509_NAME_cmp((a),(b))
+# define         X509_name_cmp(a, b)      X509_NAME_cmp((a),(b))
 
 void X509_CRL_set_default_method(const X509_CRL_METHOD *meth);
-X509_CRL_METHOD *X509_CRL_METHOD_new(int (*crl_init) (X509_CRL *crl),
-                                     int (*crl_free) (X509_CRL *crl),
-                                     int (*crl_lookup) (X509_CRL *crl,
-                                                        X509_REVOKED **ret,
-                                                        ASN1_INTEGER *ser,
-                                                        X509_NAME *issuer),
-                                     int (*crl_verify) (X509_CRL *crl,
-                                                        EVP_PKEY *pk));
+X509_CRL_METHOD *X509_CRL_METHOD_new(int (*crl_init)(X509_CRL *crl),
+                                     int (*crl_free)(X509_CRL *crl),
+                                     int (*crl_lookup)(X509_CRL *crl,
+                                                       X509_REVOKED **ret,
+                                                       ASN1_INTEGER *ser,
+                                                       X509_NAME *issuer),
+                                     int (*crl_verify)(X509_CRL *crl,
+                                                       EVP_PKEY *pk));
 void X509_CRL_METHOD_free(X509_CRL_METHOD *m);
 
 void X509_CRL_set_meth_data(X509_CRL *crl, void *dat);
@@ -577,8 +581,8 @@ int X509_alias_set1(X509 *x, const unsigned char *name, int len);
 int X509_keyid_set1(X509 *x, const unsigned char *id, int len);
 unsigned char *X509_alias_get0(X509 *x, int *len);
 unsigned char *X509_keyid_get0(X509 *x, int *len);
-int (*X509_TRUST_set_default(int (*trust) (int, X509 *, int))) (int, X509 *,
-                                                                int);
+int (*X509_TRUST_set_default(int (*trust)(int, X509 *, int)))(int, X509 *,
+                                                              int);
 int X509_TRUST_set(int *t, int trust);
 int X509_add1_trust_object(X509 *x, const ASN1_OBJECT *obj);
 int X509_add1_reject_object(X509 *x, const ASN1_OBJECT *obj);
@@ -640,7 +644,7 @@ int X509_set_issuer_name(X509 *x, X509_NAME *name);
 X509_NAME *X509_get_issuer_name(const X509 *a);
 int X509_set_subject_name(X509 *x, X509_NAME *name);
 X509_NAME *X509_get_subject_name(const X509 *a);
-const ASN1_TIME * X509_get0_notBefore(const X509 *x);
+const ASN1_TIME *X509_get0_notBefore(const X509 *x);
 ASN1_TIME *X509_getm_notBefore(const X509 *x);
 int X509_set1_notBefore(X509 *x, const ASN1_TIME *tm);
 const ASN1_TIME *X509_get0_notAfter(const X509 *x);
@@ -839,7 +843,7 @@ int X509_NAME_ENTRY_set_object(X509_NAME_ENTRY *ne, const ASN1_OBJECT *obj);
 int X509_NAME_ENTRY_set_data(X509_NAME_ENTRY *ne, int type,
                              const unsigned char *bytes, int len);
 ASN1_OBJECT *X509_NAME_ENTRY_get_object(const X509_NAME_ENTRY *ne);
-ASN1_STRING * X509_NAME_ENTRY_get_data(const X509_NAME_ENTRY *ne);
+ASN1_STRING *X509_NAME_ENTRY_get_data(const X509_NAME_ENTRY *ne);
 int X509_NAME_ENTRY_set(const X509_NAME_ENTRY *ne);
 
 int X509_NAME_get0_der(X509_NAME *nm, const unsigned char **pder,
@@ -1034,7 +1038,7 @@ int X509_check_trust(X509 *x, int id, int flags);
 int X509_TRUST_get_count(void);
 X509_TRUST *X509_TRUST_get0(int idx);
 int X509_TRUST_get_by_id(int id);
-int X509_TRUST_add(int id, int flags, int (*ck) (X509_TRUST *, X509 *, int),
+int X509_TRUST_add(int id, int flags, int (*ck)(X509_TRUST *, X509 *, int),
                    const char *name, int arg1, void *arg2);
 void X509_TRUST_cleanup(void);
 int X509_TRUST_get_flags(const X509_TRUST *xp);

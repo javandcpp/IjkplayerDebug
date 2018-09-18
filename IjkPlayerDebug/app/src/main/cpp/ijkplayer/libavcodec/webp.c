@@ -40,6 +40,7 @@
  *   - XMP metadata
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/imgutils.h"
 
 #define BITSTREAM_READER_LE

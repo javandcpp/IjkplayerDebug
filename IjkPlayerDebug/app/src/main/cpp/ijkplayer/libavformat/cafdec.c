@@ -26,6 +26,7 @@
  */
 
 #include <inttypes.h>
+#include <libavutil/internal.h>
 
 #include "avformat.h"
 #include "internal.h"

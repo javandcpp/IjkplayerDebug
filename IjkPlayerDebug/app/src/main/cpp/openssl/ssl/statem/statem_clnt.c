@@ -13,14 +13,14 @@
 #include <time.h>
 #include "../ssl_locl.h"
 #include "statem_locl.h"
-#include <openssl/buffer.h>
-#include <openssl/rand.h>
-#include <openssl/objects.h>
-#include <openssl/evp.h>
-#include <openssl/md5.h>
-#include <openssl/dh.h>
-#include <openssl/bn.h>
-#include <openssl/engine.h>
+#include <../openssl/include/openssl/buffer.h>
+#include <../openssl/include/openssl/rand.h>
+#include <../openssl/include/openssl/objects.h>
+#include <../openssl/include/openssl/evp.h>
+#include <../openssl/include/openssl/md5.h>
+#include <../openssl/include/openssl/dh.h>
+#include <../openssl/include/openssl/bn.h>
+#include <../openssl/include/openssl/engine.h>
 
 static MSG_PROCESS_RETURN tls_process_hello_retry_request(SSL *s, PACKET *pkt);
 static MSG_PROCESS_RETURN tls_process_encrypted_extensions(SSL *s, PACKET *pkt);

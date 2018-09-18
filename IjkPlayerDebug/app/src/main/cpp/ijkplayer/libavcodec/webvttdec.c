@@ -25,6 +25,7 @@
  * @todo need to support extended markups and cue settings
  */
 
+#include <libavutil/internal.h>
 #include "avcodec.h"
 #include "ass.h"
 #include "libavutil/bprint.h"

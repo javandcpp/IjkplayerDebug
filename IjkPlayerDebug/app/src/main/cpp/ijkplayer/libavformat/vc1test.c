@@ -26,6 +26,7 @@
  * Format specified in SMPTE standard 421 Annex L
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"
 #include "internal.h"

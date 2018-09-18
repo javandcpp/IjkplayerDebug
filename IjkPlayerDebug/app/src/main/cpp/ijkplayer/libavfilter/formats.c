@@ -596,12 +596,12 @@ static int default_query_formats_common(AVFilterContext *ctx,
 
 int ff_default_query_formats(AVFilterContext *ctx)
 {
-    return default_query_formats_common(ctx, ff_all_channel_counts);
+    return default_query_formats_common(ctx, ff_all_channel_layouts);
 }
 
-int ff_query_formats_all_layouts(AVFilterContext *ctx)
+int ff_query_formats_all(AVFilterContext *ctx)
 {
-    return default_query_formats_common(ctx, ff_all_channel_layouts);
+    return default_query_formats_common(ctx, ff_all_channel_counts);
 }
 
 /* internal functions for parsing audio format arguments */
@@ -662,20 +662,24 @@ int ff_parse_sample_rate(int *ret, const char *arg, void *log_ctx)
 int ff_parse_channel_layout(int64_t *ret, int *nret, const char *arg,
                             void *log_ctx)
 {
+    char *tail;
     int64_t chlayout;
-    int nb_channels;
 
-    if (av_get_extended_channel_layout(arg, &chlayout, &nb_channels) < 0) {
-        av_log(log_ctx, AV_LOG_ERROR, "Invalid channel layout '%s'\n", arg);
-        return AVERROR(EINVAL);
-    }
-    if (!chlayout && !nret) {
-        av_log(log_ctx, AV_LOG_ERROR, "Unknown channel layout '%s' is not supported.\n", arg);
-        return AVERROR(EINVAL);
+    chlayout = av_get_channel_layout(arg);
+    if (chlayout == 0) {
+        chlayout = strtol(arg, &tail, 10);
+        if (!(*tail == '\0' || *tail == 'c' && *(tail + 1) == '\0') || chlayout <= 0 || chlayout > 63) {
+            av_log(log_ctx, AV_LOG_ERROR, "Invalid channel layout '%s'\n", arg);
+            return AVERROR(EINVAL);
+        }
+        if (nret) {
+            *nret = chlayout;
+            *ret = 0;
+            return 0;
+        }
     }
     *ret = chlayout;
     if (nret)
-        *nret = nb_channels;
-
+        *nret = av_get_channel_layout_nb_channels(chlayout);
     return 0;
 }

@@ -19,6 +19,8 @@
  */
 
 #define BITSTREAM_WRITER_LE
+
+#include <libavutil/internal.h>
 #include "ttadata.h"
 #include "ttaencdsp.h"
 #include "avcodec.h"

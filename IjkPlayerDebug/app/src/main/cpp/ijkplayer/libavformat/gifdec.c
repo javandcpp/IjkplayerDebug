@@ -24,6 +24,7 @@
  * GIF demuxer.
  */
 
+#include <libavutil/internal.h>
 #include "avformat.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/opt.h"

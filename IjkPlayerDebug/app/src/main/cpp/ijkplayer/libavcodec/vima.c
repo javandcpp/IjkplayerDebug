@@ -25,6 +25,7 @@
  * @author Paul B Mahol
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/channel_layout.h"
 
 #include "adpcm_data.h"

@@ -26,8 +26,8 @@
 # include <sys/types.h>
 # include <sys/sysctl.h>
 #endif
-#include <openssl/crypto.h>
-#include <openssl/bn.h>
+#include "../include/openssl/crypto.h"
+#include "../include/openssl/bn.h"
 
 #include "ppc_arch.h"
 

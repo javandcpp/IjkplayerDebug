@@ -9,8 +9,8 @@
  */
 
 #include <stdio.h>
-#include <openssl/rand.h>
-#include <openssl/engine.h>
+#include <../include/openssl/rand.h>
+#include <../include/openssl/engine.h>
 #include "internal/refcount.h"
 #include "ssl_locl.h"
 #include "statem/statem_locl.h"

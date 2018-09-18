@@ -20,6 +20,7 @@
 
 #define BITSTREAM_WRITER_LE
 
+#include <libavutil/internal.h>
 #include "libavutil/intreadwrite.h"
 #include "libavutil/opt.h"
 #include "avcodec.h"

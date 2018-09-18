@@ -24,6 +24,7 @@
  * Miro VideoXL codec.
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"

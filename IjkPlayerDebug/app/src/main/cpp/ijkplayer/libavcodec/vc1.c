@@ -26,6 +26,7 @@
  * VC-1 and WMV3 decoder common code
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/attributes.h"
 #include "internal.h"
 #include "avcodec.h"

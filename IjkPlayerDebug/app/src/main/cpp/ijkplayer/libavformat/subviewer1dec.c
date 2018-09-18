@@ -23,6 +23,7 @@
  * SubViewer v1 subtitle demuxer
  */
 
+#include <libavutil/internal.h>
 #include "avformat.h"
 #include "internal.h"
 #include "subtitles.h"

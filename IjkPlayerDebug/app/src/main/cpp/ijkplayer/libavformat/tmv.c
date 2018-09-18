@@ -26,6 +26,7 @@
  * @see http://www.oldskool.org/pc/8088_Corruption
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/channel_layout.h"
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"

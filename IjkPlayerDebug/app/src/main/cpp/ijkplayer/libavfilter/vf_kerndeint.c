@@ -35,7 +35,7 @@
 #include "formats.h"
 #include "internal.h"
 
-typedef struct KerndeintContext {
+typedef struct {
     const AVClass *class;
     int           frame; ///< frame count, starting from 0
     int           thresh, map, order, sharp, twoway;

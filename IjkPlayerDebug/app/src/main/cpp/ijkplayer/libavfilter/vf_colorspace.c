@@ -33,7 +33,6 @@
 #include "formats.h"
 #include "internal.h"
 #include "video.h"
-#include "colorspace.h"
 
 enum DitherMode {
     DITHER_NONE,
@@ -57,8 +56,6 @@ enum Colorspace {
 enum Whitepoint {
     WP_D65,
     WP_C,
-    WP_DCI,
-    WP_E,
     WP_NB,
 };
 
@@ -111,11 +108,19 @@ static const enum AVColorSpace default_csp[CS_NB + 1] = {
 
 struct ColorPrimaries {
     enum Whitepoint wp;
-    struct PrimaryCoefficients coeff;
+    double xr, yr, xg, yg, xb, yb;
 };
 
 struct TransferCharacteristics {
     double alpha, beta, gamma, delta;
+};
+
+struct LumaCoefficients {
+    double cr, cg, cb;
+};
+
+struct WhitepointCoefficients {
+    double xw, yw;
 };
 
 typedef struct ColorSpaceContext {
@@ -162,27 +167,13 @@ typedef struct ColorSpaceContext {
     int did_warn_range;
 } ColorSpaceContext;
 
-// FIXME deal with odd width/heights
+// FIXME deal with odd width/heights (or just forbid it)
 // FIXME faster linearize/delinearize implementation (integer pow)
 // FIXME bt2020cl support (linearization between yuv/rgb step instead of between rgb/xyz)
 // FIXME test that the values in (de)lin_lut don't exceed their container storage
 // type size (only useful if we keep the LUT and don't move to fast integer pow)
 // FIXME dithering if bitdepth goes down?
 // FIXME bitexact for fate integration?
-
-static const double ycgco_matrix[3][3] =
-{
-    {  0.25, 0.5,  0.25 },
-    { -0.25, 0.5, -0.25 },
-    {  0.5,  0,   -0.5  },
-};
-
-static const double gbr_matrix[3][3] =
-{
-    { 0,    1,   0   },
-    { 0,   -0.5, 0.5 },
-    { 0.5, -0.5, 0   },
-};
 
 /*
  * All constants explained in e.g. https://linuxtv.org/downloads/v4l-dvb-apis/ch02s06.html
@@ -196,8 +187,6 @@ static const struct LumaCoefficients luma_coefficients[AVCOL_SPC_NB] = {
     [AVCOL_SPC_SMPTE170M]  = { 0.299,  0.587,  0.114  },
     [AVCOL_SPC_BT709]      = { 0.2126, 0.7152, 0.0722 },
     [AVCOL_SPC_SMPTE240M]  = { 0.212,  0.701,  0.087  },
-    [AVCOL_SPC_YCOCG]      = { 0.25,   0.5,    0.25   },
-    [AVCOL_SPC_RGB]        = { 1,      1,      1      },
     [AVCOL_SPC_BT2020_NCL] = { 0.2627, 0.6780, 0.0593 },
     [AVCOL_SPC_BT2020_CL]  = { 0.2627, 0.6780, 0.0593 },
 };
@@ -219,15 +208,6 @@ static void fill_rgb2yuv_table(const struct LumaCoefficients *coeffs,
                                double rgb2yuv[3][3])
 {
     double bscale, rscale;
-
-    // special ycgco matrix
-    if (coeffs->cr == 0.25 && coeffs->cg == 0.5 && coeffs->cb == 0.25) {
-        memcpy(rgb2yuv, ycgco_matrix, sizeof(double) * 9);
-        return;
-    } else if (coeffs->cr == 1 && coeffs->cg == 1 && coeffs->cb == 1) {
-        memcpy(rgb2yuv, gbr_matrix, sizeof(double) * 9);
-        return;
-    }
 
     rgb2yuv[0][0] = coeffs->cr;
     rgb2yuv[0][1] = coeffs->cg;
@@ -252,7 +232,6 @@ static const struct TransferCharacteristics transfer_characteristics[AVCOL_TRC_N
     [AVCOL_TRC_SMPTE170M] = { 1.099,  0.018,  0.45, 4.5 },
     [AVCOL_TRC_SMPTE240M] = { 1.1115, 0.0228, 0.45, 4.0 },
     [AVCOL_TRC_IEC61966_2_1] = { 1.055, 0.0031308, 1.0 / 2.4, 12.92 },
-    [AVCOL_TRC_IEC61966_2_4] = { 1.099, 0.018, 0.45, 4.5 },
     [AVCOL_TRC_BT2020_10] = { 1.099,  0.018,  0.45, 4.5 },
     [AVCOL_TRC_BT2020_12] = { 1.0993, 0.0181, 0.45, 4.5 },
 };
@@ -274,35 +253,55 @@ static const struct TransferCharacteristics *
 static const struct WhitepointCoefficients whitepoint_coefficients[WP_NB] = {
     [WP_D65] = { 0.3127, 0.3290 },
     [WP_C]   = { 0.3100, 0.3160 },
-    [WP_DCI] = { 0.3140, 0.3510 },
-    [WP_E]   = { 1/3.0f, 1/3.0f },
 };
 
 static const struct ColorPrimaries color_primaries[AVCOL_PRI_NB] = {
-    [AVCOL_PRI_BT709]     = { WP_D65, { 0.640, 0.330, 0.300, 0.600, 0.150, 0.060 } },
-    [AVCOL_PRI_BT470M]    = { WP_C,   { 0.670, 0.330, 0.210, 0.710, 0.140, 0.080 } },
-    [AVCOL_PRI_BT470BG]   = { WP_D65, { 0.640, 0.330, 0.290, 0.600, 0.150, 0.060 } },
-    [AVCOL_PRI_SMPTE170M] = { WP_D65, { 0.630, 0.340, 0.310, 0.595, 0.155, 0.070 } },
-    [AVCOL_PRI_SMPTE240M] = { WP_D65, { 0.630, 0.340, 0.310, 0.595, 0.155, 0.070 } },
-    [AVCOL_PRI_SMPTE428]  = { WP_E,   { 0.735, 0.265, 0.274, 0.718, 0.167, 0.009 } },
-    [AVCOL_PRI_SMPTE431]  = { WP_DCI, { 0.680, 0.320, 0.265, 0.690, 0.150, 0.060 } },
-    [AVCOL_PRI_SMPTE432]  = { WP_D65, { 0.680, 0.320, 0.265, 0.690, 0.150, 0.060 } },
-    [AVCOL_PRI_FILM]      = { WP_C,   { 0.681, 0.319, 0.243, 0.692, 0.145, 0.049 } },
-    [AVCOL_PRI_BT2020]    = { WP_D65, { 0.708, 0.292, 0.170, 0.797, 0.131, 0.046 } },
-    [AVCOL_PRI_JEDEC_P22] = { WP_D65, { 0.630, 0.340, 0.295, 0.605, 0.155, 0.077 } },
+    [AVCOL_PRI_BT709]     = { WP_D65, 0.640, 0.330, 0.300, 0.600, 0.150, 0.060 },
+    [AVCOL_PRI_BT470M]    = { WP_C,   0.670, 0.330, 0.210, 0.710, 0.140, 0.080 },
+    [AVCOL_PRI_BT470BG]   = { WP_D65, 0.640, 0.330, 0.290, 0.600, 0.150, 0.060,},
+    [AVCOL_PRI_SMPTE170M] = { WP_D65, 0.630, 0.340, 0.310, 0.595, 0.155, 0.070 },
+    [AVCOL_PRI_SMPTE240M] = { WP_D65, 0.630, 0.340, 0.310, 0.595, 0.155, 0.070 },
+    [AVCOL_PRI_BT2020]    = { WP_D65, 0.708, 0.292, 0.170, 0.797, 0.131, 0.046 },
 };
 
 static const struct ColorPrimaries *get_color_primaries(enum AVColorPrimaries prm)
 {
-    const struct ColorPrimaries *p;
+    const struct ColorPrimaries *coeffs;
 
     if (prm >= AVCOL_PRI_NB)
         return NULL;
-    p = &color_primaries[prm];
-    if (!p->coeff.xr)
+    coeffs = &color_primaries[prm];
+    if (!coeffs->xr)
         return NULL;
 
-    return p;
+    return coeffs;
+}
+
+static void invert_matrix3x3(const double in[3][3], double out[3][3])
+{
+    double m00 = in[0][0], m01 = in[0][1], m02 = in[0][2],
+           m10 = in[1][0], m11 = in[1][1], m12 = in[1][2],
+           m20 = in[2][0], m21 = in[2][1], m22 = in[2][2];
+    int i, j;
+    double det;
+
+    out[0][0] =  (m11 * m22 - m21 * m12);
+    out[0][1] = -(m01 * m22 - m21 * m02);
+    out[0][2] =  (m01 * m12 - m11 * m02);
+    out[1][0] = -(m10 * m22 - m20 * m12);
+    out[1][1] =  (m00 * m22 - m20 * m02);
+    out[1][2] = -(m00 * m12 - m10 * m02);
+    out[2][0] =  (m10 * m21 - m20 * m11);
+    out[2][1] = -(m00 * m21 - m20 * m01);
+    out[2][2] =  (m00 * m11 - m10 * m01);
+
+    det = m00 * out[0][0] + m10 * out[0][1] + m20 * out[0][2];
+    det = 1.0 / det;
+
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++)
+            out[i][j] *= det;
+    }
 }
 
 static int fill_gamma_table(ColorSpaceContext *s)
@@ -346,6 +345,49 @@ static int fill_gamma_table(ColorSpaceContext *s)
 }
 
 /*
+ * see e.g. http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html
+ */
+static void fill_rgb2xyz_table(const struct ColorPrimaries *coeffs,
+                               double rgb2xyz[3][3])
+{
+    const struct WhitepointCoefficients *wp = &whitepoint_coefficients[coeffs->wp];
+    double i[3][3], sr, sg, sb, zw;
+
+    rgb2xyz[0][0] = coeffs->xr / coeffs->yr;
+    rgb2xyz[0][1] = coeffs->xg / coeffs->yg;
+    rgb2xyz[0][2] = coeffs->xb / coeffs->yb;
+    rgb2xyz[1][0] = rgb2xyz[1][1] = rgb2xyz[1][2] = 1.0;
+    rgb2xyz[2][0] = (1.0 - coeffs->xr - coeffs->yr) / coeffs->yr;
+    rgb2xyz[2][1] = (1.0 - coeffs->xg - coeffs->yg) / coeffs->yg;
+    rgb2xyz[2][2] = (1.0 - coeffs->xb - coeffs->yb) / coeffs->yb;
+    invert_matrix3x3(rgb2xyz, i);
+    zw = 1.0 - wp->xw - wp->yw;
+    sr = i[0][0] * wp->xw + i[0][1] * wp->yw + i[0][2] * zw;
+    sg = i[1][0] * wp->xw + i[1][1] * wp->yw + i[1][2] * zw;
+    sb = i[2][0] * wp->xw + i[2][1] * wp->yw + i[2][2] * zw;
+    rgb2xyz[0][0] *= sr;
+    rgb2xyz[0][1] *= sg;
+    rgb2xyz[0][2] *= sb;
+    rgb2xyz[1][0] *= sr;
+    rgb2xyz[1][1] *= sg;
+    rgb2xyz[1][2] *= sb;
+    rgb2xyz[2][0] *= sr;
+    rgb2xyz[2][1] *= sg;
+    rgb2xyz[2][2] *= sb;
+}
+
+static void mul3x3(double dst[3][3], const double src1[3][3], const double src2[3][3])
+{
+    int m, n;
+
+    for (m = 0; m < 3; m++)
+        for (n = 0; n < 3; n++)
+            dst[m][n] = src2[m][0] * src1[0][n] +
+                        src2[m][1] * src1[1][n] +
+                        src2[m][2] * src1[2][n];
+}
+
+/*
  * See http://www.brucelindbloom.com/index.html?Eqn_ChromAdapt.html
  * This function uses the Bradford mechanism.
  */
@@ -371,7 +413,7 @@ static void fill_whitepoint_conv_table(double out[3][3], enum WhitepointAdaptati
     double mai[3][3], fac[3][3], tmp[3][3];
     double rs, gs, bs, rd, gd, bd;
 
-    ff_matrix_invert_3x3(ma, mai);
+    invert_matrix3x3(ma, mai);
     rs = ma[0][0] * wp_src->xw + ma[0][1] * wp_src->yw + ma[0][2] * zw_src;
     gs = ma[1][0] * wp_src->xw + ma[1][1] * wp_src->yw + ma[1][2] * zw_src;
     bs = ma[2][0] * wp_src->xw + ma[2][1] * wp_src->yw + ma[2][2] * zw_src;
@@ -382,8 +424,8 @@ static void fill_whitepoint_conv_table(double out[3][3], enum WhitepointAdaptati
     fac[1][1] = gd / gs;
     fac[2][2] = bd / bs;
     fac[0][1] = fac[0][2] = fac[1][0] = fac[1][2] = fac[2][0] = fac[2][1] = 0.0;
-    ff_matrix_mul_3x3(tmp, ma, fac);
-    ff_matrix_mul_3x3(out, tmp, mai);
+    mul3x3(tmp, ma, fac);
+    mul3x3(out, tmp, mai);
 }
 
 static void apply_lut(int16_t *buf[3], ptrdiff_t stride,
@@ -584,23 +626,20 @@ static int create_filtergraph(AVFilterContext *ctx,
                                            sizeof(*s->in_primaries));
         if (!s->lrgb2lrgb_passthrough) {
             double rgb2xyz[3][3], xyz2rgb[3][3], rgb2rgb[3][3];
-            const struct WhitepointCoefficients *wp_out, *wp_in;
 
-            wp_out = &whitepoint_coefficients[s->out_primaries->wp];
-            wp_in = &whitepoint_coefficients[s->in_primaries->wp];
-            ff_fill_rgb2xyz_table(&s->out_primaries->coeff, wp_out, rgb2xyz);
-            ff_matrix_invert_3x3(rgb2xyz, xyz2rgb);
-            ff_fill_rgb2xyz_table(&s->in_primaries->coeff, wp_in, rgb2xyz);
+            fill_rgb2xyz_table(s->out_primaries, rgb2xyz);
+            invert_matrix3x3(rgb2xyz, xyz2rgb);
+            fill_rgb2xyz_table(s->in_primaries, rgb2xyz);
             if (s->out_primaries->wp != s->in_primaries->wp &&
                 s->wp_adapt != WP_ADAPT_IDENTITY) {
                 double wpconv[3][3], tmp[3][3];
 
                 fill_whitepoint_conv_table(wpconv, s->wp_adapt, s->in_primaries->wp,
                                            s->out_primaries->wp);
-                ff_matrix_mul_3x3(tmp, rgb2xyz, wpconv);
-                ff_matrix_mul_3x3(rgb2rgb, tmp, xyz2rgb);
+                mul3x3(tmp, rgb2xyz, wpconv);
+                mul3x3(rgb2rgb, tmp, xyz2rgb);
             } else {
-                ff_matrix_mul_3x3(rgb2rgb, rgb2xyz, xyz2rgb);
+                mul3x3(rgb2rgb, rgb2xyz, xyz2rgb);
             }
             for (m = 0; m < 3; m++)
                 for (n = 0; n < 3; n++) {
@@ -725,7 +764,7 @@ static int create_filtergraph(AVFilterContext *ctx,
             for (n = 0; n < 8; n++)
                 s->yuv_offset[0][n] = off;
             fill_rgb2yuv_table(s->in_lumacoef, rgb2yuv);
-            ff_matrix_invert_3x3(rgb2yuv, yuv2rgb);
+            invert_matrix3x3(rgb2yuv, yuv2rgb);
             bits = 1 << (in_desc->comp[0].depth - 1);
             for (n = 0; n < 3; n++) {
                 for (in_rng = s->in_y_rng, m = 0; m < 3; m++, in_rng = s->in_uv_rng) {
@@ -781,7 +820,7 @@ static int create_filtergraph(AVFilterContext *ctx,
             double yuv2yuv[3][3];
             int in_rng, out_rng;
 
-            ff_matrix_mul_3x3(yuv2yuv, yuv2rgb, rgb2yuv);
+            mul3x3(yuv2yuv, yuv2rgb, rgb2yuv);
             for (out_rng = s->out_y_rng, m = 0; m < 3; m++, out_rng = s->out_uv_rng) {
                 for (in_rng = s->in_y_rng, n = 0; n < 3; n++, in_rng = s->in_uv_rng) {
                     s->yuv2yuv_coeffs[m][n][0] =
@@ -972,14 +1011,7 @@ static int query_formats(AVFilterContext *ctx)
 
 static int config_props(AVFilterLink *outlink)
 {
-    AVFilterContext *ctx = outlink->dst;
     AVFilterLink *inlink = outlink->src->inputs[0];
-
-    if (inlink->w % 2 || inlink->h % 2) {
-        av_log(ctx, AV_LOG_ERROR, "Invalid odd size (%dx%d)\n",
-               inlink->w, inlink->h);
-        return AVERROR_PATCHWELCOME;
-    }
 
     outlink->w = inlink->w;
     outlink->h = inlink->h;
@@ -1014,9 +1046,6 @@ static const AVOption colorspace_options[] = {
     ENUM("bt470bg",     AVCOL_SPC_BT470BG,     "csp"),
     ENUM("smpte170m",   AVCOL_SPC_SMPTE170M,   "csp"),
     ENUM("smpte240m",   AVCOL_SPC_SMPTE240M,   "csp"),
-    ENUM("ycgco",       AVCOL_SPC_YCGCO,       "csp"),
-    ENUM("gbr",         AVCOL_SPC_RGB,         "csp"),
-    ENUM("bt2020nc",    AVCOL_SPC_BT2020_NCL,  "csp"),
     ENUM("bt2020ncl",   AVCOL_SPC_BT2020_NCL,  "csp"),
 
     { "range",      "Output color range",
@@ -1035,12 +1064,7 @@ static const AVOption colorspace_options[] = {
     ENUM("bt470bg",      AVCOL_PRI_BT470BG,    "prm"),
     ENUM("smpte170m",    AVCOL_PRI_SMPTE170M,  "prm"),
     ENUM("smpte240m",    AVCOL_PRI_SMPTE240M,  "prm"),
-    ENUM("smpte428",     AVCOL_PRI_SMPTE428,   "prm"),
-    ENUM("film",         AVCOL_PRI_FILM,       "prm"),
-    ENUM("smpte431",     AVCOL_PRI_SMPTE431,   "prm"),
-    ENUM("smpte432",     AVCOL_PRI_SMPTE432,   "prm"),
     ENUM("bt2020",       AVCOL_PRI_BT2020,     "prm"),
-    ENUM("jedec-p22",    AVCOL_PRI_JEDEC_P22,  "prm"),
 
     { "trc",        "Output transfer characteristics",
       OFFSET(user_trc),   AV_OPT_TYPE_INT, { .i64 = AVCOL_TRC_UNSPECIFIED },
@@ -1054,8 +1078,6 @@ static const AVOption colorspace_options[] = {
     ENUM("smpte240m",    AVCOL_TRC_SMPTE240M,    "trc"),
     ENUM("srgb",         AVCOL_TRC_IEC61966_2_1, "trc"),
     ENUM("iec61966-2-1", AVCOL_TRC_IEC61966_2_1, "trc"),
-    ENUM("xvycc",        AVCOL_TRC_IEC61966_2_4, "trc"),
-    ENUM("iec61966-2-4", AVCOL_TRC_IEC61966_2_4, "trc"),
     ENUM("bt2020-10",    AVCOL_TRC_BT2020_10,    "trc"),
     ENUM("bt2020-12",    AVCOL_TRC_BT2020_12,    "trc"),
 

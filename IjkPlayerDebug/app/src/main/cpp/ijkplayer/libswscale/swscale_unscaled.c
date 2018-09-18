@@ -1137,18 +1137,20 @@ static int bayer_to_rgb24_wrapper(SwsContext *c, const uint8_t* src[], int srcSt
     case pixfmt: copy        = bayer_##prefix##_to_rgb24_copy; \
                  interpolate = bayer_##prefix##_to_rgb24_interpolate; \
                  break;
-    CASE(AV_PIX_FMT_BAYER_BGGR8,    bggr8)
-    CASE(AV_PIX_FMT_BAYER_BGGR16LE, bggr16le)
-    CASE(AV_PIX_FMT_BAYER_BGGR16BE, bggr16be)
-    CASE(AV_PIX_FMT_BAYER_RGGB8,    rggb8)
-    CASE(AV_PIX_FMT_BAYER_RGGB16LE, rggb16le)
-    CASE(AV_PIX_FMT_BAYER_RGGB16BE, rggb16be)
-    CASE(AV_PIX_FMT_BAYER_GBRG8,    gbrg8)
-    CASE(AV_PIX_FMT_BAYER_GBRG16LE, gbrg16le)
-    CASE(AV_PIX_FMT_BAYER_GBRG16BE, gbrg16be)
-    CASE(AV_PIX_FMT_BAYER_GRBG8,    grbg8)
-    CASE(AV_PIX_FMT_BAYER_GRBG16LE, grbg16le)
-    CASE(AV_PIX_FMT_BAYER_GRBG16BE, grbg16be)
+
+//    CASE(AV_PIX_FMT_BAYER_BGGR8,    bggr8)
+//    CASE(AV_PIX_FMT_BAYER_BGGR16LE, bggr16le)
+//    CASE(AV_PIX_FMT_BAYER_BGGR16BE, bggr16be)
+//    CASE(AV_PIX_FMT_BAYER_RGGB8,    rggb8)
+//    CASE(AV_PIX_FMT_BAYER_RGGB16LE, rggb16le)
+//    CASE(AV_PIX_FMT_BAYER_RGGB16BE, rggb16be)
+//    CASE(AV_PIX_FMT_BAYER_GBRG8,    gbrg8)
+//    CASE(AV_PIX_FMT_BAYER_GBRG16LE, gbrg16le)
+//    CASE(AV_PIX_FMT_BAYER_GBRG16BE, gbrg16be)
+//    CASE(AV_PIX_FMT_BAYER_GRBG8,    grbg8)
+//    CASE(AV_PIX_FMT_BAYER_GRBG16LE, grbg16le)
+//    CASE(AV_PIX_FMT_BAYER_GRBG16BE, grbg16be)
+
 #undef CASE
     default: return 0;
     }
@@ -1188,18 +1190,18 @@ static int bayer_to_yv12_wrapper(SwsContext *c, const uint8_t* src[], int srcStr
     case pixfmt: copy        = bayer_##prefix##_to_yv12_copy; \
                  interpolate = bayer_##prefix##_to_yv12_interpolate; \
                  break;
-    CASE(AV_PIX_FMT_BAYER_BGGR8,    bggr8)
-    CASE(AV_PIX_FMT_BAYER_BGGR16LE, bggr16le)
-    CASE(AV_PIX_FMT_BAYER_BGGR16BE, bggr16be)
-    CASE(AV_PIX_FMT_BAYER_RGGB8,    rggb8)
-    CASE(AV_PIX_FMT_BAYER_RGGB16LE, rggb16le)
-    CASE(AV_PIX_FMT_BAYER_RGGB16BE, rggb16be)
-    CASE(AV_PIX_FMT_BAYER_GBRG8,    gbrg8)
-    CASE(AV_PIX_FMT_BAYER_GBRG16LE, gbrg16le)
-    CASE(AV_PIX_FMT_BAYER_GBRG16BE, gbrg16be)
-    CASE(AV_PIX_FMT_BAYER_GRBG8,    grbg8)
-    CASE(AV_PIX_FMT_BAYER_GRBG16LE, grbg16le)
-    CASE(AV_PIX_FMT_BAYER_GRBG16BE, grbg16be)
+//    CASE(AV_PIX_FMT_BAYER_BGGR8,    bggr8)
+//    CASE(AV_PIX_FMT_BAYER_BGGR16LE, bggr16le)
+//    CASE(AV_PIX_FMT_BAYER_BGGR16BE, bggr16be)
+//    CASE(AV_PIX_FMT_BAYER_RGGB8,    rggb8)
+//    CASE(AV_PIX_FMT_BAYER_RGGB16LE, rggb16le)
+//    CASE(AV_PIX_FMT_BAYER_RGGB16BE, rggb16be)
+//    CASE(AV_PIX_FMT_BAYER_GBRG8,    gbrg8)
+//    CASE(AV_PIX_FMT_BAYER_GBRG16LE, gbrg16le)
+//    CASE(AV_PIX_FMT_BAYER_GBRG16BE, gbrg16be)
+//    CASE(AV_PIX_FMT_BAYER_GRBG8,    grbg8)
+//    CASE(AV_PIX_FMT_BAYER_GRBG16LE, grbg16le)
+//    CASE(AV_PIX_FMT_BAYER_GRBG16BE, grbg16be)
 #undef CASE
     default: return 0;
     }

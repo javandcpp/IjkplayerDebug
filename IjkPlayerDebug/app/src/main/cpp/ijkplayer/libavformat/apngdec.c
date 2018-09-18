@@ -26,6 +26,7 @@
  * @see http://www.w3.org/TR/PNG
  */
 
+#include <libavutil/internal.h>
 #include "avformat.h"
 #include "avio_internal.h"
 #include "internal.h"

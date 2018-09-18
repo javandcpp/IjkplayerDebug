@@ -23,6 +23,8 @@
 
 #if CONFIG_ZLIB
 #include <zlib.h>
+#include <libavutil/internal.h>
+
 #endif /* CONFIG_ZLIB */
 
 #include "libavutil/avassert.h"

@@ -24,6 +24,7 @@
  * Microsoft Windows ICO muxer
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/intreadwrite.h"
 #include "libavutil/pixdesc.h"
 #include "avformat.h"

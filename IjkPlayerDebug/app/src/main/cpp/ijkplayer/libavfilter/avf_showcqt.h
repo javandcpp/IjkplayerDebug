@@ -25,16 +25,16 @@
 #include "avfilter.h"
 #include "internal.h"
 
-typedef struct Coeffs {
+typedef struct {
     FFTSample *val;
     int start, len;
 } Coeffs;
 
-typedef struct RGBFloat {
+typedef struct {
     float r, g, b;
 } RGBFloat;
 
-typedef struct YUVFloat {
+typedef struct {
     float y, u, v;
 } YUVFloat;
 
@@ -43,90 +43,79 @@ typedef union {
     YUVFloat yuv;
 } ColorFloat;
 
-typedef struct ShowCQTContext {
-    const AVClass *class;
-    AVFilterContext *ctx;
-    AVFrame *axis_frame;
-    AVFrame *sono_frame;
-    enum AVPixelFormat format;
-    int sono_idx;
-    int sono_count;
-    int step;
-    AVRational step_frac;
-    int remaining_frac;
-    int remaining_fill;
-    int remaining_fill_max;
-    int64_t next_pts;
-    double *freq;
-    FFTContext *fft_ctx;
-    Coeffs *coeffs;
-    struct FFTComplex *fft_data;
-    struct FFTComplex *fft_result;
-    struct FFTComplex *cqt_result;
-    float *attack_data;
-    int fft_bits;
-    int fft_len;
-    int cqt_len;
-    int cqt_align;
-    ColorFloat *c_buf;
-    float *h_buf;
-    float *rcp_h_buf;
-    float *sono_v_buf;
-    float *bar_v_buf;
-    float cmatrix[3][3];
-    float cscheme_v[6];
-
+typedef struct {
+    const AVClass       *class;
+    AVFilterContext     *ctx;
+    AVFrame             *axis_frame;
+    AVFrame             *sono_frame;
+    enum AVPixelFormat  format;
+    int                 sono_idx;
+    int                 sono_count;
+    int                 step;
+    AVRational          step_frac;
+    int                 remaining_frac;
+    int                 remaining_fill;
+    int64_t             next_pts;
+    double              *freq;
+    FFTContext          *fft_ctx;
+    Coeffs              *coeffs;
+    FFTComplex          *fft_data;
+    FFTComplex          *fft_result;
+    FFTComplex          *cqt_result;
+    int                 fft_bits;
+    int                 fft_len;
+    int                 cqt_len;
+    int                 cqt_align;
+    ColorFloat          *c_buf;
+    float               *h_buf;
+    float               *rcp_h_buf;
+    float               *sono_v_buf;
+    float               *bar_v_buf;
+    float               cmatrix[3][3];
+    float               cscheme_v[6];
     /* callback */
-    void (*cqt_calc)(struct FFTComplex *dst, const struct FFTComplex *src, const Coeffs *coeffs,
-                     int len, int fft_len);
-
-    void (*permute_coeffs)(float *v, int len);
-
-    void (*draw_bar)(AVFrame *out, const float *h, const float *rcp_h,
-                     const ColorFloat *c, int bar_h, float bar_t);
-
-    void (*draw_axis)(AVFrame *out, AVFrame *axis, const ColorFloat *c, int off);
-
-    void (*draw_sono)(AVFrame *out, AVFrame *sono, int off, int idx);
-
-    void (*update_sono)(AVFrame *sono, const ColorFloat *c, int idx);
-
+    void                (*cqt_calc)(FFTComplex *dst, const FFTComplex *src, const Coeffs *coeffs,
+                                    int len, int fft_len);
+    void                (*permute_coeffs)(float *v, int len);
+    void                (*draw_bar)(AVFrame *out, const float *h, const float *rcp_h,
+                                    const ColorFloat *c, int bar_h);
+    void                (*draw_axis)(AVFrame *out, AVFrame *axis, const ColorFloat *c, int off);
+    void                (*draw_sono)(AVFrame *out, AVFrame *sono, int off, int idx);
+    void                (*update_sono)(AVFrame *sono, const ColorFloat *c, int idx);
     /* performance debugging */
-    int64_t fft_time;
-    int64_t cqt_time;
-    int64_t process_cqt_time;
-    int64_t update_sono_time;
-    int64_t alloc_time;
-    int64_t bar_time;
-    int64_t axis_time;
-    int64_t sono_time;
+    int64_t             fft_time;
+    int64_t             cqt_time;
+    int64_t             process_cqt_time;
+    int64_t             update_sono_time;
+    int64_t             alloc_time;
+    int64_t             bar_time;
+    int64_t             axis_time;
+    int64_t             sono_time;
     /* option */
-    int width, height;
-    AVRational rate;
-    int bar_h;
-    int axis_h;
-    int sono_h;
-    int fullhd; /* deprecated */
-    char *sono_v;
-    char *bar_v;
-    float sono_g;
-    float bar_g;
-    float bar_t;
-    double timeclamp;
-    double attack;
-    double basefreq;
-    double endfreq;
-    float coeffclamp; /* deprecated - ignored */
-    char *tlength;
-    int count;
-    int fcount;
-    char *fontfile;
-    char *font;
-    char *fontcolor;
-    char *axisfile;
-    int axis;
-    int csp;
-    char *cscheme;
+    int                 width, height;
+    AVRational          rate;
+    int                 bar_h;
+    int                 axis_h;
+    int                 sono_h;
+    int                 fullhd; /* deprecated */
+    char                *sono_v;
+    char                *bar_v;
+    float               sono_g;
+    float               bar_g;
+    double              timeclamp;
+    double              basefreq;
+    double              endfreq;
+    float               coeffclamp; /* deprecated - ignored */
+    char                *tlength;
+    int                 count;
+    int                 fcount;
+    char                *fontfile;
+    char                *font;
+    char                *fontcolor;
+    char                *axisfile;
+    int                 axis;
+    int                 csp;
+    char                *cscheme;
 } ShowCQTContext;
 
 void ff_showcqt_init_x86(ShowCQTContext *s);

@@ -10,25 +10,25 @@
 #ifndef HEADER_TS_H
 # define HEADER_TS_H
 
-# include <openssl/opensslconf.h>
+# include "opensslconf.h"
 
 # ifndef OPENSSL_NO_TS
-# include <openssl/symhacks.h>
-# include <openssl/buffer.h>
-# include <openssl/evp.h>
-# include <openssl/bio.h>
-# include <openssl/asn1.h>
-# include <openssl/safestack.h>
-# include <openssl/rsa.h>
-# include <openssl/dsa.h>
-# include <openssl/dh.h>
-# include <openssl/tserr.h>
+# include "symhacks.h"
+# include "buffer.h"
+# include "evp.h"
+# include "bio.h"
+# include "asn1.h"
+# include "safestack.h"
+# include "rsa.h"
+# include "dsa.h"
+# include "dh.h"
+# include "tserr.h"
 # ifdef  __cplusplus
 extern "C" {
 # endif
 
-# include <openssl/x509.h>
-# include <openssl/x509v3.h>
+# include "x509.h"
+# include "x509v3.h"
 
 typedef struct TS_msg_imprint_st TS_MSG_IMPRINT;
 typedef struct TS_req_st TS_REQ;
@@ -422,28 +422,28 @@ int TS_RESP_verify_signature(PKCS7 *token, STACK_OF(X509) *certs,
 /* Context structure for the generic verify method. */
 
 /* Verify the signer's certificate and the signature of the response. */
-# define TS_VFY_SIGNATURE        (1u << 0)
+# define TS_VFY_SIGNATURE        (1u "" 0)
 /* Verify the version number of the response. */
-# define TS_VFY_VERSION          (1u << 1)
+# define TS_VFY_VERSION          (1u "" 1)
 /* Verify if the policy supplied by the user matches the policy of the TSA. */
-# define TS_VFY_POLICY           (1u << 2)
+# define TS_VFY_POLICY           (1u "" 2)
 /*
  * Verify the message imprint provided by the user. This flag should not be
  * specified with TS_VFY_DATA.
  */
-# define TS_VFY_IMPRINT          (1u << 3)
+# define TS_VFY_IMPRINT          (1u "" 3)
 /*
  * Verify the message imprint computed by the verify method from the user
  * provided data and the MD algorithm of the response. This flag should not
  * be specified with TS_VFY_IMPRINT.
  */
-# define TS_VFY_DATA             (1u << 4)
+# define TS_VFY_DATA             (1u "" 4)
 /* Verify the nonce value. */
-# define TS_VFY_NONCE            (1u << 5)
+# define TS_VFY_NONCE            (1u "" 5)
 /* Verify if the TSA name field matches the signer certificate. */
-# define TS_VFY_SIGNER           (1u << 6)
+# define TS_VFY_SIGNER           (1u "" 6)
 /* Verify if the TSA name field equals to the user provided name. */
-# define TS_VFY_TSA_NAME         (1u << 7)
+# define TS_VFY_TSA_NAME         (1u "" 7)
 
 /* You can use the following convenience constants. */
 # define TS_VFY_ALL_IMPRINT      (TS_VFY_SIGNATURE       \

@@ -22,6 +22,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <libavutil/internal.h>
 
 #include "libavutil/avassert.h"
 #include "libavutil/avutil.h"
@@ -756,7 +757,7 @@ static void rgb48Toxyz12(struct SwsContext *c, uint16_t *dst,
  * swscale wrapper, so we don't need to export the SwsContext.
  * Assumes planar YUV to be in YUV order instead of YVU.
  */
-int attribute_align_arg sws_scale(struct SwsContext *c,
+int sws_scale(struct SwsContext *c,
                                   const uint8_t * const srcSlice[],
                                   const int srcStride[], int srcSliceY,
                                   int srcSliceH, uint8_t *const dst[],

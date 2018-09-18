@@ -11,16 +11,16 @@
 # define HEADER_ASN1_H
 
 # include <time.h>
-# include <openssl/e_os2.h>
-# include <openssl/opensslconf.h>
-# include <openssl/bio.h>
-# include <openssl/safestack.h>
-# include <openssl/asn1err.h>
-# include <openssl/symhacks.h>
+# include "e_os2.h"
+# include "opensslconf.h"
+# include "bio.h"
+# include "safestack.h"
+# include "asn1err.h"
+# include "symhacks.h"
 
-# include <openssl/ossl_typ.h>
+# include "ossl_typ.h"
 # if OPENSSL_API_COMPAT < 0x10100000L
-#  include <openssl/bn.h>
+#  include "bn.h"
 # endif
 
 # ifdef OPENSSL_BUILD_SHLIBCRYPTO

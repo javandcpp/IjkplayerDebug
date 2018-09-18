@@ -35,12 +35,12 @@ FFTContext *av_fft_init(int nbits, int inverse)
     return s;
 }
 
-void av_fft_permute(FFTContext *s, struct FFTComplex *z)
+void av_fft_permute(FFTContext *s, FFTComplex *z)
 {
     s->fft_permute(s, z);
 }
 
-void av_fft_calc(FFTContext *s, struct FFTComplex *z)
+void av_fft_calc(FFTContext *s, FFTComplex *z)
 {
     s->fft_calc(s, z);
 }

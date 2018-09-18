@@ -9,8 +9,8 @@
 
 #include "e_os.h"
 #include <stdio.h>
-#include <openssl/objects.h>
-#include <openssl/rand.h>
+#include <../include/openssl/objects.h>
+#include <../include/openssl/rand.h>
 #include "ssl_locl.h"
 
 static void get_current_time(struct timeval *t);

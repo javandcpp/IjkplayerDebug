@@ -49,7 +49,7 @@ typedef struct TLSContext {
 } TLSContext;
 
 #if HAVE_THREADS
-#include "../openssl/crypto.h"
+#include "../openssl/include/openssl/crypto.h"
 pthread_mutex_t *openssl_mutexes;
 static void openssl_lock(int mode, int type, const char *file, int line)
 {

@@ -54,7 +54,7 @@ typedef struct SpectrumSynthContext {
     AVFrame *magnitude, *phase;
     FFTContext *fft;            ///< Fast Fourier Transform context
     int fft_bits;               ///< number of bits (FFT window size = 1<<fft_bits)
-    struct FFTComplex **fft_data;      ///< bins holder for each (displayed) channels
+    FFTComplex **fft_data;      ///< bins holder for each (displayed) channels
     int win_size;
     int size;
     int nb_freq;
@@ -210,7 +210,7 @@ static int config_output(AVFilterLink *outlink)
                                       sizeof(*s->window_func_lut));
     if (!s->window_func_lut)
         return AVERROR(ENOMEM);
-    generate_window_func(s->window_func_lut, s->win_size, s->win_func, &overlap);
+    ff_generate_window_func(s->window_func_lut, s->win_size, s->win_func, &overlap);
     if (s->overlap == 1)
         s->overlap = overlap;
     s->hop_size = (1 - s->overlap) * s->win_size;

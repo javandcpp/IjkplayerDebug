@@ -9,9 +9,9 @@
 
 #include <stdio.h>
 #include "ssl_locl.h"
-#include <openssl/conf.h>
-#include <openssl/objects.h>
-#include <openssl/dh.h>
+#include <../include/openssl/conf.h>
+#include <../include/openssl/objects.h>
+#include <../include/openssl/dh.h>
 #include "internal/nelem.h"
 
 /*

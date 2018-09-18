@@ -24,6 +24,7 @@
  * FITS muxer.
  */
 
+#include <libavutil/internal.h>
 #include "internal.h"
 
 typedef struct FITSContext {

@@ -29,6 +29,8 @@
 #include <string.h>
 #if HAVE_MMAP
 #include <sys/mman.h>
+#include <libavutil/internal.h>
+
 #if defined(MAP_ANON) && !defined(MAP_ANONYMOUS)
 #define MAP_ANONYMOUS MAP_ANON
 #endif

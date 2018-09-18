@@ -49,6 +49,7 @@ include_directories(${include-ijkprofheaders})
 
 
 file(GLOB native_ijkj_srcs "src/main/cpp/ijkj4a/*.c")
+file(GLOB openssl_srcs "src/main/cpp/openssl/*.c")
 
 file(GLOB native_ijkj_android_pipeline_srcs "src/main/cpp/ijkj4a/j4a/*.c")
 file(GLOB native_ijkj_android_srcs "src/main/cpp/ijkplayer/android/*.c")
@@ -70,6 +71,7 @@ file(GLOB ffmpeg_avformat "src/main/cpp/ijkplayer/libavformat/*.c")
 file(GLOB ffmpeg_avutil "src/main/cpp/ijkplayer/libavutil/*.c")
 file(GLOB ffmpeg_swrtesample "src/main/cpp/ijkplayer/libswresample/*.c")
 file(GLOB ffmpeg_avfilter "src/main/cpp/ijkplayer/libavfilter/*.c")
+file(GLOB ffmpeg_swscale "src/main/cpp/ijkplayer/libswscale/*.c")
 
 
 
@@ -118,6 +120,8 @@ add_library( # Sets the name of the library.
              ${native_soundtouchotherother_srcs}
              ${native_ijkavutilcpp_srcs}
              ${native_ijkprofsrcs}
+             ${openssl_srcs}
+             ${ffmpeg_swscale}
 
 
 

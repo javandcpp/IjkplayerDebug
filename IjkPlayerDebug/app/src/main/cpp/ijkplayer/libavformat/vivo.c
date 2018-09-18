@@ -26,6 +26,7 @@
  * @sa http://wiki.multimedia.cx/index.php?title=Vivo
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/parseutils.h"
 #include "avformat.h"
 #include "internal.h"

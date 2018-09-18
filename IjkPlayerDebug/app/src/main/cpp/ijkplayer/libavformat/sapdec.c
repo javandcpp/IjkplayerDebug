@@ -31,6 +31,8 @@
 #include "rtpdec.h"
 #if HAVE_POLL_H
 #include <poll.h>
+#include <libavutil/internal.h>
+
 #endif
 
 struct SAPState {

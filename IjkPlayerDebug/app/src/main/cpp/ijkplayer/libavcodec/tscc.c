@@ -42,6 +42,7 @@
 #include "msrledec.h"
 
 #include <zlib.h>
+#include <libavutil/internal.h>
 
 typedef struct TsccContext {
 

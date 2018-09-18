@@ -25,6 +25,7 @@
  *   http://www.csse.monash.edu.au/~timf/
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/avassert.h"
 #include "libavutil/imgutils.h"
 

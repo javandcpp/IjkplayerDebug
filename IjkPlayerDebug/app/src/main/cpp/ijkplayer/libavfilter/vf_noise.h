@@ -34,7 +34,7 @@
 #define NOISE_AVERAGED 8
 #define NOISE_PATTERN  16
 
-typedef struct FilterParams {
+typedef struct {
     int strength;
     unsigned flags;
     AVLFG lfg;
@@ -45,7 +45,7 @@ typedef struct FilterParams {
     int rand_shift_init;
 } FilterParams;
 
-typedef struct NoiseContext {
+typedef struct {
     const AVClass *class;
     int nb_planes;
     int bytewidth[4];

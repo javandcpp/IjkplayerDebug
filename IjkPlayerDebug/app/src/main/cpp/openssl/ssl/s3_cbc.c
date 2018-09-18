@@ -11,8 +11,8 @@
 #include "ssl_locl.h"
 #include "internal/cryptlib.h"
 
-#include <openssl/md5.h>
-#include <openssl/sha.h>
+#include <../include/openssl/md5.h>
+#include <../include/openssl/sha.h>
 
 /*
  * MAX_HASH_BIT_COUNT_BYTES is the maximum number of bytes in the hash's

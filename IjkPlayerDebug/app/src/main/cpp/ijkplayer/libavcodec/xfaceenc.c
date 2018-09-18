@@ -24,6 +24,7 @@
  * X-Face encoder, based on libcompface, by James Ashton.
  */
 
+#include <libavutil/internal.h>
 #include "xface.h"
 #include "avcodec.h"
 #include "internal.h"

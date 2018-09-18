@@ -11,14 +11,14 @@
 #ifndef HEADER_BN_H
 # define HEADER_BN_H
 
-# include <openssl/e_os2.h>
+# include "e_os2.h"
 # ifndef OPENSSL_NO_STDIO
 #  include <stdio.h>
 # endif
-# include <openssl/opensslconf.h>
-# include <openssl/ossl_typ.h>
-# include <openssl/crypto.h>
-# include <openssl/bnerr.h>
+# include "opensslconf.h"
+# include "ossl_typ.h"
+# include "crypto.h"
+# include "bnerr.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -35,10 +35,10 @@ extern "C" {
 /*
  * 64-bit processor other than LP64 ABI
  */
-# ifdef SIXTY_FOUR_BIT
+//# ifdef SIXTY_FOUR_BIT
 #  define BN_ULONG        unsigned long long
 #  define BN_BYTES        8
-# endif
+//# endif
 
 # ifdef THIRTY_TWO_BIT
 #  define BN_ULONG        unsigned int

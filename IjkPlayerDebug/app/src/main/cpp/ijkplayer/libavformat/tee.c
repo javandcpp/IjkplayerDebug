@@ -20,6 +20,7 @@
  */
 
 
+#include <libavutil/internal.h>
 #include "libavutil/avutil.h"
 #include "libavutil/avstring.h"
 #include "libavutil/opt.h"

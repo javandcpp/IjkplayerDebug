@@ -30,7 +30,7 @@
 
 #include "libpostproc/postprocess.h"
 
-typedef struct PPFilterContext {
+typedef struct {
     const AVClass *class;
     char *subfilters;
     int mode_id;

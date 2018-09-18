@@ -19,6 +19,8 @@
 #ifndef AVCODEC_VT_INTERNAL_H
 #define AVCODEC_VT_INTERNAL_H
 
+#include <stdbool.h>
+
 typedef struct VTContext {
     // The current bitstream buffer.
     uint8_t                     *bitstream;

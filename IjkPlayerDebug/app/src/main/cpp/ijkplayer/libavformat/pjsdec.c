@@ -25,6 +25,7 @@
  * @see http://subs.com.ru/page.php?al=pjs
  */
 
+#include <libavutil/internal.h>
 #include "avformat.h"
 #include "internal.h"
 #include "subtitles.h"

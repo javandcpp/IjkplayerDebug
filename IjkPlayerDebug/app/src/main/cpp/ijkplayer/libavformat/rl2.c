@@ -33,6 +33,7 @@
  */
 
 #include <stdint.h>
+#include <libavutil/internal.h>
 
 #include "libavutil/intreadwrite.h"
 #include "libavutil/mathematics.h"

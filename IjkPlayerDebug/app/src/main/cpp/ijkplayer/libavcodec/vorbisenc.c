@@ -42,6 +42,7 @@
 
 #undef NDEBUG
 #include <assert.h>
+#include <libavutil/internal.h>
 
 typedef struct vorbis_enc_codebook {
     int nentries;

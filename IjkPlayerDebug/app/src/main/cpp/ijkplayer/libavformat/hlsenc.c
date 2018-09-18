@@ -25,12 +25,14 @@
 #include <stdint.h>
 #if HAVE_UNISTD_H
 #include <unistd.h>
+#include <libavutil/internal.h>
+
 #endif
 
 #if CONFIG_GCRYPT
 #include <gcrypt.h>
 #elif CONFIG_OPENSSL
-#include <openssl/rand.h>
+#include "../openssl/include/openssl/rand.h"
 #endif
 
 #include "libavutil/avassert.h"

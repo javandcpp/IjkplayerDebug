@@ -67,7 +67,7 @@ public class SampleMediaListFragment extends Fragment {
                 VideoActivity.intentTo(activity, url, name);
             }
         });
-
+        mAdapter.addItem("/sdcard/test.mp3","testmp3");
         mAdapter.addItem("https://cdn.kaishuhezi.com/kstory/microcourse/video/07128c2a-a53a-4ed1-8e25-6594c018553a.mp4","testmp4");
         mAdapter.addItem("http://devimages.apple.com.edgekey.net/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8", "bipbop basic master playlist");
         mAdapter.addItem("http://devimages.apple.com.edgekey.net/streaming/examples/bipbop_4x3/gear1/prog_index.m3u8", "bipbop basic 400x300 @ 232 kbps");

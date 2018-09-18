@@ -20,6 +20,7 @@
  */
 
 #include <stdint.h>
+#include <libavutil/internal.h>
 
 #include "av1.h"
 #include "avc.h"

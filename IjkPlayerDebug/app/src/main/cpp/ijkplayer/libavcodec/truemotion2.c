@@ -25,6 +25,7 @@
  */
 
 #include <inttypes.h>
+#include <libavutil/internal.h>
 
 #include "avcodec.h"
 #include "bswapdsp.h"

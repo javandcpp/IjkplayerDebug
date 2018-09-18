@@ -10,10 +10,10 @@
 
 #include <stdio.h>
 #include "ssl_locl.h"
-#include <openssl/comp.h>
-#include <openssl/evp.h>
-#include <openssl/kdf.h>
-#include <openssl/rand.h>
+#include <../include/openssl/comp.h>
+#include <../include/openssl/evp.h>
+#include <../include/openssl/kdf.h>
+#include <../include/openssl/rand.h>
 
 /* seed1 through seed5 are concatenated */
 static int tls1_PRF(SSL *s,

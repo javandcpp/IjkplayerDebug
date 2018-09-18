@@ -20,6 +20,7 @@
  */
 
 #include <inttypes.h>
+#include <libavutil/internal.h>
 
 #include "libavutil/adler32.h"
 #include "avformat.h"

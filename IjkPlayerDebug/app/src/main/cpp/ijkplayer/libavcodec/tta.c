@@ -28,6 +28,7 @@
  */
 
 #include <limits.h>
+#include <libavutil/internal.h>
 
 #include "libavutil/crc.h"
 #include "libavutil/intreadwrite.h"

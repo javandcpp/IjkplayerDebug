@@ -44,6 +44,7 @@
  */
 
 #include <inttypes.h>
+#include <libavutil/internal.h>
 
 #include "libavutil/aes.h"
 #include "libavutil/avassert.h"

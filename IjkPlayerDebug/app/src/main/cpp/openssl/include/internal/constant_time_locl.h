@@ -11,7 +11,7 @@
 # define HEADER_CONSTANT_TIME_LOCL_H
 
 # include <stdlib.h>
-# include <openssl/e_os2.h>              /* For 'ossl_inline' */
+# include "../openssl/e_os2.h"             /* For 'ossl_inline' */
 
 #ifdef __cplusplus
 extern "C" {

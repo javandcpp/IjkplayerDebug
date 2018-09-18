@@ -26,6 +26,7 @@
  * http://tools.ietf.org/html/draft-pantos-http-live-streaming
  */
 
+#include <libavutil/internal.h>
 #include "libavformat/http.h"
 #include "libavutil/avstring.h"
 #include "libavutil/avassert.h"

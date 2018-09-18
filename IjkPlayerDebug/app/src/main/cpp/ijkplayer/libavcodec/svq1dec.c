@@ -32,6 +32,7 @@
  *   http://www.pcisys.net/~melanson/codecs/
  */
 
+#include <libavutil/internal.h>
 #include "avcodec.h"
 #include "get_bits.h"
 #include "h263.h"

@@ -24,6 +24,7 @@
  * LPCM codecs for PCM formats found in Video DVD streams
  */
 
+#include <libavutil/internal.h>
 #include "avcodec.h"
 #include "bytestream.h"
 #include "internal.h"

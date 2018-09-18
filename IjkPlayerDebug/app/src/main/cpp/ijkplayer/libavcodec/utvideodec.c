@@ -26,6 +26,7 @@
 
 #include <inttypes.h>
 #include <stdlib.h>
+#include <libavutil/internal.h>
 
 #define UNCHECKED_BITSTREAM_READER 1
 

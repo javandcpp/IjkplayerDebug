@@ -34,7 +34,7 @@
 #include "avfilter.h"
 #include "internal.h"
 
-typedef struct ANullContext {
+typedef struct {
     const AVClass *class;
     char   *channel_layout_str;
     uint64_t channel_layout;

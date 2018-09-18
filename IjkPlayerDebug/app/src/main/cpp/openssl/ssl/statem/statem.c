@@ -8,7 +8,7 @@
  */
 
 #include "internal/cryptlib.h"
-#include <openssl/rand.h>
+#include <../openssl/include/openssl/rand.h>
 #include "../ssl_locl.h"
 #include "statem_locl.h"
 #include <assert.h>

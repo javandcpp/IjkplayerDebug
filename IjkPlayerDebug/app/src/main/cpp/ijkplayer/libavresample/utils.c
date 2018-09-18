@@ -33,6 +33,7 @@
 #include "audio_mix.h"
 #include "resample.h"
 
+
 int avresample_open(AVAudioResampleContext *avr)
 {
     int ret;
@@ -327,7 +328,7 @@ static int handle_buffered_output(AVAudioResampleContext *avr,
     return 0;
 }
 
-int attribute_align_arg avresample_convert(AVAudioResampleContext *avr,
+int avresample_convert(AVAudioResampleContext *avr,
                                            uint8_t **output, int out_plane_size,
                                            int out_samples,
                                            uint8_t * const *input,

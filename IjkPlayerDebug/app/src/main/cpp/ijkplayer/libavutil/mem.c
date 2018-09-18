@@ -60,6 +60,7 @@ void  free(void *ptr);
 #endif /* MALLOC_PREFIX */
 
 #include "mem_internal.h"
+#include "internal.h"
 
 #define ALIGN (HAVE_AVX512 ? 64 : (HAVE_AVX ? 32 : 16))
 
@@ -90,7 +91,7 @@ void *av_malloc(size_t size)
     ptr = _aligned_malloc(size, ALIGN);
 #elif HAVE_MEMALIGN
 #ifndef __DJGPP__
-    ptr = memalign(ALIGN, size);
+//    ptr = memalign(ALIGN, size);size
 #else
     ptr = memalign(size, ALIGN);
 #endif

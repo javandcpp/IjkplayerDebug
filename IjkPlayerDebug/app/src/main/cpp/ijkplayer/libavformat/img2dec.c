@@ -23,6 +23,7 @@
 #define _DEFAULT_SOURCE
 #define _BSD_SOURCE
 #include <sys/stat.h>
+#include <libavutil/internal.h>
 #include "libavutil/avstring.h"
 #include "libavutil/log.h"
 #include "libavutil/opt.h"

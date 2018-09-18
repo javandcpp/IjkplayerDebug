@@ -10,12 +10,12 @@
  */
 
 #include <stdio.h>
-#include <openssl/objects.h>
+#include <../include/openssl/objects.h>
 #include "internal/nelem.h"
 #include "ssl_locl.h"
-#include <openssl/md5.h>
-#include <openssl/dh.h>
-#include <openssl/rand.h>
+#include <../include/openssl/md5.h>
+#include <../include/openssl/dh.h>
+#include <../include/openssl/rand.h>
 #include "internal/cryptlib.h"
 
 #define SSL3_NUM_CIPHERS        OSSL_NELEM(ssl3_ciphers)

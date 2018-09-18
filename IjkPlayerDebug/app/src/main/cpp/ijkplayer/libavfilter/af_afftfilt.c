@@ -35,7 +35,7 @@ typedef struct AFFTFiltContext {
     int fft_bits;
 
     FFTContext *fft, *ifft;
-    struct  FFTComplex **fft_data;
+    FFTComplex **fft_data;
     int nb_exprs;
     int window_size;
     AVExpr **real;
@@ -166,7 +166,7 @@ static int config_input(AVFilterLink *inlink)
                                       sizeof(*s->window_func_lut));
     if (!s->window_func_lut)
         return AVERROR(ENOMEM);
-    generate_window_func(s->window_func_lut, s->window_size, s->win_func, &overlap);
+    ff_generate_window_func(s->window_func_lut, s->window_size, s->win_func, &overlap);
     if (s->overlap == 1)
         s->overlap = overlap;
 
@@ -197,10 +197,8 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
     int ch, n, ret, i, j, k;
     int start = s->start, end = s->end;
 
-    ret = av_audio_fifo_write(s->fifo, (void **)frame->extended_data, frame->nb_samples);
+    av_audio_fifo_write(s->fifo, (void **)frame->extended_data, frame->nb_samples);
     av_frame_free(&frame);
-    if (ret < 0)
-        return ret;
 
     while (av_audio_fifo_size(s->fifo) >= window_size) {
         if (!in) {
@@ -215,7 +213,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
 
         for (ch = 0; ch < inlink->channels; ch++) {
             const float *src = (float *)in->extended_data[ch];
-            struct  FFTComplex *fft_data = s->fft_data[ch];
+            FFTComplex *fft_data = s->fft_data[ch];
 
             for (n = 0; n < in->nb_samples; n++) {
                 fft_data[n].re = src[n] * s->window_func_lut[n];
@@ -234,7 +232,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
         values[VAR_CHANNELS]    = inlink->channels;
 
         for (ch = 0; ch < inlink->channels; ch++) {
-            struct  FFTComplex *fft_data = s->fft_data[ch];
+            FFTComplex *fft_data = s->fft_data[ch];
             float *buf = (float *)s->buffer->extended_data[ch];
             int x;
 
@@ -318,7 +316,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
     }
 
     av_frame_free(&in);
-    return ret < 0 ? ret : 0;
+    return ret;
 }
 
 static int query_formats(AVFilterContext *ctx)
@@ -373,9 +371,6 @@ static av_cold void uninit(AVFilterContext *ctx)
     av_freep(&s->real);
     av_freep(&s->imag);
     av_frame_free(&s->buffer);
-    av_freep(&s->window_func_lut);
-
-    av_audio_fifo_free(s->fifo);
 }
 
 static const AVFilterPad inputs[] = {

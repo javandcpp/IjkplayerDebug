@@ -25,8 +25,11 @@
  */
 
 #include <stddef.h>
+#include <stdint.h>
 
 #include "libavutil/attributes.h"
+#include "swscale_internal.h"
+#include "rgb2rgb.h"
 
 static inline void rgb24tobgr32_c(const uint8_t *src, uint8_t *dst,
                                   int src_size)

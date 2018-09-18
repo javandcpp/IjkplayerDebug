@@ -33,7 +33,7 @@
 #include "internal.h"
 #include "video.h"
 
-typedef struct Super2xSaIContext {
+typedef struct {
     /* masks used for two pixels interpolation */
     uint32_t hi_pixel_mask;
     uint32_t lo_pixel_mask;

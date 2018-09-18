@@ -28,6 +28,8 @@
 #include "config.h"
 #if CONFIG_ZLIB
 #include <zlib.h>
+#include <libavutil/internal.h>
+
 #endif
 
 #include "libavutil/imgutils.h"

@@ -26,6 +26,7 @@
  * @see http://wiki.multimedia.cx/index.php?title=FunCom_ISS
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/channel_layout.h"
 #include "avformat.h"
 #include "internal.h"

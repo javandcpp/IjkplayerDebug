@@ -23,6 +23,7 @@
 
 #include <linux/videodev2.h>
 #include <sys/ioctl.h>
+#include <libavutil/internal.h>
 #include "libavutil/pixfmt.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/opt.h"

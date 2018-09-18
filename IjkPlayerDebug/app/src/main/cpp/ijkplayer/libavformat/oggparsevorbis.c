@@ -23,6 +23,7 @@
  */
 
 #include <stdlib.h>
+#include <libavutil/internal.h>
 
 #include "libavutil/avstring.h"
 #include "libavutil/base64.h"

@@ -191,7 +191,7 @@ void avcodec_register_all(void)
     REGISTER_ENCDEC (FLASHSV,           flashsv);
     REGISTER_ENCDEC (FLASHSV2,          flashsv2);
     REGISTER_DECODER(FLIC,              flic);
-    REGISTER_ENCDEC (FLV,               flv);
+//    REGISTER_ENCDEC (FLV,               flv);
     REGISTER_DECODER(FMVC,              fmvc);
     REGISTER_DECODER(FOURXM,            fourxm);
     REGISTER_DECODER(FRAPS,             fraps);
@@ -199,10 +199,10 @@ void avcodec_register_all(void)
     REGISTER_DECODER(G2M,               g2m);
     REGISTER_ENCDEC (GIF,               gif);
     REGISTER_ENCDEC (H261,              h261);
-    REGISTER_ENCDEC (H263,              h263);
+//    REGISTER_ENCDEC (H263,              h263);
     REGISTER_DECODER(H263I,             h263i);
     REGISTER_ENCDEC (H263P,             h263p);
-    REGISTER_DECODER(H264,              h264);
+//    REGISTER_DECODER(H264,              h264);
     REGISTER_DECODER(H264_CRYSTALHD,    h264_crystalhd);
     REGISTER_DECODER(H264_MEDIACODEC,   h264_mediacodec);
     REGISTER_DECODER(H264_MMAL,         h264_mmal);
@@ -212,7 +212,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER(H264_VDPAU,        h264_vdpau);
 #endif
     REGISTER_ENCDEC (HAP,               hap);
-    REGISTER_DECODER(HEVC,              hevc);
+//    REGISTER_DECODER(HEVC,              hevc);
     REGISTER_DECODER(HEVC_QSV,          hevc_qsv);
     REGISTER_DECODER(HNM4_VIDEO,        hnm4_video);
     REGISTER_DECODER(HQ_HQA,            hq_hqa);
@@ -676,8 +676,8 @@ void avcodec_register_all(void)
     REGISTER_DECODER(VP9_MEDIACODEC,    vp9_mediacodec);
 
     /* parsers */
-    REGISTER_PARSER(AAC,                aac);
-    REGISTER_PARSER(AAC_LATM,           aac_latm);
+//    REGISTER_PARSER(AAC,                aac);
+//    REGISTER_PARSER(AAC_LATM,           aac_latm);
     REGISTER_PARSER(AC3,                ac3);
     REGISTER_PARSER(ADX,                adx);
     REGISTER_PARSER(BMP,                bmp);
@@ -691,11 +691,11 @@ void avcodec_register_all(void)
     REGISTER_PARSER(DVBSUB,             dvbsub);
     REGISTER_PARSER(DVDSUB,             dvdsub);
     REGISTER_PARSER(DVD_NAV,            dvd_nav);
-    REGISTER_PARSER(FLAC,               flac);
+//    REGISTER_PARSER(FLAC,               flac);
     REGISTER_PARSER(G729,               g729);
     REGISTER_PARSER(GSM,                gsm);
     REGISTER_PARSER(H261,               h261);
-    REGISTER_PARSER(H263,               h263);
+//    REGISTER_PARSER(H263,               h263);
     REGISTER_PARSER(H264,               h264);
     REGISTER_PARSER(HEVC,               hevc);
     REGISTER_PARSER(MJPEG,              mjpeg);

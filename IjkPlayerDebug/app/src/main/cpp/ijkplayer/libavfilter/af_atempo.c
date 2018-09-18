@@ -53,7 +53,7 @@
 /**
  * A fragment of audio waveform
  */
-typedef struct AudioFragment {
+typedef struct {
     // index of the first sample of this fragment in the overall waveform;
     // 0: input sample position
     // 1: output sample position
@@ -84,7 +84,7 @@ typedef enum {
 /**
  * Filter state machine
  */
-typedef struct ATempoContext {
+typedef struct {
     const AVClass *class;
 
     // ring-buffer of input samples, necessary because some times
@@ -153,7 +153,7 @@ typedef struct ATempoContext {
 
 static const AVOption atempo_options[] = {
     { "tempo", "set tempo scale factor",
-      OFFSET(tempo), AV_OPT_TYPE_DOUBLE, { .dbl = 1.0 }, 0.5, 100.0,
+      OFFSET(tempo), AV_OPT_TYPE_DOUBLE, { .dbl = 1.0 }, 0.5, 2.0,
       AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_FILTERING_PARAM },
     { NULL }
 };
@@ -279,8 +279,8 @@ static int yae_reset(ATempoContext *atempo,
     // initialize audio fragment buffers:
     RE_MALLOC_OR_FAIL(atempo->frag[0].data, atempo->window * atempo->stride);
     RE_MALLOC_OR_FAIL(atempo->frag[1].data, atempo->window * atempo->stride);
-    RE_MALLOC_OR_FAIL(atempo->frag[0].xdat, atempo->window * sizeof(struct  FFTComplex));
-    RE_MALLOC_OR_FAIL(atempo->frag[1].xdat, atempo->window * sizeof(struct  FFTComplex));
+    RE_MALLOC_OR_FAIL(atempo->frag[0].xdat, atempo->window * sizeof(FFTComplex));
+    RE_MALLOC_OR_FAIL(atempo->frag[1].xdat, atempo->window * sizeof(FFTComplex));
 
     // initialize rDFT contexts:
     av_rdft_end(atempo->real_to_complex);
@@ -301,7 +301,7 @@ static int yae_reset(ATempoContext *atempo,
         return AVERROR(ENOMEM);
     }
 
-    RE_MALLOC_OR_FAIL(atempo->correlation, atempo->window * sizeof(struct  FFTComplex));
+    RE_MALLOC_OR_FAIL(atempo->correlation, atempo->window * sizeof(FFTComplex));
 
     atempo->ring = atempo->window * 3;
     RE_MALLOC_OR_FAIL(atempo->buffer, atempo->ring * atempo->stride);
@@ -404,7 +404,7 @@ static void yae_downmix(ATempoContext *atempo, AudioFragment *frag)
     const uint8_t *src = frag->data;
 
     // init complex data buffer used for FFT and Correlation:
-    memset(frag->xdat, 0, sizeof(struct  FFTComplex) * atempo->window);
+    memset(frag->xdat, 0, sizeof(FFTComplex) * atempo->window);
 
     if (atempo->format == AV_SAMPLE_FMT_U8) {
         yae_init_xdat(uint8_t, 127);
@@ -439,8 +439,8 @@ static int yae_load_data(ATempoContext *atempo,
         return 0;
     }
 
-    // samples are not expected to be skipped, unless tempo is greater than 2:
-    av_assert0(read_size <= atempo->ring || atempo->tempo > 2.0);
+    // samples are not expected to be skipped:
+    av_assert0(read_size <= atempo->ring);
 
     while (atempo->position[0] < stop_here && src < src_end) {
         int src_samples = (src_end - src) / atempo->stride;
@@ -605,11 +605,11 @@ static void yae_advance_to_next_frag(ATempoContext *atempo)
  */
 static void yae_xcorr_via_rdft(FFTSample *xcorr,
                                RDFTContext *complex_to_real,
-                               const struct  FFTComplex *xa,
-                               const struct  FFTComplex *xb,
+                               const FFTComplex *xa,
+                               const FFTComplex *xb,
                                const int window)
 {
-    struct  FFTComplex *xc = (struct  FFTComplex *)xcorr;
+    FFTComplex *xc = (FFTComplex *)xcorr;
     int i;
 
     // NOTE: first element requires special care -- Given Y = rDFT(X),
@@ -655,8 +655,8 @@ static int yae_align(AudioFragment *frag,
 
     yae_xcorr_via_rdft(correlation,
                        complex_to_real,
-                       (const struct  FFTComplex *)prev->xdat,
-                       (const struct  FFTComplex *)frag->xdat,
+                       (const FFTComplex *)prev->xdat,
+                       (const FFTComplex *)frag->xdat,
                        window);
 
     // identify search window boundaries:
@@ -697,11 +697,11 @@ static int yae_adjust_position(ATempoContext *atempo)
     AudioFragment       *frag = yae_curr_frag(atempo);
 
     const double prev_output_position =
-        (double)(prev->position[1] - atempo->origin[1] + atempo->window / 2) *
-        atempo->tempo;
+        (double)(prev->position[1] - atempo->origin[1] + atempo->window / 2);
 
     const double ideal_output_position =
-        (double)(prev->position[0] - atempo->origin[0] + atempo->window / 2);
+        (double)(prev->position[0] - atempo->origin[0] + atempo->window / 2) /
+        atempo->tempo;
 
     const int drift = (int)(prev_output_position - ideal_output_position);
 
@@ -914,11 +914,6 @@ static int yae_flush(ATempoContext *atempo,
 
     atempo->state = YAE_FLUSH_OUTPUT;
 
-    if (!atempo->nfrag) {
-        // there is nothing to flush:
-        return 0;
-    }
-
     if (atempo->position[0] == frag->position[0] + frag->nsamples &&
         atempo->position[1] == frag->position[1] + frag->nsamples) {
         // the current fragment is already flushed:
@@ -1019,7 +1014,7 @@ static int query_formats(AVFilterContext *ctx)
     };
     int ret;
 
-    layouts = ff_all_channel_counts();
+    layouts = ff_all_channel_layouts();
     if (!layouts) {
         return AVERROR(ENOMEM);
     }
@@ -1095,10 +1090,8 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *src_buffer)
     while (src < src_end) {
         if (!atempo->dst_buffer) {
             atempo->dst_buffer = ff_get_audio_buffer(outlink, n_out);
-            if (!atempo->dst_buffer) {
-                av_frame_free(&src_buffer);
+            if (!atempo->dst_buffer)
                 return AVERROR(ENOMEM);
-            }
             av_frame_copy_props(atempo->dst_buffer, src_buffer);
 
             atempo->dst = atempo->dst_buffer->data[0];
@@ -1153,8 +1146,6 @@ static int request_frame(AVFilterLink *outlink)
 
             if (n_out) {
                 ret = push_samples(atempo, outlink, n_out);
-                if (ret < 0)
-                    return ret;
             }
         }
 

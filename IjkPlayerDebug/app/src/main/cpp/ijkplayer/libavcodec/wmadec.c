@@ -33,6 +33,7 @@
  * should be 4 extra bytes for v1 data and 6 extra bytes for v2 data.
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/attributes.h"
 #include "libavutil/ffmath.h"
 

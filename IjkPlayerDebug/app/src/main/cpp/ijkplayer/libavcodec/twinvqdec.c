@@ -21,6 +21,7 @@
 
 #include <math.h>
 #include <stdint.h>
+#include <libavutil/internal.h>
 
 #include "libavutil/channel_layout.h"
 #include "avcodec.h"

@@ -7,13 +7,13 @@
  * https://www.openssl.org/source/license.html
  */
 
-#include <openssl/crypto.h>
-#include <openssl/rand.h>
-#include <openssl/err.h>
+#include <../include/openssl/crypto.h>
+#include <../include/openssl/rand.h>
+#include <../include/openssl/err.h>
 #include "ssl_locl.h"
 
 #ifndef OPENSSL_NO_SRP
-# include <openssl/srp.h>
+# include <../include/openssl/srp.h>
 
 int SSL_CTX_SRP_CTX_free(struct ssl_ctx_st *ctx)
 {

@@ -10,8 +10,8 @@
 #include <stdio.h>
 #include <errno.h>
 #include "../ssl_locl.h"
-#include <openssl/evp.h>
-#include <openssl/buffer.h>
+#include <../openssl/include/openssl/evp.h>
+#include <../openssl/include/openssl/buffer.h>
 #include "record_locl.h"
 #include "../packet_locl.h"
 #include "internal/cryptlib.h"

@@ -21,6 +21,7 @@
  */
 
 #include <inttypes.h>
+#include <libavutil/internal.h>
 
 #include "libavutil/imgutils.h"
 #include "avcodec.h"

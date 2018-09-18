@@ -27,6 +27,7 @@
  *   http://www.pcisys.net/~melanson/codecs/
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/intreadwrite.h"
 #include "libavutil/intfloat.h"
 #include "libavcodec/internal.h"

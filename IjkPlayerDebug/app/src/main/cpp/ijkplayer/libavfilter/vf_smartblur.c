@@ -42,7 +42,7 @@
 #define THRESHOLD_MIN -30
 #define THRESHOLD_MAX 30
 
-typedef struct FilterParam {
+typedef struct {
     float              radius;
     float              strength;
     int                threshold;
@@ -50,7 +50,7 @@ typedef struct FilterParam {
     struct SwsContext *filter_context;
 } FilterParam;
 
-typedef struct SmartblurContext {
+typedef struct {
     const AVClass *class;
     FilterParam  luma;
     FilterParam  chroma;

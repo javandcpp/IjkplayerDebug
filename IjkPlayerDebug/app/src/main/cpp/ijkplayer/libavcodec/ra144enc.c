@@ -26,6 +26,7 @@
  */
 
 #include <float.h>
+#include <libavutil/internal.h>
 
 #include "avcodec.h"
 #include "audio_frame_queue.h"

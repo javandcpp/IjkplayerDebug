@@ -25,6 +25,9 @@
  * quarterpel DSP function templates
  */
 
+#include <libavutil/arm/intreadwrite.h>
+#include "rnd_avg.h"
+
 #define PIXOP2(OPNAME, OP)                                              \
 static inline void OPNAME ## _no_rnd_pixels8_l2_8(uint8_t *dst,         \
                                                   const uint8_t *src1,  \

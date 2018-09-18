@@ -24,6 +24,7 @@
  * Adobe Filmstrip demuxer
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/intreadwrite.h"
 #include "libavutil/imgutils.h"
 #include "avformat.h"

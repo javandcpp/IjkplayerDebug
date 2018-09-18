@@ -21,6 +21,7 @@
  */
 
 #include <stdarg.h>
+#include <libavutil/internal.h>
 #include "avcodec.h"
 #include "libavutil/avstring.h"
 #include "libavutil/bprint.h"

@@ -31,6 +31,7 @@
  * special FLIs from the PC games "Magic Carpet" and "X-COM: Terror from the Deep".
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/channel_layout.h"
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"

@@ -21,6 +21,7 @@
  */
 
 #include <stdio.h>
+#include <libavutil/internal.h>
 
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"

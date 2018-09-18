@@ -29,6 +29,7 @@
  */
 #include <time.h>
 #include <stdarg.h>
+#include <libavutil/internal.h>
 
 #include "avformat.h"
 #include "internal.h"

@@ -65,43 +65,43 @@ extern AVCodecParser ff_vp8_parser;
 extern AVCodecParser ff_vp9_parser;
 extern AVCodecParser ff_xma_parser;
 
-#include "libavcodec/parser_list.c"
-
-static AVOnce av_parser_next_init = AV_ONCE_INIT;
-
-static void av_parser_init_next(void)
-{
-    AVCodecParser *prev = NULL, *p;
-    int i = 0;
-    while ((p = (AVCodecParser*)parser_list[i++])) {
-        if (prev)
-            prev->next = p;
-        prev = p;
-    }
-}
-
-AVCodecParser *av_parser_next(const AVCodecParser *p)
-{
-    ff_thread_once(&av_parser_next_init, av_parser_init_next);
-
-    if (p)
-        return p->next;
-    else
-        return (AVCodecParser*)parser_list[0];
-}
-
-const AVCodecParser *av_parser_iterate(void **opaque)
-{
-    uintptr_t i = (uintptr_t)*opaque;
-    const AVCodecParser *p = parser_list[i];
-
-    if (p)
-        *opaque = (void*)(i + 1);
-
-    return p;
-}
-
-void av_register_codec_parser(AVCodecParser *parser)
-{
-    ff_thread_once(&av_parser_next_init, av_parser_init_next);
-}
+//#include "libavcodec/parser_list.c"
+//
+//static AVOnce av_parser_next_init = AV_ONCE_INIT;
+//
+//static void av_parser_init_next(void)
+//{
+//    AVCodecParser *prev = NULL, *p;
+//    int i = 0;
+//    while ((p = (AVCodecParser*)parser_list[i++])) {
+//        if (prev)
+//            prev->next = p;
+//        prev = p;
+//    }
+//}
+//
+//AVCodecParser *av_parser_next(const AVCodecParser *p)
+//{
+//    ff_thread_once(&av_parser_next_init, av_parser_init_next);
+//
+//    if (p)
+//        return p->next;
+//    else
+//        return (AVCodecParser*)parser_list[0];
+//}
+//
+//const AVCodecParser *av_parser_iterate(void **opaque)
+//{
+//    uintptr_t i = (uintptr_t)*opaque;
+//    const AVCodecParser *p = parser_list[i];
+//
+//    if (p)
+//        *opaque = (void*)(i + 1);
+//
+//    return p;
+//}
+//
+//void av_register_codec_parser(AVCodecParser *parser)
+//{
+//    ff_thread_once(&av_parser_next_init, av_parser_init_next);
+//}

@@ -36,7 +36,7 @@ typedef float FFTSample;
 
 typedef struct FFTComplex {
     FFTSample re, im;
-};
+} FFTComplex;
 
 typedef struct FFTContext FFTContext;
 
@@ -50,13 +50,13 @@ FFTContext *av_fft_init(int nbits, int inverse);
 /**
  * Do the permutation needed BEFORE calling ff_fft_calc().
  */
-void av_fft_permute(FFTContext *s, struct FFTComplex *z);
+void av_fft_permute(FFTContext *s, FFTComplex *z);
 
 /**
  * Do a complex FFT with the parameters defined in av_fft_init(). The
  * input data must be permuted before. No 1.0/sqrt(n) normalization is done.
  */
-void av_fft_calc(FFTContext *s, struct FFTComplex *z);
+void av_fft_calc(FFTContext *s, FFTComplex *z);
 
 void av_fft_end(FFTContext *s);
 

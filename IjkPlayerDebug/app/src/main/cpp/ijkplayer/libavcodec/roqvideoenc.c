@@ -55,6 +55,7 @@
  */
 
 #include <string.h>
+#include <libavutil/internal.h>
 
 #include "libavutil/attributes.h"
 #include "libavutil/opt.h"

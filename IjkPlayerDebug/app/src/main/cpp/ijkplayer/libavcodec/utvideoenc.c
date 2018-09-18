@@ -24,6 +24,7 @@
  * Ut Video encoder
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/opt.h"

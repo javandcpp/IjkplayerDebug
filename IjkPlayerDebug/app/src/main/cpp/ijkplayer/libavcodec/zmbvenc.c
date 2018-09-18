@@ -33,6 +33,7 @@
 #include "internal.h"
 
 #include <zlib.h>
+#include <libavutil/internal.h>
 
 #define ZMBV_KEYFRAME 1
 #define ZMBV_DELTAPAL 2

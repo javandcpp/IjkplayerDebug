@@ -24,6 +24,7 @@
  * X-Face decoder, based on libcompface, by James Ashton.
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/pixdesc.h"
 #include "avcodec.h"
 #include "bytestream.h"

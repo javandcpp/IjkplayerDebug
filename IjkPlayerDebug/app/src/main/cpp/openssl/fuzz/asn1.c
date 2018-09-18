@@ -17,21 +17,21 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <openssl/asn1.h>
-#include <openssl/asn1t.h>
-#include <openssl/dh.h>
-#include <openssl/ec.h>
-#include <openssl/ocsp.h>
-#include <openssl/pkcs12.h>
-#include <openssl/rsa.h>
-#include <openssl/ts.h>
-#include <openssl/x509v3.h>
-#include <openssl/cms.h>
-#include <openssl/err.h>
-#include <openssl/rand.h>
-#include <openssl/bio.h>
-#include <openssl/evp.h>
-#include <openssl/ssl.h>
+#include <../openssl/include/openssl/asn1.h>
+#include <../openssl/include/openssl/asn1t.h>
+#include <../openssl/include/openssl/dh.h>
+#include <../openssl/include/openssl/ec.h>
+#include <../openssl/include/openssl/ocsp.h>
+#include <../openssl/include/openssl/pkcs12.h>
+#include <../openssl/include/openssl/rsa.h>
+#include <../openssl/include/openssl/ts.h>
+#include <../openssl/include/openssl/x509v3.h>
+#include <../openssl/include/openssl/cms.h>
+#include <../openssl/include/openssl/err.h>
+#include <../openssl/include/openssl/rand.h>
+#include <../openssl/include/openssl/bio.h>
+#include <../openssl/include/openssl/evp.h>
+#include <../openssl/include/openssl/ssl.h>
 #include "fuzzer.h"
 
 #include "rand.inc"

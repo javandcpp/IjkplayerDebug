@@ -22,7 +22,7 @@
 #include "avfilter.h"
 #include "internal.h"
 
-typedef struct SeparateFieldsContext {
+typedef struct {
     int nb_planes;
     AVFrame *second;
 } SeparateFieldsContext;
@@ -118,13 +118,6 @@ static int request_frame(AVFilterLink *outlink)
     return ret;
 }
 
-static av_cold void uninit(AVFilterContext *ctx)
-{
-    SeparateFieldsContext *s = ctx->priv;
-
-    av_frame_free(&s->second);
-}
-
 static const AVFilterPad separatefields_inputs[] = {
     {
         .name         = "default",
@@ -148,7 +141,6 @@ AVFilter ff_vf_separatefields = {
     .name        = "separatefields",
     .description = NULL_IF_CONFIG_SMALL("Split input video frames into fields."),
     .priv_size   = sizeof(SeparateFieldsContext),
-    .uninit      = uninit,
     .inputs      = separatefields_inputs,
     .outputs     = separatefields_outputs,
 };

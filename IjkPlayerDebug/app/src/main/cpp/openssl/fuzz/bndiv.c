@@ -14,8 +14,8 @@
  */
 
 #include <stdio.h>
-#include <openssl/bn.h>
-#include <openssl/err.h>
+#include <../openssl/include/openssl/bn.h>
+#include <../openssl/include/openssl/err.h>
 #include "fuzzer.h"
 
 /* 256 kB */

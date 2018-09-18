@@ -10,17 +10,17 @@
 #ifndef HEADER_RSA_H
 # define HEADER_RSA_H
 
-# include <openssl/opensslconf.h>
+# include "opensslconf.h"
 
 # ifndef OPENSSL_NO_RSA
-# include <openssl/asn1.h>
-# include <openssl/bio.h>
-# include <openssl/crypto.h>
-# include <openssl/ossl_typ.h>
+# include "asn1.h"
+# include "bio.h"
+# include "crypto.h"
+# include "ossl_typ.h"
 # if OPENSSL_API_COMPAT < 0x10100000L
-#  include <openssl/bn.h>
+#  include "bn.h"
 # endif
-# include <openssl/rsaerr.h>
+# include "rsaerr.h"
 # ifdef  __cplusplus
 extern "C" {
 # endif

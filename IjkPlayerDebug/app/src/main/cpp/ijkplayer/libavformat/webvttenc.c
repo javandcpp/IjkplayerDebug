@@ -24,6 +24,7 @@
  * @see http://dev.w3.org/html5/webvtt/
  */
 
+#include <libavutil/internal.h>
 #include "avformat.h"
 #include "internal.h"
 

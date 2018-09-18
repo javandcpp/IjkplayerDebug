@@ -11,14 +11,14 @@
 
 #include <stdio.h>
 #include "ssl_locl.h"
-#include <openssl/objects.h>
-#include <openssl/x509v3.h>
-#include <openssl/rand.h>
-#include <openssl/ocsp.h>
-#include <openssl/dh.h>
-#include <openssl/engine.h>
-#include <openssl/async.h>
-#include <openssl/ct.h>
+#include <../include/openssl/objects.h>
+#include <../include/openssl/x509v3.h>
+#include <../include/openssl/rand.h>
+#include <../include/openssl/ocsp.h>
+#include <../include/openssl/dh.h>
+#include <../include/openssl/engine.h>
+#include <../include/openssl/async.h>
+#include <../include/openssl/ct.h>
 #include "internal/cryptlib.h"
 #include "internal/rand.h"
 #include "internal/refcount.h"

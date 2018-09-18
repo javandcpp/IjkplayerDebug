@@ -24,6 +24,7 @@
  * Microsoft Windows ICO demuxer
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/intreadwrite.h"
 #include "libavcodec/bytestream.h"
 #include "libavcodec/bmp.h"

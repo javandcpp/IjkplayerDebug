@@ -26,6 +26,7 @@
  * VC-1 and WMV3 decoder
  */
 
+#include <libavutil/internal.h>
 #include "avcodec.h"
 #include "blockdsp.h"
 #include "get_bits.h"

@@ -10,8 +10,8 @@
 #include "e_os.h"
 
 #include "internal/err.h"
-#include <openssl/crypto.h>
-#include <openssl/evp.h>
+#include <../include/openssl/crypto.h>
+#include <../include/openssl/evp.h>
 #include "ssl_locl.h"
 #include "internal/thread_once.h"
 

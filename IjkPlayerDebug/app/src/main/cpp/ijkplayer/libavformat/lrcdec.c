@@ -22,6 +22,7 @@
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
+#include <libavutil/internal.h>
 
 #include "avformat.h"
 #include "internal.h"

@@ -21,7 +21,7 @@
 #ifndef AVCODEC_QSV_H
 #define AVCODEC_QSV_H
 
-#include <mfx/mfxvideo.h>
+//#include <mfx/mfxvideo.h>
 
 #include "libavutil/buffer.h"
 
@@ -38,7 +38,7 @@ typedef struct AVQSVContext {
      * If non-NULL, the session to use for encoding or decoding.
      * Otherwise, libavcodec will try to create an internal session.
      */
-    mfxSession session;
+//    mfxSession session;
 
     /**
      * The IO pattern to use.
@@ -48,7 +48,7 @@ typedef struct AVQSVContext {
     /**
      * Extra buffers to pass to encoder or decoder initialization.
      */
-    mfxExtBuffer **ext_buffers;
+//    mfxExtBuffer **ext_buffers;
     int         nb_ext_buffers;
 
     /**

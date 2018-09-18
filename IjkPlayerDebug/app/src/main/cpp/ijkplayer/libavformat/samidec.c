@@ -24,6 +24,7 @@
  * @see http://msdn.microsoft.com/en-us/library/ms971327.aspx
  */
 
+#include <libavutil/internal.h>
 #include "avformat.h"
 #include "internal.h"
 #include "subtitles.h"

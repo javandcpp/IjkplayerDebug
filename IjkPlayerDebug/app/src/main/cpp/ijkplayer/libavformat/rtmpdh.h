@@ -36,8 +36,8 @@ typedef mpz_ptr FFBigNum;
 typedef gcry_mpi_t FFBigNum;
 
 #elif CONFIG_OPENSSL
-#include "../openssl/bn.h"
-#include "../openssl/dh.h"
+#include "../openssl/include/openssl/bn.h"
+#include "../openssl/include/openssl/dh.h"
 
 typedef BIGNUM *FFBigNum;
 #elif CONFIG_MBEDTLS

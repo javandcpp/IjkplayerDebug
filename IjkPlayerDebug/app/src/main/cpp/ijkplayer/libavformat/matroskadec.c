@@ -65,6 +65,7 @@
 #if CONFIG_ZLIB
 #include <zlib.h>
 #include <libavutil/internal.h>
+#include <libavutil/intmath.h>
 
 #endif
 

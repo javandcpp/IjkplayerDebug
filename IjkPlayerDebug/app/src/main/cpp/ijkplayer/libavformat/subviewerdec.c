@@ -24,6 +24,7 @@
  * @see https://en.wikipedia.org/wiki/SubViewer
  */
 
+#include <libavutil/internal.h>
 #include "avformat.h"
 #include "internal.h"
 #include "subtitles.h"

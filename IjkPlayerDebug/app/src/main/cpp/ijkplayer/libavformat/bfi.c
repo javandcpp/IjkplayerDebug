@@ -26,6 +26,7 @@
  * @see http://wiki.multimedia.cx/index.php?title=BFI
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/channel_layout.h"
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"

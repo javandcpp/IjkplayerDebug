@@ -31,6 +31,7 @@
 #include "internal.h"
 
 #include <zlib.h>
+#include <libavutil/internal.h>
 
 typedef struct WCMVContext {
     int         bpp;

@@ -27,6 +27,7 @@
  *   http://www.csse.monash.edu.au/~timf/
  */
 
+#include <libavutil/internal.h>
 #include "libavutil/channel_layout.h"
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"

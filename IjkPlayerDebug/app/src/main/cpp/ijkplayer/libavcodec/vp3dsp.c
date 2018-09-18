@@ -24,6 +24,8 @@
  * source code.
  */
 
+#include <config.h>
+#include <libavutil/internal.h>
 #include "libavutil/attributes.h"
 #include "libavutil/common.h"
 #include "libavutil/intreadwrite.h"

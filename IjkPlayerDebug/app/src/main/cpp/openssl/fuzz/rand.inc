@@ -7,7 +7,7 @@
  * https://www.openssl.org/source/license.html
  * or in the file LICENSE in the source distribution.
  */
-#include <openssl/rand.h>
+#include <../openssl/include/openssl/rand.h>
 
 static int fuzz_bytes(unsigned char *buf, int num)
 {

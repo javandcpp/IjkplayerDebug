@@ -58,6 +58,12 @@ static int query_formats(AVFilterContext *ctx)
     return ff_set_common_formats(ctx, pix_fmts);
 }
 
+static int filter_frame(AVFilterLink *inlink, AVFrame *in)
+{
+    StackContext *s = inlink->dst->priv;
+    return ff_framesync_filter_frame(&s->fs, inlink, in);
+}
+
 static av_cold int init(AVFilterContext *ctx)
 {
     StackContext *s = ctx->priv;
@@ -77,6 +83,7 @@ static av_cold int init(AVFilterContext *ctx)
         pad.name = av_asprintf("input%d", i);
         if (!pad.name)
             return AVERROR(ENOMEM);
+        pad.filter_frame = filter_frame;
 
         if ((ret = ff_insert_inpad(ctx, i, &pad)) < 0) {
             av_freep(&pad.name);
@@ -105,7 +112,6 @@ static int process_frame(FFFrameSync *fs)
     if (!out)
         return AVERROR(ENOMEM);
     out->pts = av_rescale_q(s->fs.pts, s->fs.time_base, outlink->time_base);
-    out->sample_aspect_ratio = outlink->sample_aspect_ratio;
 
     for (i = 0; i < s->nb_inputs; i++) {
         AVFilterLink *inlink = ctx->inputs[i];
@@ -148,7 +154,6 @@ static int config_output(AVFilterLink *outlink)
     StackContext *s = ctx->priv;
     AVRational time_base = ctx->inputs[0]->time_base;
     AVRational frame_rate = ctx->inputs[0]->frame_rate;
-    AVRational sar = ctx->inputs[0]->sample_aspect_ratio;
     int height = ctx->inputs[0]->h;
     int width = ctx->inputs[0]->w;
     FFFrameSyncIn *in;
@@ -181,7 +186,6 @@ static int config_output(AVFilterLink *outlink)
     outlink->h          = height;
     outlink->time_base  = time_base;
     outlink->frame_rate = frame_rate;
-    outlink->sample_aspect_ratio = sar;
 
     if ((ret = ff_framesync_init(&s->fs, ctx, s->nb_inputs)) < 0)
         return ret;
@@ -202,6 +206,12 @@ static int config_output(AVFilterLink *outlink)
     return ff_framesync_configure(&s->fs);
 }
 
+static int request_frame(AVFilterLink *outlink)
+{
+    StackContext *s = outlink->src->priv;
+    return ff_framesync_request_frame(&s->fs, outlink);
+}
+
 static av_cold void uninit(AVFilterContext *ctx)
 {
     StackContext *s = ctx->priv;
@@ -212,12 +222,6 @@ static av_cold void uninit(AVFilterContext *ctx)
 
     for (i = 0; i < ctx->nb_inputs; i++)
         av_freep(&ctx->input_pads[i].name);
-}
-
-static int activate(AVFilterContext *ctx)
-{
-    StackContext *s = ctx->priv;
-    return ff_framesync_activate(&s->fs);
 }
 
 #define OFFSET(x) offsetof(StackContext, x)
@@ -233,6 +237,7 @@ static const AVFilterPad outputs[] = {
         .name          = "default",
         .type          = AVMEDIA_TYPE_VIDEO,
         .config_props  = config_output,
+        .request_frame = request_frame,
     },
     { NULL }
 };
@@ -251,7 +256,6 @@ AVFilter ff_vf_hstack = {
     .outputs       = outputs,
     .init          = init,
     .uninit        = uninit,
-    .activate      = activate,
     .flags         = AVFILTER_FLAG_DYNAMIC_INPUTS,
 };
 
@@ -271,7 +275,6 @@ AVFilter ff_vf_vstack = {
     .outputs       = outputs,
     .init          = init,
     .uninit        = uninit,
-    .activate      = activate,
     .flags         = AVFILTER_FLAG_DYNAMIC_INPUTS,
 };
 

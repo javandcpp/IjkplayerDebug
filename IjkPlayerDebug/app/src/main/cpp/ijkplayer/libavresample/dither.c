@@ -30,6 +30,7 @@
 
 #include <math.h>
 #include <stdint.h>
+#include <config.h>
 
 #include "libavutil/attributes.h"
 #include "libavutil/common.h"

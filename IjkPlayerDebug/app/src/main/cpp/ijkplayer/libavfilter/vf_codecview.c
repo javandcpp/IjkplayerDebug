@@ -44,7 +44,7 @@
 #define FRAME_TYPE_P (1<<1)
 #define FRAME_TYPE_B (1<<2)
 
-typedef struct CodecViewContext {
+typedef struct {
     const AVClass *class;
     unsigned mv;
     unsigned frame_type;

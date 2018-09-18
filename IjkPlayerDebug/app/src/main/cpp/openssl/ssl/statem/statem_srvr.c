@@ -13,15 +13,15 @@
 #include "../ssl_locl.h"
 #include "statem_locl.h"
 #include "internal/constant_time_locl.h"
-#include <openssl/buffer.h>
-#include <openssl/rand.h>
-#include <openssl/objects.h>
-#include <openssl/evp.h>
-#include <openssl/hmac.h>
-#include <openssl/x509.h>
-#include <openssl/dh.h>
-#include <openssl/bn.h>
-#include <openssl/md5.h>
+#include <../openssl/include/openssl/buffer.h>
+#include <../openssl/include/openssl/rand.h>
+#include <../openssl/include/openssl/objects.h>
+#include <../openssl/include/openssl/evp.h>
+#include <../openssl/include/openssl/hmac.h>
+#include <../openssl/include/openssl/x509.h>
+#include <../openssl/include/openssl/dh.h>
+#include <../openssl/include/openssl/bn.h>
+#include <../openssl/include/openssl/md5.h>
 
 static int tls_construct_encrypted_extensions(SSL *s, WPACKET *pkt);
 static int tls_construct_hello_retry_request(SSL *s, WPACKET *pkt);

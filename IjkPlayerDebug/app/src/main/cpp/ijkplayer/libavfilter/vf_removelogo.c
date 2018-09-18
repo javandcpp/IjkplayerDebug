@@ -79,7 +79,7 @@
 #include "lavfutils.h"
 #include "lswsutils.h"
 
-typedef struct RemovelogoContext {
+typedef struct {
     const AVClass *class;
     char *filename;
     /* Stores our collection of masks. The first is for an array of

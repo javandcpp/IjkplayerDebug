@@ -24,6 +24,7 @@
  */
 
 #include <inttypes.h>
+#include <libavutil/internal.h>
 
 #include "libavutil/bswap.h"
 #include "libavutil/channel_layout.h"
