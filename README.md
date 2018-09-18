@@ -1,2 +1,5 @@
-# IjkplayerDebug
-ijkplayer debug版本(native层调试)：  ijkplayer+openssl
+# Ijkplayer
+
+Android Studio Project:
+
+ijkplayer(native层debug调试)：  ijkplayer+openssl
