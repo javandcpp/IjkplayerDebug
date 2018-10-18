@@ -315,7 +315,7 @@
 //        ret = AVERROR(ENOMEM);
 //        goto error;
 //    }
-//    glyph->code  = code;
+//    glyph->code  = code;g
 //
 //    if (FT_Get_Glyph(s->face->glyph, &glyph->glyph)) {
 //        ret = AVERROR(EINVAL);
