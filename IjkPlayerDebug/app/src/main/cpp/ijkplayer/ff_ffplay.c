@@ -48,6 +48,7 @@
 #include "libavutil/avassert.h"
 #include "libavutil/time.h"
 #include "libavformat/avformat.h"
+#include "ksdebug.h"
 #if CONFIG_AVDEVICE
 #include "libavdevice/avdevice.h"
 #endif
@@ -76,6 +77,8 @@
 #include <stdatomic.h>
 #if defined(__ANDROID__)
 #include "ijksoundtouch_wrap.h"
+#include <android/log.h>
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,"debug log jni" ,__VA_ARGS__)
 #endif
 
 #ifndef AV_CODEC_FLAG2_FAST
@@ -253,6 +256,14 @@ static void packet_queue_flush(PacketQueue *q)
     q->duration = 0;
     SDL_UnlockMutex(q->mutex);
 }
+
+
+static void ksDebugMethod(char *result){
+#if defined(__ANDROID__)
+    LOGE("ksDebug log:%s",result);
+#endif
+}
+
 
 static void packet_queue_destroy(PacketQueue *q)
 {
@@ -3121,7 +3132,7 @@ static int read_thread(void *arg)
         av_dict_set_int(&ic->metadata, "skip-calc-frame-rate", ffp->skip_calc_frame_rate, 0);
         av_dict_set_int(&ffp->format_opts, "skip-calc-frame-rate", ffp->skip_calc_frame_rate, 0);
     }
-
+    setKsDebugCallback(ksDebugMethod);
     if (ffp->iformat_name)
         is->iformat = av_find_input_format(ffp->iformat_name);
     err = avformat_open_input(&ic, is->filename, is->iformat, &ffp->format_opts);
