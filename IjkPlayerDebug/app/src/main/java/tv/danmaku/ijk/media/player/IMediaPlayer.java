@@ -143,6 +143,8 @@ public interface IMediaPlayer {
 
     void setOnTimedTextListener(OnTimedTextListener listener);
 
+    void setIpFindListener(OnIpFindListener listener);
+
     /*--------------------
      * Listeners
      */

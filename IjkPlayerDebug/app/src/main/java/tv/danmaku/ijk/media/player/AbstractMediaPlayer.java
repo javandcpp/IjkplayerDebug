@@ -29,6 +29,7 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
     private OnErrorListener mOnErrorListener;
     private OnInfoListener mOnInfoListener;
     private OnTimedTextListener mOnTimedTextListener;
+    protected OnIpFindListener mOnIpFindListener;
 
     public final void setOnPreparedListener(OnPreparedListener listener) {
         mOnPreparedListener = listener;
@@ -62,6 +63,10 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
 
     public final void setOnTimedTextListener(OnTimedTextListener listener) {
         mOnTimedTextListener = listener;
+    }
+
+    public final void setIpFindListener(OnIpFindListener listener){
+        mOnIpFindListener=listener;
     }
 
     public void resetListeners() {
@@ -113,6 +118,12 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
     protected final void notifyOnTimedText(IjkTimedText text) {
         if (mOnTimedTextListener != null)
             mOnTimedTextListener.onTimedText(this, text);
+    }
+
+    protected final void notifyIpFind(String msg){
+        if(null!=mOnIpFindListener){
+            mOnIpFindListener.ipHostFind(msg);
+        }
     }
 
     public void setDataSource(IMediaDataSource mediaDataSource) {

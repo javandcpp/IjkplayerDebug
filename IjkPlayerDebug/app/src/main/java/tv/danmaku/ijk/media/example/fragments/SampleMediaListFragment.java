@@ -68,6 +68,7 @@ public class SampleMediaListFragment extends Fragment {
             }
         });
 
+        mAdapter.addItem("https://cdn.kaishuhezi.com/kstory/microcourse/video/8421be02-88a8-4a2f-8f26-25db1ff1785b.mp4","学画圆圈图");
 //        mAdapter.addItem("https://cdn.kaishuhezi.com/mcourse/camp/video/34d5b658-64a7-400b-b3bd-a167539a72ef.mp4","机械拼插00");
 //        mAdapter.addItem("https://cdn.kaishuhezi.com/mcourse/camp/video/c71fdcd3-d237-4145-b4e5-41e25292bfe3.mp4","机械拼插01");
 //        mAdapter.addItem("https://cdn.kaishuhezi.com/mcourse/camp/video/db317dbd-c677-4d7d-a3f9-5f29a3a4c2de.mp4","机械拼插02");

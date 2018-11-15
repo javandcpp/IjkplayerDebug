@@ -298,6 +298,11 @@ public class MediaPlayerProxy implements IMediaPlayer {
     }
 
     @Override
+    public void setIpFindListener(OnIpFindListener listener) {
+
+    }
+
+    @Override
     public void setAudioStreamType(int streamtype) {
         mBackEndMediaPlayer.setAudioStreamType(streamtype);
     }
