@@ -15,8 +15,6 @@ void IDemux::main() {
 //        }
         if (data.size > 0) {
             notifyObserver(data);
-        } else {
-            isExit=true;
         }
     }
 }

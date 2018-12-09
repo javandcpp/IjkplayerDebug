@@ -8,12 +8,17 @@
 
 #include "decode/FFmpegDecode.h"
 #include "demux/FFmpegDemux.h"
+#include "encode/AudioEncoder.h"
 #include <mutex>
+using namespace std;
 class VideoCompressComponent{
 private:
     FFmpegDemux *mDemux= nullptr;
-    FFmpegDecode *mFfmpegDecode= nullptr;
-    mutex mtx;
+    FFmpegDecode *mVideoFfmpegDecode= nullptr;
+    FFmpegDecode *mAudioFfmpegDecode= nullptr;
+    AudioEncoder *audioEncoder= nullptr;
+
+    mutable mutex mut;
     
 public:
 
@@ -23,9 +28,12 @@ public:
     bool initialize();
 
     FFmpegDemux* getDemux();
-    FFmpegDecode* getDecode();
+    FFmpegDecode* getVideoDecode();
+    FFmpegDecode* getAudioDecode();
+    AudioEncoder* getAudioEncode();
 
     bool openSource(const char *url);
+
 
 };
 

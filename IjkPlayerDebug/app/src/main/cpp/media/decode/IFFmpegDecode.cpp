@@ -42,6 +42,12 @@ void IFFmpegDecode::main() {
                 AVData frame = this->receiveFrame();
                 if (!frame.data) break;
                 //XLOGE("RecvFrame %d",frame.size);
+                if(frame.isAudio){
+                    LOGD("is Audio true");
+                }else{
+                    LOGD("is Audio false");
+                }
+
                 pts = frame.pts;
 
                 //发送数据给观察者

@@ -27,8 +27,8 @@ bool FFmpegDecode::openCodec(AVParameters parameters) {
     }
     AVCodec *codec = NULL;
     if (parameters.codecParameters->codec_type == AVMEDIA_TYPE_VIDEO) {
-//        codec = avcodec_find_decoder_by_name("h264_mediacodec");
-        codec = avcodec_find_decoder(parameters.codecParameters->codec_id);
+        codec = avcodec_find_decoder_by_name("h264_mediacodec");
+//        codec = avcodec_find_decoder(parameters.codecParameters->codec_id);
     } else {
         codec = avcodec_find_decoder(parameters.codecParameters->codec_id);
     }
@@ -131,12 +131,14 @@ AVData FFmpegDecode::receiveFrame() {
         //样本字节数 * 单通道样本数 * 通道数
         avData.size =
                 av_get_bytes_per_sample((AVSampleFormat) avFrame->format) * avFrame->nb_samples * 2;
+        avData.isAudio=true;
 
     } else if (codecContext->codec_type == AVMEDIA_TYPE_VIDEO) {
         avData.size = (avFrame->linesize[0] + avFrame->linesize[1] + avFrame->linesize[2]) *
                       avFrame->height;
         avData.width = avFrame->width;
         avData.height = avFrame->height;
+        avData.isAudio=false;
     }
 
     avData.format = avFrame->format;

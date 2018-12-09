@@ -2,12 +2,12 @@
 #include <jni.h>
 #include "global_header.h"
 #include "VideoCompressComponent.h"
+
 using namespace std;
 mutex mtx;
 
-VideoCompressComponent *videoCompressComponent=NULL;
+VideoCompressComponent *videoCompressComponent = NULL;
 static int init;
-
 
 
 extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
@@ -32,12 +32,22 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
 
     mtx.lock();
     const char *url = env->GetStringUTFChars(url_, 0);
-    videoCompressComponent=new VideoCompressComponent();
-    if(videoCompressComponent){
+    videoCompressComponent = new VideoCompressComponent();
+    if (videoCompressComponent) {
         videoCompressComponent->initialize();
         videoCompressComponent->openSource(url);
-        videoCompressComponent->getDemux()->startThread();
+        FFmpegDemux *pDemux = videoCompressComponent->getDemux();
+        //打开音视频解码器
+        videoCompressComponent->getAudioDecode()->openCodec(*(pDemux->getAudioParameters()));
+        videoCompressComponent->getVideoDecode()->openCodec(*(pDemux->getVideoParamters()));
 
+//        videoCompressComponent->getAudioDecode()->startThread();
+//        videoCompressComponent->getVideoDecode()->startThread();
+
+        //打开音频编码
+        videoCompressComponent->getAudioEncode()->InitEncode(videoCompressComponent->getDemux()->getAudioParameters()->codecParameters);
+        //开始解复用
+//        videoCompressComponent->getDemux()->startThread();
     }
 
     env->ReleaseStringUTFChars(url_, url);

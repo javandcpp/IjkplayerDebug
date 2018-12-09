@@ -109,7 +109,7 @@ AVData FFmpegDemux::readMediaData() {
     pkt->dts = pkt->dts * (1000 * r2d(avFormatContext->streams[pkt->stream_index]->time_base));
     avData.pts = (int) pkt->pts;
     LOGD("read media data size:%d", avData.size);
-    LOGD("pts:%lud", pkt->pts);
+    LOGD("pts:%lld", pkt->pts);
     return avData;
 }
 
