@@ -53,6 +53,11 @@ public class TextureMediaPlayer extends MediaPlayerProxy implements IMediaPlayer
     }
 
     @Override
+    public void setOnExtraInfoListener(OnExtraInfoListener listener) {
+
+    }
+
+    @Override
     public void release() {
         super.release();
         releaseSurfaceTexture();

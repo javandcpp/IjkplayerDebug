@@ -283,6 +283,11 @@ public class MediaPlayerProxy implements IMediaPlayer {
     }
 
     @Override
+    public void setOnExtraInfoListener(OnExtraInfoListener listener) {
+
+    }
+
+    @Override
     public void setOnTimedTextListener(OnTimedTextListener listener) {
         if (listener != null) {
             final OnTimedTextListener finalListener = listener;
@@ -296,6 +301,15 @@ public class MediaPlayerProxy implements IMediaPlayer {
             mBackEndMediaPlayer.setOnTimedTextListener(null);
         }
     }
+
+    @Override
+    public void setIpFindListener(OnIpFindListener onIpFindListener) {
+    }
+
+//    @Override
+//    public void setIpFindListener(OnIpFindListener listener) {
+//
+//    }
 
     @Override
     public void setAudioStreamType(int streamtype) {

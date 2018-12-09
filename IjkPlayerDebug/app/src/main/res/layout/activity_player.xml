@@ -48,6 +48,14 @@
             tools:context=".toolbar_widget" />
     </FrameLayout>
 
+    <TextView
+        android:id="@+id/iptv"
+        android:layout_width="wrap_content"
+        android:layout_margin="20dp"
+        android:textColor="#FFFFFF"
+        android:textSize="17sp"
+        android:layout_height="wrap_content" />
+
     <!-- The navigation drawer -->
     <FrameLayout android:id="@+id/right_drawer"
         android:layout_width="240dp"

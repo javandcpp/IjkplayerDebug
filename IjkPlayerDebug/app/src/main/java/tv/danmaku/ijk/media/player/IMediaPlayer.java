@@ -68,6 +68,10 @@ public interface IMediaPlayer {
     int MEDIA_ERROR_UNSUPPORTED = -1010;
     int MEDIA_ERROR_TIMED_OUT = -110;
 
+
+
+
+
     void setDisplay(SurfaceHolder sh);
 
     void setDataSource(Context context, Uri uri)
@@ -141,11 +145,16 @@ public interface IMediaPlayer {
 
     void setOnInfoListener(OnInfoListener listener);
 
+    void setOnExtraInfoListener(OnExtraInfoListener listener);
+
     void setOnTimedTextListener(OnTimedTextListener listener);
+
+    void setIpFindListener(OnIpFindListener onIpFindListener);
 
     /*--------------------
      * Listeners
      */
+
     interface OnPreparedListener {
         void onPrepared(IMediaPlayer mp);
     }
@@ -173,6 +182,10 @@ public interface IMediaPlayer {
 
     interface OnInfoListener {
         boolean onInfo(IMediaPlayer mp, int what, int extra);
+    }
+
+    interface OnExtraInfoListener {
+        boolean onExtraInfo(IMediaPlayer mp, int what, int extra, String str);
     }
 
     interface OnTimedTextListener {

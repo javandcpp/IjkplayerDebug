@@ -25,6 +25,9 @@
 #include "ijkplayer_internal.h"
 #include "ijkversion.h"
 
+
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,"debug log jni" ,__VA_ARGS__)
+
 #define MP_RET_IF_FAILED(ret) \
     do { \
         int retval = ret; \
@@ -692,8 +695,13 @@ int ijkmp_get_msg(IjkMediaPlayer *mp, AVMessage *msg, int block)
     while (1) {
         int continue_wait_next_msg = 0;
         int retval = msg_queue_get(&mp->ffplayer->msg_queue, msg, block);
+
+        LOGE("msg.what:%d  retval:%d",msg->what,retval);
+
         if (retval <= 0)
             return retval;
+
+
 
         switch (msg->what) {
         case FFP_MSG_PREPARED:
@@ -786,6 +794,7 @@ int ijkmp_get_msg(IjkMediaPlayer *mp, AVMessage *msg, int block)
             pthread_mutex_unlock(&mp->mutex);
             break;
         }
+
         if (continue_wait_next_msg) {
             msg_free_res(msg);
             continue;
