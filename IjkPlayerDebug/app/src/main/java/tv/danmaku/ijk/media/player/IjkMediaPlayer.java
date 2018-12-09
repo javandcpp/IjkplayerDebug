@@ -187,7 +187,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
             return;
         }
 
-        //Log.i(TAG, "halimin2018 ==========> event: what=" + what + ", extra=" + extra + ", str=" + obj.toString());
 
         if (sp.mEventHandler != null) {
             Message m = sp.mEventHandler.obtainMessage(what, extra, reserved, obj);
@@ -195,31 +194,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         }
     }
 
-    /*
-    private class EventHandler extends Handler
-    {
-        private IjkMediaPlayer mIjkMediaPlayer;
 
-        public EventHandler(IjkMediaPlayer player, Looper looper)
-        {
-            super(looper);
-            mIjkMediaPlayer = player;
-        }
-
-        @Override
-        public void handleMessage(Message msg)
-        {
-            Log.i(TAG, "halimin2018 message: what=" + msg.what + ", extra=" + msg.arg1);
-
-            switch (msg.what)
-            {
-
-
-                default:
-                    break;
-            }
-        }
-    }*/
 
     /**
      * Default library loader
