@@ -59,6 +59,9 @@ file(GLOB native_soundtouchotherother_srcs "src/main/cpp/ijksoundtouch/source/So
 file(GLOB native_ijkprofsrcs "src/main/cpp/ijkprof/*.c")
 file(GLOB media_srcs_cpp "src/main/cpp/media/*.cpp")
 file(GLOB media_srcs_c "src/main/cpp/media/*.c")
+file(GLOB media_demux_cpp "src/main/cpp/media/demux/*.cpp")
+file(GLOB media_decode_cpp "src/main/cpp/media/decode/*.cpp")
+file(GLOB media_audio_cpp "src/main/cpp/media/audio/*.cpp")
 
 
 
@@ -88,6 +91,9 @@ add_library( # Sets the name of the library.
 
             ${media_srcs_c}
             ${media_srcs_cpp}
+            ${media_demux_cpp}
+            ${media_decode_cpp}
+            ${media_audio_cpp}
 
              )
 
