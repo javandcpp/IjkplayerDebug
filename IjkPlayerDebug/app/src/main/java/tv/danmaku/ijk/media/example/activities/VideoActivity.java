@@ -24,8 +24,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -33,20 +31,18 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
-import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 import tv.danmaku.ijk.media.example.R;
 import tv.danmaku.ijk.media.example.application.Settings;
 import tv.danmaku.ijk.media.example.content.RecentMediaStorage;
 import tv.danmaku.ijk.media.example.fragments.TracksFragment;
 import tv.danmaku.ijk.media.example.widget.media.AndroidMediaController;
 import tv.danmaku.ijk.media.example.widget.media.IjkVideoView;
-import tv.danmaku.ijk.media.example.widget.media.MeasureHelper;
+import tv.danmaku.ijk.media.player.IjkMediaPlayer;
+import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 
 public class VideoActivity extends AppCompatActivity implements TracksFragment.ITrackHolder {
     private static final String TAG = "VideoActivity";
@@ -181,49 +177,49 @@ public class VideoActivity extends AppCompatActivity implements TracksFragment.I
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_toggle_ratio) {
-            int aspectRatio = mVideoView.toggleAspectRatio();
-            String aspectRatioText = MeasureHelper.getAspectRatioText(this, aspectRatio);
-            mToastTextView.setText(aspectRatioText);
-            mMediaController.showOnce(mToastTextView);
-            return true;
-        } else if (id == R.id.action_toggle_player) {
-            int player = mVideoView.togglePlayer();
-            String playerText = IjkVideoView.getPlayerText(this, player);
-            mToastTextView.setText(playerText);
-            mMediaController.showOnce(mToastTextView);
-            return true;
-        } else if (id == R.id.action_toggle_render) {
-            int render = mVideoView.toggleRender();
-            String renderText = IjkVideoView.getRenderText(this, render);
-            mToastTextView.setText(renderText);
-            mMediaController.showOnce(mToastTextView);
-            return true;
-        } else if (id == R.id.action_show_info) {
-            mVideoView.showMediaInfo();
-        } else if (id == R.id.action_show_tracks) {
-            if (mDrawerLayout.isDrawerOpen(mRightDrawer)) {
-                Fragment f = getSupportFragmentManager().findFragmentById(R.id.right_drawer);
-                if (f != null) {
-                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.remove(f);
-                    transaction.commit();
-                }
-                mDrawerLayout.closeDrawer(mRightDrawer);
-            } else {
-                Fragment f = TracksFragment.newInstance();
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.right_drawer, f);
-                transaction.commit();
-                mDrawerLayout.openDrawer(mRightDrawer);
-            }
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//        if (id == R.id.action_toggle_ratio) {
+//            int aspectRatio = mVideoView.toggleAspectRatio();
+//            String aspectRatioText = MeasureHelper.getAspectRatioText(this, aspectRatio);
+//            mToastTextView.setText(aspectRatioText);
+//            mMediaController.showOnce(mToastTextView);
+//            return true;
+//        } else if (id == R.id.action_toggle_player) {
+//            int player = mVideoView.togglePlayer();
+//            String playerText = IjkVideoView.getPlayerText(this, player);
+//            mToastTextView.setText(playerText);
+//            mMediaController.showOnce(mToastTextView);
+//            return true;
+//        } else if (id == R.id.action_toggle_render) {
+//            int render = mVideoView.toggleRender();
+//            String renderText = IjkVideoView.getRenderText(this, render);
+//            mToastTextView.setText(renderText);
+//            mMediaController.showOnce(mToastTextView);
+//            return true;
+//        } else if (id == R.id.action_show_info) {
+//            mVideoView.showMediaInfo();
+//        } else if (id == R.id.action_show_tracks) {
+//            if (mDrawerLayout.isDrawerOpen(mRightDrawer)) {
+//                Fragment f = getSupportFragmentManager().findFragmentById(R.id.right_drawer);
+//                if (f != null) {
+//                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//                    transaction.remove(f);
+//                    transaction.commit();
+//                }
+//                mDrawerLayout.closeDrawer(mRightDrawer);
+//            } else {
+//                Fragment f = TracksFragment.newInstance();
+//                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//                transaction.replace(R.id.right_drawer, f);
+//                transaction.commit();
+//                mDrawerLayout.openDrawer(mRightDrawer);
+//            }
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
     @Override
     public ITrackInfo[] getTrackInfo() {

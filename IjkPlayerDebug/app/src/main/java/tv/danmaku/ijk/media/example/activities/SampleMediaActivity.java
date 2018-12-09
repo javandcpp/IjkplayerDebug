@@ -22,8 +22,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import tv.danmaku.ijk.media.example.R;
 import tv.danmaku.ijk.media.example.application.AppActivity;
@@ -50,16 +48,16 @@ public class SampleMediaActivity extends AppActivity  {
         transaction.commit();
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean show = super.onPrepareOptionsMenu(menu);
-        if (!show)
-            return show;
-
-        MenuItem item = menu.findItem(R.id.action_recent);
-        if (item != null)
-            item.setVisible(false);
-
-        return true;
-    }
+//    @Override
+//    public boolean onPrepareOptionsMenu(Menu menu) {
+//        boolean show = super.onPrepareOptionsMenu(menu);
+//        if (!show)
+//            return show;
+//
+//        MenuItem item = menu.findItem(R.id.action_recent);
+//        if (item != null)
+//            item.setVisible(false);
+//
+//        return true;
+//    }
 }

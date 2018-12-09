@@ -45,11 +45,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import tv.danmaku.ijk.media.exo.IjkExoMediaPlayer;
-import tv.danmaku.ijk.media.player.AndroidMediaPlayer;
+import tv.danmaku.ijk.media.example.R;
+import tv.danmaku.ijk.media.example.application.Settings;
+import tv.danmaku.ijk.media.example.services.MediaPlayerService;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkTimedText;
@@ -59,9 +58,6 @@ import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
 import tv.danmaku.ijk.media.player.misc.IMediaFormat;
 import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 import tv.danmaku.ijk.media.player.misc.IjkMediaFormat;
-import tv.danmaku.ijk.media.example.R;
-import tv.danmaku.ijk.media.example.application.Settings;
-import tv.danmaku.ijk.media.example.services.MediaPlayerService;
 
 public class IjkVideoView extends FrameLayout implements MediaController.MediaPlayerControl {
     private String TAG = "IjkVideoView";
@@ -1034,19 +1030,19 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public IMediaPlayer createPlayer(int playerType) {
         IMediaPlayer mediaPlayer = null;
 
-        switch (playerType) {
-            case Settings.PV_PLAYER__IjkExoMediaPlayer: {
-                IjkExoMediaPlayer IjkExoMediaPlayer = new IjkExoMediaPlayer(mAppContext);
-                mediaPlayer = IjkExoMediaPlayer;
-            }
-            break;
-            case Settings.PV_PLAYER__AndroidMediaPlayer: {
-                AndroidMediaPlayer androidMediaPlayer = new AndroidMediaPlayer();
-                mediaPlayer = androidMediaPlayer;
-            }
-            break;
-            case Settings.PV_PLAYER__IjkMediaPlayer:
-            default: {
+//        switch (playerType) {
+//            case Settings.PV_PLAYER__IjkExoMediaPlayer: {
+//                IjkExoMediaPlayer IjkExoMediaPlayer = new IjkExoMediaPlayer(mAppContext);
+//                mediaPlayer = IjkExoMediaPlayer;
+//            }
+//            break;
+//            case Settings.PV_PLAYER__AndroidMediaPlayer: {
+//                AndroidMediaPlayer androidMediaPlayer = new AndroidMediaPlayer();
+//                mediaPlayer = androidMediaPlayer;
+//            }
+//            break;
+//            case Settings.PV_PLAYER__IjkMediaPlayer:
+//            default: {
                 IjkMediaPlayer ijkMediaPlayer = null;
                 if (mUri != null) {
                     ijkMediaPlayer = new IjkMediaPlayer();
@@ -1088,9 +1084,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                     ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_CODEC, "skip_loop_filter", 48);
                 }
                 mediaPlayer = ijkMediaPlayer;
-            }
-            break;
-        }
+//            }
+//            break;
+//        }
 
         if (mSettings.getEnableDetachedSurfaceTextureView()) {
             mediaPlayer = new TextureMediaPlayer(mediaPlayer);

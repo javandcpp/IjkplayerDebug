@@ -174,6 +174,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private int mVideoSarNum;
     private int mVideoSarDen;
 
+    private String mHostIpInfo;
+
     private String mDataSource;
 
     private boolean mPostMessage;
@@ -933,6 +935,10 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
     private native String _getAudioCodecInfo();
 
+    public String getHostIpInfo(){
+        return mHostIpInfo;
+    }
+
     public void setOption(int category, String name, String value) {
         _setOption(category, name, value);
     }
@@ -990,6 +996,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
     private static class EventHandler extends Handler {
         private final WeakReference<IjkMediaPlayer> mWeakPlayer;
+
 
         public EventHandler(IjkMediaPlayer mp, Looper looper) {
             super(looper);
@@ -1081,7 +1088,9 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                             player.mVideoSarNum, player.mVideoSarDen);
                     break;
                 case MEDIA_IP:
-                    player.notifyIpFind((String) msg.obj);
+                    Log.e("Media_ip",msg.obj.toString());
+//                    player.notifyIpFind((String) msg.obj);
+                    player.mHostIpInfo=msg.obj.toString();
                     break;
 
                 default:

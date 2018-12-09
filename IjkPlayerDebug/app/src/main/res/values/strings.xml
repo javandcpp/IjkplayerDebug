@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ijkmediademo</string>
+    <string name="app_name">播放信息测试</string>
 
     <string name="N_A">N/A</string>
     <string name="close">Close</string>
     <string name="exit">Exit</string>
-    <string name="sample">示例</string>
+    <string name="sample">播放资源列表</string>
     <string name="recent">Recent</string>
     <string name="settings">设置</string>
     <string name="tracks">Tracks</string>
@@ -23,7 +23,8 @@
     <string name="seek_load_cost">seek_load_cost</string>
     <string name="tcp_speed">tcp_speed</string>
     <string name="bit_rate">bit_rate</string>
-    <string name="iphost">iphost</string>
+    <string name="ip">ip</string>
+    <string name="hostname">hostname</string>
 
     <string name="media_information">Media Information</string>
     <string name="mi_player">Player</string>
