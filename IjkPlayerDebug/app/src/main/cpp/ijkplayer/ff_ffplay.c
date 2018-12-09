@@ -3132,7 +3132,7 @@ static int read_thread(void *arg)
         av_dict_set_int(&ic->metadata, "skip-calc-frame-rate", ffp->skip_calc_frame_rate, 0);
         av_dict_set_int(&ffp->format_opts, "skip-calc-frame-rate", ffp->skip_calc_frame_rate, 0);
     }
-    setKsDebugCallback(ksDebugMethod);
+  //  setKsDebugCallback(ksDebugMethod);
     if (ffp->iformat_name)
         is->iformat = av_find_input_format(ffp->iformat_name);
     err = avformat_open_input(&ic, is->filename, is->iformat, &ffp->format_opts);
