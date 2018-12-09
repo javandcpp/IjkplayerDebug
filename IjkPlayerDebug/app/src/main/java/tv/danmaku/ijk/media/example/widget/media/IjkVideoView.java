@@ -334,12 +334,12 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             mMediaPlayer.setOnCompletionListener(mCompletionListener);
             mMediaPlayer.setOnErrorListener(mErrorListener);
             mMediaPlayer.setOnInfoListener(mInfoListener);
-//            mMediaPlayer.setIpFindListener(new OnIpFindListener() {
-//                @Override
-//                public void ipHostFind(String msg) {
-//                    ipTv.setText(msg);
-//                }
-//            });
+            mMediaPlayer.setIpFindListener(new OnIpFindListener() {
+                @Override
+                public void ipHostFind(String msg) {
+                    ipTv.setText(msg);
+                }
+            });
             mMediaPlayer.setOnBufferingUpdateListener(mBufferingUpdateListener);
             mMediaPlayer.setOnSeekCompleteListener(mSeekCompleteListener);
             mMediaPlayer.setOnTimedTextListener(mOnTimedTextListener);

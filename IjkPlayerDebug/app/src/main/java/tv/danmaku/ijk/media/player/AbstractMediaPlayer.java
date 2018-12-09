@@ -130,9 +130,6 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
             mOnIpFindListener.ipHostFind(msg);
         }
     }
-    protected final boolean notifyOnExtraInfo(int what, int extra, String str) {
-        return mOnExtraInfoListener != null && mOnExtraInfoListener.onExtraInfo(this, what, extra, str);
-    }
 
     public void setDataSource(IMediaDataSource mediaDataSource) {
         throw new UnsupportedOperationException();

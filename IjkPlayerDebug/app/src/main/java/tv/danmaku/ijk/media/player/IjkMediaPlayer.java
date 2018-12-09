@@ -65,8 +65,8 @@ import static java.lang.System.currentTimeMillis;
 
 /**
  * @author bbcallen
- *
- *         Java wrapper of ffplay.
+ * <p>
+ * Java wrapper of ffplay.
  */
 public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private final static String TAG = IjkMediaPlayer.class.getName();
@@ -80,6 +80,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private static final int MEDIA_TIMED_TEXT = 99;
     private static final int MEDIA_ERROR = 100;
     private static final int MEDIA_INFO = 200;
+    private static final int MEDIA_IP = 300;
 
     private static final int MEDIA_WHAT_BEGIN = 1000;
     private static final int MEDIA_WHAT_END = 2000;
@@ -99,10 +100,10 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     public static final int IJK_LOG_FATAL = 7;
     public static final int IJK_LOG_SILENT = 8;
 
-    public static final int OPT_CATEGORY_FORMAT     = 1;
-    public static final int OPT_CATEGORY_CODEC      = 2;
-    public static final int OPT_CATEGORY_SWS        = 3;
-    public static final int OPT_CATEGORY_PLAYER     = 4;
+    public static final int OPT_CATEGORY_FORMAT = 1;
+    public static final int OPT_CATEGORY_CODEC = 2;
+    public static final int OPT_CATEGORY_SWS = 3;
+    public static final int OPT_CATEGORY_PLAYER = 4;
 
     public static final int SDL_FCC_YV12 = 0x32315659; // YV12
     public static final int SDL_FCC_RV16 = 0x36315652; // RGB565
@@ -111,41 +112,41 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
     //----------------------------------------
     // properties
-    public static final int PROP_FLOAT_VIDEO_DECODE_FRAMES_PER_SECOND       = 10001;
-    public static final int PROP_FLOAT_VIDEO_OUTPUT_FRAMES_PER_SECOND       = 10002;
-    public static final int FFP_PROP_FLOAT_PLAYBACK_RATE                    = 10003;
-    public static final int FFP_PROP_FLOAT_DROP_FRAME_RATE                  = 10007;
+    public static final int PROP_FLOAT_VIDEO_DECODE_FRAMES_PER_SECOND = 10001;
+    public static final int PROP_FLOAT_VIDEO_OUTPUT_FRAMES_PER_SECOND = 10002;
+    public static final int FFP_PROP_FLOAT_PLAYBACK_RATE = 10003;
+    public static final int FFP_PROP_FLOAT_DROP_FRAME_RATE = 10007;
 
-    public static final int FFP_PROP_INT64_SELECTED_VIDEO_STREAM            = 20001;
-    public static final int FFP_PROP_INT64_SELECTED_AUDIO_STREAM            = 20002;
-    public static final int FFP_PROP_INT64_SELECTED_TIMEDTEXT_STREAM        = 20011;
+    public static final int FFP_PROP_INT64_SELECTED_VIDEO_STREAM = 20001;
+    public static final int FFP_PROP_INT64_SELECTED_AUDIO_STREAM = 20002;
+    public static final int FFP_PROP_INT64_SELECTED_TIMEDTEXT_STREAM = 20011;
 
-    public static final int FFP_PROP_INT64_VIDEO_DECODER                    = 20003;
-    public static final int FFP_PROP_INT64_AUDIO_DECODER                    = 20004;
-    public static final int     FFP_PROPV_DECODER_UNKNOWN                   = 0;
-    public static final int     FFP_PROPV_DECODER_AVCODEC                   = 1;
-    public static final int     FFP_PROPV_DECODER_MEDIACODEC                = 2;
-    public static final int     FFP_PROPV_DECODER_VIDEOTOOLBOX              = 3;
-    public static final int FFP_PROP_INT64_VIDEO_CACHED_DURATION            = 20005;
-    public static final int FFP_PROP_INT64_AUDIO_CACHED_DURATION            = 20006;
-    public static final int FFP_PROP_INT64_VIDEO_CACHED_BYTES               = 20007;
-    public static final int FFP_PROP_INT64_AUDIO_CACHED_BYTES               = 20008;
-    public static final int FFP_PROP_INT64_VIDEO_CACHED_PACKETS             = 20009;
-    public static final int FFP_PROP_INT64_AUDIO_CACHED_PACKETS             = 20010;
-    public static final int FFP_PROP_INT64_ASYNC_STATISTIC_BUF_BACKWARDS    = 20201;
-    public static final int FFP_PROP_INT64_ASYNC_STATISTIC_BUF_FORWARDS     = 20202;
-    public static final int FFP_PROP_INT64_ASYNC_STATISTIC_BUF_CAPACITY     = 20203;
-    public static final int FFP_PROP_INT64_TRAFFIC_STATISTIC_BYTE_COUNT     = 20204;
-    public static final int FFP_PROP_INT64_CACHE_STATISTIC_PHYSICAL_POS     = 20205;
-    public static final int FFP_PROP_INT64_CACHE_STATISTIC_FILE_FORWARDS    = 20206;
-    public static final int FFP_PROP_INT64_CACHE_STATISTIC_FILE_POS         = 20207;
-    public static final int FFP_PROP_INT64_CACHE_STATISTIC_COUNT_BYTES      = 20208;
-    public static final int FFP_PROP_INT64_LOGICAL_FILE_SIZE                = 20209;
-    public static final int FFP_PROP_INT64_SHARE_CACHE_DATA                 = 20210;
-    public static final int FFP_PROP_INT64_BIT_RATE                         = 20100;
-    public static final int FFP_PROP_INT64_TCP_SPEED                        = 20200;
-    public static final int FFP_PROP_INT64_LATEST_SEEK_LOAD_DURATION        = 20300;
-    public static final int FFP_PROP_INT64_IMMEDIATE_RECONNECT              = 20211;
+    public static final int FFP_PROP_INT64_VIDEO_DECODER = 20003;
+    public static final int FFP_PROP_INT64_AUDIO_DECODER = 20004;
+    public static final int FFP_PROPV_DECODER_UNKNOWN = 0;
+    public static final int FFP_PROPV_DECODER_AVCODEC = 1;
+    public static final int FFP_PROPV_DECODER_MEDIACODEC = 2;
+    public static final int FFP_PROPV_DECODER_VIDEOTOOLBOX = 3;
+    public static final int FFP_PROP_INT64_VIDEO_CACHED_DURATION = 20005;
+    public static final int FFP_PROP_INT64_AUDIO_CACHED_DURATION = 20006;
+    public static final int FFP_PROP_INT64_VIDEO_CACHED_BYTES = 20007;
+    public static final int FFP_PROP_INT64_AUDIO_CACHED_BYTES = 20008;
+    public static final int FFP_PROP_INT64_VIDEO_CACHED_PACKETS = 20009;
+    public static final int FFP_PROP_INT64_AUDIO_CACHED_PACKETS = 20010;
+    public static final int FFP_PROP_INT64_ASYNC_STATISTIC_BUF_BACKWARDS = 20201;
+    public static final int FFP_PROP_INT64_ASYNC_STATISTIC_BUF_FORWARDS = 20202;
+    public static final int FFP_PROP_INT64_ASYNC_STATISTIC_BUF_CAPACITY = 20203;
+    public static final int FFP_PROP_INT64_TRAFFIC_STATISTIC_BYTE_COUNT = 20204;
+    public static final int FFP_PROP_INT64_CACHE_STATISTIC_PHYSICAL_POS = 20205;
+    public static final int FFP_PROP_INT64_CACHE_STATISTIC_FILE_FORWARDS = 20206;
+    public static final int FFP_PROP_INT64_CACHE_STATISTIC_FILE_POS = 20207;
+    public static final int FFP_PROP_INT64_CACHE_STATISTIC_COUNT_BYTES = 20208;
+    public static final int FFP_PROP_INT64_LOGICAL_FILE_SIZE = 20209;
+    public static final int FFP_PROP_INT64_SHARE_CACHE_DATA = 20210;
+    public static final int FFP_PROP_INT64_BIT_RATE = 20100;
+    public static final int FFP_PROP_INT64_TCP_SPEED = 20200;
+    public static final int FFP_PROP_INT64_LATEST_SEEK_LOAD_DURATION = 20300;
+    public static final int FFP_PROP_INT64_IMMEDIATE_RECONNECT = 20211;
     //----------------------------------------
 
     @AccessedByNative
@@ -180,18 +181,15 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private static long mStartTime = 0;
     private static long mEndTime = 0;
 
-    private static void postExtraEventFromNative(Object ijkmediaplayer_ref, int what, int extra, int reserved, String obj)
-    {
-        IjkMediaPlayer sp = (IjkMediaPlayer)((WeakReference)ijkmediaplayer_ref).get();
-        if (sp == null)
-        {
+    private static void postExtraEventFromNative(Object ijkmediaplayer_ref, int what, int extra, int reserved, String obj) {
+        IjkMediaPlayer sp = (IjkMediaPlayer) ((WeakReference) ijkmediaplayer_ref).get();
+        if (sp == null) {
             return;
         }
 
         //Log.i(TAG, "halimin2018 ==========> event: what=" + what + ", extra=" + extra + ", str=" + obj.toString());
 
-        if (sp.mEventHandler != null)
-        {
+        if (sp.mEventHandler != null) {
             Message m = sp.mEventHandler.obtainMessage(what, extra, reserved, obj);
             sp.mEventHandler.sendMessage(m);
         }
@@ -235,6 +233,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     };
 
     private static volatile boolean mIsLibLoaded = false;
+
     public static void loadLibrariesOnce(IjkLibLoader libLoader) {
         synchronized (IjkMediaPlayer.class) {
             if (!mIsLibLoaded) {
@@ -250,6 +249,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     }
 
     private static volatile boolean mIsNativeInitialized = false;
+
     private static void initNativeOnce() {
         synchronized (IjkMediaPlayer.class) {
             if (!mIsNativeInitialized) {
@@ -274,8 +274,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
     /**
      * do not loadLibaray
-     * @param libLoader
-     *              custom library loader, can be null.
+     *
+     * @param libLoader custom library loader, can be null.
      */
     public IjkMediaPlayer(IjkLibLoader libLoader) {
         initPlayer(libLoader);
@@ -313,15 +313,14 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     /**
      * Sets the {@link SurfaceHolder} to use for displaying the video portion of
      * the media.
-     *
+     * <p>
      * Either a surface holder or surface must be set if a display or video sink
      * is needed. Not calling this method or {@link #setSurface(Surface)} when
      * playing back a video will result in only the audio track being played. A
      * null surface holder or surface will result in only the audio track being
      * played.
      *
-     * @param sh
-     *            the SurfaceHolder to use for video display
+     * @param sh the SurfaceHolder to use for video display
      */
     @Override
     public void setDisplay(SurfaceHolder sh) {
@@ -342,7 +341,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      * does not support {@link #setScreenOnWhilePlaying(boolean)}. Setting a
      * Surface will un-set any Surface or SurfaceHolder that was previously set.
      * A null surface will result in only the audio track being played.
-     *
+     * <p>
      * If the Surface sends frames to a {@link SurfaceTexture}, the timestamps
      * returned from {@link SurfaceTexture#getTimestamp()} will have an
      * unspecified zero point. These timestamps cannot be directly compared
@@ -351,9 +350,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      * monotonically increasing and is unaffected by time-of-day adjustments,
      * but it is reset when the position is set.
      *
-     * @param surface
-     *            The {@link Surface} to be used for the video portion of the
-     *            media.
+     * @param surface The {@link Surface} to be used for the video portion of the
+     *                media.
      */
     @Override
     public void setSurface(Surface surface) {
@@ -370,7 +368,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      * Sets the data source as a content Uri.
      *
      * @param context the Context to use when resolving the Uri
-     * @param uri the Content URI of the data you want to play
+     * @param uri     the Content URI of the data you want to play
      * @throws IllegalStateException if it is called in an invalid state
      */
     @Override
@@ -383,7 +381,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      * Sets the data source as a content Uri.
      *
      * @param context the Context to use when resolving the Uri
-     * @param uri the Content URI of the data you want to play
+     * @param uri     the Content URI of the data you want to play
      * @param headers the headers to be sent together with the request for the data
      *                Note that the cross domain redirection is allowed by default, but that can be
      *                changed with key/value pairs through the headers parameter with
@@ -441,19 +439,17 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     /**
      * Sets the data source (file-path or http/rtsp URL) to use.
      *
-     * @param path
-     *            the path of the file, or the http/rtsp URL of the stream you
-     *            want to play
-     * @throws IllegalStateException
-     *             if it is called in an invalid state
-     *
-     *             <p>
-     *             When <code>path</code> refers to a local file, the file may
-     *             actually be opened by a process other than the calling
-     *             application. This implies that the pathname should be an
-     *             absolute path (as any other process runs with unspecified
-     *             current working directory), and that the pathname should
-     *             reference a world-readable file.
+     * @param path the path of the file, or the http/rtsp URL of the stream you
+     *             want to play
+     * @throws IllegalStateException if it is called in an invalid state
+     *                               <p>
+     *                               <p>
+     *                               When <code>path</code> refers to a local file, the file may
+     *                               actually be opened by a process other than the calling
+     *                               application. This implies that the pathname should be an
+     *                               absolute path (as any other process runs with unspecified
+     *                               current working directory), and that the pathname should
+     *                               reference a world-readable file.
      */
     @Override
     public void setDataSource(String path)
@@ -465,16 +461,15 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     /**
      * Sets the data source (file-path or http/rtsp URL) to use.
      *
-     * @param path the path of the file, or the http/rtsp URL of the stream you want to play
+     * @param path    the path of the file, or the http/rtsp URL of the stream you want to play
      * @param headers the headers associated with the http request for the stream you want to play
      * @throws IllegalStateException if it is called in an invalid state
      */
     public void setDataSource(String path, Map<String, String> headers)
-            throws IOException, IllegalArgumentException, SecurityException, IllegalStateException
-    {
+            throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
         if (headers != null && !headers.isEmpty()) {
             StringBuilder sb = new StringBuilder();
-            for(Map.Entry<String, String> entry: headers.entrySet()) {
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
                 sb.append(entry.getKey());
                 sb.append(":");
                 String value = entry.getValue();
@@ -526,7 +521,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      * seekable (N.B. a LocalSocket is not seekable). It is the caller's responsibility
      * to close the file descriptor. It is safe to do so as soon as this call returns.
      *
-     * @param fd the FileDescriptor for the file you want to play
+     * @param fd     the FileDescriptor for the file you want to play
      * @param offset the offset into the file where the data to be played starts, in bytes
      * @param length the length in bytes of the data to be played
      * @throws IllegalStateException if it is called in an invalid state
@@ -576,7 +571,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         stayAwake(true);
         _start();
 
-        StartPostLocalMessage();
     }
 
     private native void _start() throws IllegalStateException;
@@ -586,7 +580,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         stayAwake(false);
         _stop();
 
-        StopPostLocalMessage();
     }
 
     private native void _stop() throws IllegalStateException;
@@ -663,7 +656,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
             return null;
 
         ArrayList<IjkTrackInfo> trackInfos = new ArrayList<IjkTrackInfo>();
-        for (IjkMediaMeta.IjkStreamMeta streamMeta: mediaMeta.mStreams) {
+        for (IjkMediaMeta.IjkStreamMeta streamMeta : mediaMeta.mStreams) {
             IjkTrackInfo trackInfo = new IjkTrackInfo(streamMeta);
             if (streamMeta.mType.equalsIgnoreCase(IjkMediaMeta.IJKM_VAL_TYPE__VIDEO)) {
                 trackInfo.setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_VIDEO);
@@ -682,11 +675,11 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     public int getSelectedTrack(int trackType) {
         switch (trackType) {
             case ITrackInfo.MEDIA_TRACK_TYPE_VIDEO:
-                return (int)_getPropertyLong(FFP_PROP_INT64_SELECTED_VIDEO_STREAM, -1);
+                return (int) _getPropertyLong(FFP_PROP_INT64_SELECTED_VIDEO_STREAM, -1);
             case ITrackInfo.MEDIA_TRACK_TYPE_AUDIO:
-                return (int)_getPropertyLong(FFP_PROP_INT64_SELECTED_AUDIO_STREAM, -1);
+                return (int) _getPropertyLong(FFP_PROP_INT64_SELECTED_AUDIO_STREAM, -1);
             case ITrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT:
-                return (int)_getPropertyLong(FFP_PROP_INT64_SELECTED_TIMEDTEXT_STREAM, -1);
+                return (int) _getPropertyLong(FFP_PROP_INT64_SELECTED_TIMEDTEXT_STREAM, -1);
             default:
                 return -1;
         }
@@ -813,7 +806,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     }
 
     public int getVideoDecoder() {
-        return (int)_getPropertyLong(FFP_PROP_INT64_VIDEO_DECODER, FFP_PROPV_DECODER_UNKNOWN);
+        return (int) _getPropertyLong(FFP_PROP_INT64_VIDEO_DECODER, FFP_PROPV_DECODER_UNKNOWN);
     }
 
     public float getVideoOutputFramesPerSecond() {
@@ -897,9 +890,12 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     }
 
     private native float _getPropertyFloat(int property, float defaultValue);
-    private native void  _setPropertyFloat(int property, float value);
-    private native long  _getPropertyLong(int property, long defaultValue);
-    private native void  _setPropertyLong(int property, long value);
+
+    private native void _setPropertyFloat(int property, float value);
+
+    private native long _getPropertyLong(int property, long defaultValue);
+
+    private native void _setPropertyLong(int property, long value);
 
     public float getDropFrameRate() {
         return _getPropertyFloat(FFP_PROP_FLOAT_DROP_FRAME_RATE, .0f);
@@ -959,24 +955,25 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     }
 
     private native String _getVideoCodecInfo();
+
     private native String _getAudioCodecInfo();
 
-    public void setOption(int category, String name, String value)
-    {
+    public void setOption(int category, String name, String value) {
         _setOption(category, name, value);
     }
 
-    public void setOption(int category, String name, long value)
-    {
+    public void setOption(int category, String name, long value) {
         _setOption(category, name, value);
     }
 
     private native void _setOption(int category, String name, String value);
+
     private native void _setOption(int category, String name, long value);
 
     public Bundle getMediaMeta() {
         return _getMediaMeta();
     }
+
     private native Bundle _getMediaMeta();
 
     public static String getColorFormatName(int mediaCodecColorFormat) {
@@ -1013,131 +1010,107 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     }
 
     public void setCacheShare(int share) {
-        _setPropertyLong(FFP_PROP_INT64_SHARE_CACHE_DATA, (long)share);
+        _setPropertyLong(FFP_PROP_INT64_SHARE_CACHE_DATA, (long) share);
     }
 
-    private static class EventHandler extends Handler
-    {
+    private static class EventHandler extends Handler {
         private final WeakReference<IjkMediaPlayer> mWeakPlayer;
 
-        public EventHandler(IjkMediaPlayer mp, Looper looper)
-        {
+        public EventHandler(IjkMediaPlayer mp, Looper looper) {
             super(looper);
             mWeakPlayer = new WeakReference<IjkMediaPlayer>(mp);
         }
 
         @Override
-        public void handleMessage(Message msg)
-        {
+        public void handleMessage(Message msg) {
             IjkMediaPlayer player = mWeakPlayer.get();
-            if (player == null || player.mNativeMediaPlayer == 0)
-            {
+            if (player == null || player.mNativeMediaPlayer == 0) {
                 DebugLog.w(TAG, "IjkMediaPlayer went away with unhandled events");
                 return;
             }
 
-            ///////////////////////////////////////////////////////////////////////
-            //halimin added
-            if(msg.what >= MEDIA_WHAT_BEGIN && msg.what <= MEDIA_WHAT_END)
-            {
-                if(msg.what == MEDIA_EXTRAINFO_TRACE_HTTP_DOWNLOAD_RATE)
-                {
-                    mStartTime = System.currentTimeMillis() / 1000;
-                }
 
-                player.notifyOnExtraInfo(msg.what, msg.arg1, msg.obj.toString());
-                return;
-            }
+            switch (msg.what) {
+                case MEDIA_PREPARED:
+                    player.notifyOnPrepared();
+                    return;
 
-            ///////////////////////////////////////////////////////////////////////
-
-            switch (msg.what)
-            {
-            case MEDIA_PREPARED:
-                player.notifyOnPrepared();
-                return;
-
-            case MEDIA_PLAYBACK_COMPLETE:
-                player.stayAwake(false);
-                player.notifyOnCompletion();
-                return;
-
-            case MEDIA_BUFFERING_UPDATE:
-                long bufferPosition = msg.arg1;
-                if (bufferPosition < 0)
-                {
-                    bufferPosition = 0;
-                }
-
-                long percent = 0;
-                long duration = player.getDuration();
-                if (duration > 0)
-                {
-                    percent = bufferPosition * 100 / duration;
-                }
-
-                if (percent >= 100)
-                {
-                    percent = 100;
-                }
-
-                // DebugLog.efmt(TAG, "Buffer (%d%%) %d/%d",  percent, bufferPosition, duration);
-                player.notifyOnBufferingUpdate((int)percent);
-                return;
-
-            case MEDIA_SEEK_COMPLETE:
-                player.notifyOnSeekComplete();
-                return;
-
-            case MEDIA_SET_VIDEO_SIZE:
-                player.mVideoWidth = msg.arg1;
-                player.mVideoHeight = msg.arg2;
-                player.notifyOnVideoSizeChanged(player.mVideoWidth, player.mVideoHeight,
-                        player.mVideoSarNum, player.mVideoSarDen);
-                return;
-
-            case MEDIA_ERROR:
-                DebugLog.e(TAG, "Error (" + msg.arg1 + "," + msg.arg2 + ")");
-                if (!player.notifyOnError(msg.arg1, msg.arg2))
-                {
+                case MEDIA_PLAYBACK_COMPLETE:
+                    player.stayAwake(false);
                     player.notifyOnCompletion();
-                }
-                player.stayAwake(false);
-                return;
+                    return;
 
-            case MEDIA_INFO:
-                switch (msg.arg1)
-                {
-                    case MEDIA_INFO_VIDEO_RENDERING_START:
-                        DebugLog.i(TAG, "Info: MEDIA_INFO_VIDEO_RENDERING_START\n");
-                        break;
-                }
-                player.notifyOnInfo(msg.arg1, msg.arg2);
-                // No real default action so far.
-                return;
-            case MEDIA_TIMED_TEXT:
-                if (msg.obj == null)
-                {
-                    player.notifyOnTimedText(null);
-                }
-                else
-                {
-                    IjkTimedText text = new IjkTimedText(new Rect(0, 0, 1, 1), (String)msg.obj);
-                    player.notifyOnTimedText(text);
-                }
-                return;
-            case MEDIA_NOP: // interface test message - ignore
-                break;
+                case MEDIA_BUFFERING_UPDATE:
+                    long bufferPosition = msg.arg1;
+                    if (bufferPosition < 0) {
+                        bufferPosition = 0;
+                    }
 
-            case MEDIA_SET_VIDEO_SAR:
-                player.mVideoSarNum = msg.arg1;
-                player.mVideoSarDen = msg.arg2;
-                player.notifyOnVideoSizeChanged(player.mVideoWidth, player.mVideoHeight,
-                        player.mVideoSarNum, player.mVideoSarDen);
-                break;
+                    long percent = 0;
+                    long duration = player.getDuration();
+                    if (duration > 0) {
+                        percent = bufferPosition * 100 / duration;
+                    }
 
-            default:
-                DebugLog.e(TAG, "Unknown message type " + msg.what);
+                    if (percent >= 100) {
+                        percent = 100;
+                    }
+
+                    // DebugLog.efmt(TAG, "Buffer (%d%%) %d/%d",  percent, bufferPosition, duration);
+                    player.notifyOnBufferingUpdate((int) percent);
+                    return;
+
+                case MEDIA_SEEK_COMPLETE:
+                    player.notifyOnSeekComplete();
+                    return;
+
+                case MEDIA_SET_VIDEO_SIZE:
+                    player.mVideoWidth = msg.arg1;
+                    player.mVideoHeight = msg.arg2;
+                    player.notifyOnVideoSizeChanged(player.mVideoWidth, player.mVideoHeight,
+                            player.mVideoSarNum, player.mVideoSarDen);
+                    return;
+
+                case MEDIA_ERROR:
+                    DebugLog.e(TAG, "Error (" + msg.arg1 + "," + msg.arg2 + ")");
+                    if (!player.notifyOnError(msg.arg1, msg.arg2)) {
+                        player.notifyOnCompletion();
+                    }
+                    player.stayAwake(false);
+                    return;
+
+                case MEDIA_INFO:
+                    switch (msg.arg1) {
+                        case MEDIA_INFO_VIDEO_RENDERING_START:
+                            DebugLog.i(TAG, "Info: MEDIA_INFO_VIDEO_RENDERING_START\n");
+                            break;
+                    }
+                    player.notifyOnInfo(msg.arg1, msg.arg2);
+                    // No real default action so far.
+                    return;
+                case MEDIA_TIMED_TEXT:
+                    if (msg.obj == null) {
+                        player.notifyOnTimedText(null);
+                    } else {
+                        IjkTimedText text = new IjkTimedText(new Rect(0, 0, 1, 1), (String) msg.obj);
+                        player.notifyOnTimedText(text);
+                    }
+                    return;
+                case MEDIA_NOP: // interface test message - ignore
+                    break;
+
+                case MEDIA_SET_VIDEO_SAR:
+                    player.mVideoSarNum = msg.arg1;
+                    player.mVideoSarDen = msg.arg2;
+                    player.notifyOnVideoSizeChanged(player.mVideoWidth, player.mVideoHeight,
+                            player.mVideoSarNum, player.mVideoSarDen);
+                    break;
+                case MEDIA_IP:
+                    player.notifyIpFind((String) msg.obj);
+                    break;
+
+                default:
+                    DebugLog.e(TAG, "Unknown message type " + msg.what);
             }
         }
     }
@@ -1151,7 +1124,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      */
     @CalledByNative
     private static void postEventFromNative(Object weakThiz, int what,
-            int arg1, int arg2, Object obj) {
+                                            int arg1, int arg2, Object obj) {
         if (weakThiz == null)
             return;
 
@@ -1177,6 +1150,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      */
 
     private OnControlMessageListener mOnControlMessageListener;
+
     public void setOnControlMessageListener(OnControlMessageListener listener) {
         mOnControlMessageListener = listener;
     }
@@ -1190,6 +1164,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      */
 
     private OnNativeInvokeListener mOnNativeInvokeListener;
+
     public void setOnNativeInvokeListener(OnNativeInvokeListener listener) {
         mOnNativeInvokeListener = listener;
     }
@@ -1274,7 +1249,9 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     public interface OnMediaCodecSelectListener {
         String onMediaCodecSelect(IMediaPlayer mp, String mimeType, int profile, int level);
     }
+
     private OnMediaCodecSelectListener mOnMediaCodecSelectListener;
+
     public void setOnMediaCodecSelectListener(OnMediaCodecSelectListener listener) {
         mOnMediaCodecSelectListener = listener;
     }
@@ -1327,7 +1304,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                 if (types == null)
                     continue;
 
-                for(String type: types) {
+                for (String type : types) {
                     if (TextUtils.isEmpty(type))
                         continue;
 
@@ -1367,65 +1344,11 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         }
     }
 
-    //halimin added
-    private void StartPostLocalMessage()
-    {
-        mPostMessage = true;
-
-        new Thread()
-        {
-            @Override
-            public void run()
-            {
-                while(mPostMessage)
-                {
-                    String strFreeMem = native_getFreeMemory();
-                    if(strFreeMem != null)
-                    {
-                        notifyOnExtraInfo(MEDIA_EXTRAINFO_TRACE_FREE_MEMORY, 0, strFreeMem);
-                    }
-
-                    String strUsedCPU = native_getUsedCPU();
-                    if(strUsedCPU != null)
-                    {
-                        notifyOnExtraInfo(MEDIA_EXTRAINFO_TRACE_USED_CPU, 0, strUsedCPU);
-                    }
-
-                    mEndTime = System.currentTimeMillis() / 1000;
-
-                    long Interval = mEndTime - mStartTime;
-
-                    if(Interval > 1) //not download rate message for two seconds
-                    {
-                        String strDownloadRate = "download rate: 0.0 kbps";
-                        notifyOnExtraInfo(MEDIA_EXTRAINFO_TRACE_HTTP_DOWNLOAD_RATE, 0, strDownloadRate);
-                    }
-
-                    try
-                    {
-                        Thread.sleep(1000);
-                    }
-                    catch (InterruptedException e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-        }.start();
-    }
-
-    //halimin added
-    private void StopPostLocalMessage()
-    {
-        mPostMessage = false;
-    }
-
-    private native String native_getFreeMemory();
-    private native String native_getUsedCPU();
 
     public static native void native_profileBegin(String libName);
+
     public static native void native_profileEnd();
+
     public static native void native_setLogLevel(int level);
 
     public void setLogLevel(int level) throws IllegalStateException {
