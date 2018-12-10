@@ -33,8 +33,9 @@ protected:
 
     static bool first;
 
-    virtual void update(AVData avData){};
+    void update(AVData avData){};
 
+    void main(){};
 
 
 };

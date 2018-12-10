@@ -62,6 +62,8 @@ void AudioEncoder::update(AVData avData) {
     while (!isExit) {
         if (aAudioframeQueue.Size() < maxList) {
             aAudioframeQueue.push(avData);
+            LOGE("update push audio queue data,pts:%ld   listsize:%d", avData.pts,
+                 aAudioframeQueue.Size());
             break;
         }
         xsleep(1);
@@ -86,34 +88,36 @@ void AudioEncoder::main() {
 
         const shared_ptr<AVData> &ptr = aAudioframeQueue.wait_and_pop();
         AVData *pData = ptr.get();
-
         int ret = -1;
         ret = avcodec_fill_audio_frame(outputFrame,
                                        audioCodecContext->channels,
-                                       audioCodecContext->sample_fmt, pData->data,
-                                       4096, 0);
+                                       audioCodecContext->sample_fmt, *(pData->datas),
+                                       pData->size, 0);
+        LOGE("audio encode %d", pData->size);
         if (ret < 0) {
             LOGE("audio fill frame failed!");
             continue;
         }
         //发送数据到解码线程，一个数据包，可能解码多个结果
         ret = avcodec_send_frame(audioCodecContext, outputFrame);
+        LOGE("audio enencode avcodec_send_frame result:%d", ret);
         if (ret == 0) {
-            while (!isExit) {
+//            while (!isExit) {
                 //获取解码数据
-                av_packet_unref(&audioPacket);
                 ret = avcodec_receive_packet(audioCodecContext, &audioPacket);
                 if (ret != 0) continue;
 
                 AVData avData;
-                LOGD("audio encode sucess");
+                LOGD("audio encode sucess  pts:%ld",pData->pts);
                 avData.pts = pData->pts;
-                avData.data = (unsigned char *) &audioPacket;
+                AVPacket *avPacket=av_packet_alloc();
+                memcpy(avPacket,&audioPacket, sizeof(avPacket));
+                avData.data = (unsigned char *) avPacket;
+                av_packet_unref(&audioPacket);
                 this->notifyObserver(avData);
-            }
-
+//            }
         }
-        pData->Drop();
+//        pData->Drop();
     }
 }
 
@@ -214,9 +218,10 @@ int AudioEncoder::StartEncode() {
 }
 
 
-int AudioEncoder::InitEncode(AVCodecParameters* avCodecParameters) {
+int AudioEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     std::lock_guard<std::mutex> lk(mtx);
-    avCodec = avcodec_find_encoder(avCodecParameters->codec_id);
+//    avCodec = avcodec_find_encoder(avCodecParameters->codec_id);
+    avCodec = avcodec_find_encoder_by_name("libfdk_aac");
 
     int ret = 0;
     if (!avCodec) {
@@ -237,8 +242,6 @@ int AudioEncoder::InitEncode(AVCodecParameters* avCodecParameters) {
     audioCodecContext->frame_size = 1024;
     audioCodecContext->time_base = {1, 1000000};//AUDIO VIDEO 两边时间基数要相同
     audioCodecContext->channel_layout = av_get_default_channel_layout(audioCodecContext->channels);
-    avcodec_parameters_to_context(audioCodecContext,avCodecParameters);
-    audioCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
     outputFrame = av_frame_alloc();
     outputFrame->channels = audioCodecContext->channels;

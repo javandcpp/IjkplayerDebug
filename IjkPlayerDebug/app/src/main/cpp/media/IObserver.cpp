@@ -3,12 +3,12 @@
 //
 
 #include "IObserver.h"
+
 using namespace std;
 
 void IObserver::addObserver(IObserver *observers) {
     std::lock_guard<std::mutex> lk(mtx);
-    if(!observers)return;
-
+    if (!observers)return;
     observerlist.push_back(observers);
 }
 

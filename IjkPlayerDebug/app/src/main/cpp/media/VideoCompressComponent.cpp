@@ -20,7 +20,7 @@ FFmpegDecode *VideoCompressComponent::getAudioDecode() {
     return mAudioFfmpegDecode;
 }
 
-AudioEncoder* VideoCompressComponent::getAudioEncode() {
+AudioEncoder *VideoCompressComponent::getAudioEncode() {
     return audioEncoder;
 }
 
@@ -37,17 +37,17 @@ bool VideoCompressComponent::initialize() {
         mAudioFfmpegDecode->isAudio = true;
     }
 
-    if(!audioEncoder){
-        audioEncoder=new AudioEncoder();
+    if (!audioEncoder) {
+        audioEncoder = new AudioEncoder();
     }
 
     if (mDemux) {
         if (mVideoFfmpegDecode)
-            mDemux->addObserver(mVideoFfmpegDecode);
+//            mDemux->addObserver(mVideoFfmpegDecode);
 
-        if(mAudioFfmpegDecode){
-            mAudioFfmpegDecode->addObserver(audioEncoder);// 添加音频编码
+        if (mAudioFfmpegDecode) {
             mDemux->addObserver(mAudioFfmpegDecode);//添加音频解码
+            mAudioFfmpegDecode->addObserver(audioEncoder);// 添加音频编码
         }
     }
     return true;
