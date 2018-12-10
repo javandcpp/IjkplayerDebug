@@ -41,15 +41,15 @@ bool VideoCompressComponent::initialize() {
         audioEncoder=new AudioEncoder();
     }
 
-//    if (mDemux) {
-//        if (mVideoFfmpegDecode)
-//            mDemux->addObserver(mVideoFfmpegDecode);
-//
-//        if(mAudioFfmpegDecode){
-//            mAudioFfmpegDecode->addObserver(audioEncoder);// 添加音频编码
-//            mDemux->addObserver(mAudioFfmpegDecode);//添加音频解码
-//        }
-//    }
+    if (mDemux) {
+        if (mVideoFfmpegDecode)
+            mDemux->addObserver(mVideoFfmpegDecode);
+
+        if(mAudioFfmpegDecode){
+            mAudioFfmpegDecode->addObserver(audioEncoder);// 添加音频编码
+            mDemux->addObserver(mAudioFfmpegDecode);//添加音频解码
+        }
+    }
     return true;
 }
 
