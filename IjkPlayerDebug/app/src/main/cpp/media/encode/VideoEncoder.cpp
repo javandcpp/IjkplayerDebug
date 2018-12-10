@@ -93,16 +93,16 @@ void VideoEncoder::main() {
         int ret = -1;
         int totalSize = pData->width * pData->height * 3 / 2;
         int ySize = pData->width * pData->height;
-        memcpy(outputYUVFrame->data[0], pData->data, ySize);//Y
-        memcpy(outputYUVFrame->data[1], pData->data + ySize, ySize / 4);//U
-        memcpy(outputYUVFrame->data[2], pData->data + (ySize * 5 / 4),
+        memcpy(outputYUVFrame->data[0], *(pData->datas), ySize);//Y
+        memcpy(outputYUVFrame->data[1], *(pData->datas) + ySize, ySize / 4);//U
+        memcpy(outputYUVFrame->data[2], *(pData->datas) + (ySize * 5 / 4),
                ySize / 4);
         outputYUVFrame->linesize[0] = videoCodecContext->width;
         outputYUVFrame->linesize[1] = videoCodecContext->width / 2;
         outputYUVFrame->linesize[2] = videoCodecContext->width / 2;
-        LOGE("audio encode %d", pData->size);
+        LOGE("video encode %d", pData->size);
         if (ret < 0) {
-            LOGE("audio fill frame failed!");
+            LOGE("video fill frame failed!");
             continue;
         }
         //发送数据到解码线程，一个数据包，可能解码多个结果
@@ -115,7 +115,7 @@ void VideoEncoder::main() {
             if (ret != 0) continue;
 
             AVData avData;
-            LOGD("audio encode sucess  pts:%ld", pData->pts);
+            LOGD("video encode sucess  pts:%ld", pData->pts);
             avData.pts = pData->pts;
             AVPacket *avPacket = av_packet_alloc();
             memcpy(avPacket, &videoPacket, sizeof(avPacket));
