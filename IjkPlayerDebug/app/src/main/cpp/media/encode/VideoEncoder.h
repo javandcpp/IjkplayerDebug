@@ -39,11 +39,13 @@ public:
     /**
      * 已编码数据队列
      */
-    threadsafe_queue<AVData *> vframeQueue;
+    threadsafe_queue<AVData> aVideoframeQueue;
 //    list<OriginData *> VideoDatalist;
 
 
     VideoEncoder();
+
+    int maxList=100;
 
     ~VideoEncoder();
 
@@ -108,6 +110,11 @@ public:
     AVFrame *inputYUVFrame = NULL;
 
     AVPacket videoPacket = {0};
+
+
+    virtual void update(AVData avData);
+
+    virtual void main();
 
 };
 

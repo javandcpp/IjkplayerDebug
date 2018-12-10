@@ -24,6 +24,10 @@ AudioEncoder *VideoCompressComponent::getAudioEncode() {
     return audioEncoder;
 }
 
+VideoEncoder* VideoCompressComponent::getVideoEncode() {
+    return videoEncoder;
+}
+
 bool VideoCompressComponent::initialize() {
     if (!mDemux) {
         mDemux = new FFmpegDemux();
@@ -41,9 +45,15 @@ bool VideoCompressComponent::initialize() {
         audioEncoder = new AudioEncoder();
     }
 
+    if (!videoEncoder) {
+        videoEncoder = new VideoEncoder();
+    }
+
     if (mDemux) {
-        if (mVideoFfmpegDecode)
-//            mDemux->addObserver(mVideoFfmpegDecode);
+        if (mVideoFfmpegDecode) {
+            mDemux->addObserver(mVideoFfmpegDecode);
+            mVideoFfmpegDecode->addObserver(videoEncoder);
+        }
 
         if (mAudioFfmpegDecode) {
             mDemux->addObserver(mAudioFfmpegDecode);//添加音频解码
