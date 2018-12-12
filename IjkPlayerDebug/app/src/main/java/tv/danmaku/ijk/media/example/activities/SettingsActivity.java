@@ -25,8 +25,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import tv.danmaku.ijk.media.example.R;
 import tv.danmaku.ijk.media.example.fragments.SettingsFragment;
+import tv.danmaku.ijk.media.example.test.R;
 
 public class SettingsActivity extends AppCompatActivity {
     public static Intent newIntent(Context context) {

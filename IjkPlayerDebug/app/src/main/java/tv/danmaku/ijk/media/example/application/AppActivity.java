@@ -28,7 +28,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import tv.danmaku.ijk.media.example.R;
+import tv.danmaku.ijk.media.example.test.R;
 
 @SuppressLint("Registered")
 public class AppActivity extends AppCompatActivity {

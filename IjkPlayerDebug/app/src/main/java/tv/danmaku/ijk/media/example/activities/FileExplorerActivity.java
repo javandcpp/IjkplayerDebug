@@ -27,7 +27,7 @@ import com.squareup.otto.Subscribe;
 import java.io.File;
 import java.io.IOException;
 
-import tv.danmaku.ijk.media.example.R;
+import tv.danmaku.ijk.media.example.test.R;
 import tv.danmaku.ijk.media.example.application.AppActivity;
 import tv.danmaku.ijk.media.example.application.Settings;
 import tv.danmaku.ijk.media.example.eventbus.FileExplorerEvents;

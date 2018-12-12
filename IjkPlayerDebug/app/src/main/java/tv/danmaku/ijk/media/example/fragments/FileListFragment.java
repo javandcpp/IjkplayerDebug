@@ -37,7 +37,7 @@ import android.widget.TextView;
 
 import java.io.File;
 
-import tv.danmaku.ijk.media.example.R;
+import tv.danmaku.ijk.media.example.test.R;
 import tv.danmaku.ijk.media.example.content.PathCursor;
 import tv.danmaku.ijk.media.example.content.PathCursorLoader;
 import tv.danmaku.ijk.media.example.eventbus.FileExplorerEvents;

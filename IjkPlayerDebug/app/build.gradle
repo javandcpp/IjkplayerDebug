@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion "26.0.2"
     defaultConfig {
-        applicationId "app.mobile.com.ijkplayerdebug"
+        applicationId "app.mobile.com.ijkplayerdebug.test"
         minSdkVersion 14
         targetSdkVersion 26
         versionCode 1

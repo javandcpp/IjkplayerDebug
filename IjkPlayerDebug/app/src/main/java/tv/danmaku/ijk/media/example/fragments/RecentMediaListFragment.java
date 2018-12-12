@@ -32,7 +32,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import tv.danmaku.ijk.media.example.R;
+import tv.danmaku.ijk.media.example.test.R;
 import tv.danmaku.ijk.media.example.activities.VideoActivity;
 import tv.danmaku.ijk.media.example.content.RecentMediaStorage;
 

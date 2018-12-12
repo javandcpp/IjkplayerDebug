@@ -30,8 +30,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import tv.danmaku.ijk.media.example.R;
 import tv.danmaku.ijk.media.example.activities.VideoActivity;
+import tv.danmaku.ijk.media.example.test.R;
 
 public class SampleMediaListFragment extends Fragment {
     private ListView mFileListView;
@@ -68,9 +68,8 @@ public class SampleMediaListFragment extends Fragment {
             }
         });
 
-        mAdapter.addItem("http://vjs.zencdn.net/v/oceans.mp4 ","mp4");
-        mAdapter.addItem("http://devimages.apple.com.edgekey.net/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8", "bipbop basic master playlist");
-        mAdapter.addItem("http://devimages.apple.com.edgekey.net/streaming/examples/bipbop_4x3/gear1/prog_index.m3u8", "bipbop basic 400x300 @ 232 kbps");
+        mAdapter.addItem("https://cdn.kaishuhezi.com/kstory/story/audio/e79311b2-999d-4894-a703-345be52cb2c8.mp3","音频测试");
+        mAdapter.addItem("https://cdn.kaishuhezi.com/kstory/microcourse/video/f1075c88-459f-4ce8-8f19-3268ec010014.mp4","视频测试");
     }
 
     final class SampleMediaItem {

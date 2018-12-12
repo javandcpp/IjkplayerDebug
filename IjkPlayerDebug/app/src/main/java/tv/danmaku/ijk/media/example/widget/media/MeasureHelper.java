@@ -23,7 +23,7 @@ import android.view.View;
 
 import java.lang.ref.WeakReference;
 
-import tv.danmaku.ijk.media.example.R;
+import tv.danmaku.ijk.media.example.test.R;
 
 public final class MeasureHelper {
     private WeakReference<View> mWeakView;

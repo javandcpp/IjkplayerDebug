@@ -13,7 +13,7 @@ import java.util.Locale;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import tv.danmaku.ijk.media.player.MediaPlayerProxy;
-import tv.danmaku.ijk.media.example.R;
+import tv.danmaku.ijk.media.example.test.R;
 
 public class InfoHudViewHolder {
     private TableLayoutBinder mTableLayoutBinder;

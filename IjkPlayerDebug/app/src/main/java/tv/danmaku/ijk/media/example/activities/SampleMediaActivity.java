@@ -23,9 +23,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
-import tv.danmaku.ijk.media.example.R;
 import tv.danmaku.ijk.media.example.application.AppActivity;
 import tv.danmaku.ijk.media.example.fragments.SampleMediaListFragment;
+import tv.danmaku.ijk.media.example.test.R;
 
 public class SampleMediaActivity extends AppActivity  {
     public static Intent newIntent(Context context) {

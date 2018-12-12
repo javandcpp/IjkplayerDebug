@@ -24,9 +24,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 
-import tv.danmaku.ijk.media.example.R;
 import tv.danmaku.ijk.media.example.application.AppActivity;
 import tv.danmaku.ijk.media.example.fragments.RecentMediaListFragment;
+import tv.danmaku.ijk.media.example.test.R;
 
 public class RecentMediaActivity extends AppActivity {
     public static Intent newIntent(Context context) {
