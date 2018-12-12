@@ -302,9 +302,7 @@ public class MediaPlayerProxy implements IMediaPlayer {
         }
     }
 
-    @Override
-    public void setIpFindListener(OnIpFindListener onIpFindListener) {
-    }
+
 
 //    @Override
 //    public void setIpFindListener(OnIpFindListener listener) {

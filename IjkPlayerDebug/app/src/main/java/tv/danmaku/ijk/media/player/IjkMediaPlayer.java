@@ -65,8 +65,8 @@ import static java.lang.System.currentTimeMillis;
 
 /**
  * @author bbcallen
- * <p>
- * Java wrapper of ffplay.
+ *         <p>
+ *         Java wrapper of ffplay.
  */
 public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private final static String TAG = IjkMediaPlayer.class.getName();
@@ -80,7 +80,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private static final int MEDIA_TIMED_TEXT = 99;
     private static final int MEDIA_ERROR = 100;
     private static final int MEDIA_INFO = 200;
-    private static final int MEDIA_IP = 300;
 
     private static final int MEDIA_WHAT_BEGIN = 1000;
     private static final int MEDIA_WHAT_END = 2000;
@@ -187,7 +186,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
             return;
         }
 
-        //Log.i(TAG, "halimin2018 ==========> event: what=" + what + ", extra=" + extra + ", str=" + obj.toString());
+        //Log.i(TAG, "2018 ==========> event: what=" + what + ", extra=" + extra + ", str=" + obj.toString());
 
         if (sp.mEventHandler != null) {
             Message m = sp.mEventHandler.obtainMessage(what, extra, reserved, obj);
@@ -209,7 +208,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         @Override
         public void handleMessage(Message msg)
         {
-            Log.i(TAG, "halimin2018 message: what=" + msg.what + ", extra=" + msg.arg1);
+            Log.i(TAG, "2018 message: what=" + msg.what + ", extra=" + msg.arg1);
 
             switch (msg.what)
             {
@@ -571,12 +570,14 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         stayAwake(true);
         _start();
 
+        StartPostLocalMessage();
     }
 
     private native void _start() throws IllegalStateException;
 
     @Override
     public void stop() throws IllegalStateException {
+        StopPostLocalMessage();
         stayAwake(false);
         _stop();
 
@@ -749,6 +750,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      */
     @Override
     public void release() {
+        StopPostLocalMessage();
         stayAwake(false);
         updateSurfaceScreenOn();
         resetListeners();
@@ -1029,6 +1031,18 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                 return;
             }
 
+            ///////////////////////////////////////////////////////////////////////
+            // added
+            if (msg.what >= MEDIA_WHAT_BEGIN && msg.what <= MEDIA_WHAT_END) {
+                if (msg.what == MEDIA_EXTRAINFO_TRACE_HTTP_DOWNLOAD_RATE) {
+                    mStartTime = System.currentTimeMillis() / 1000;
+                }
+
+                player.notifyOnExtraInfo(msg.what, msg.arg1, msg.obj.toString());
+                return;
+            }
+
+            ///////////////////////////////////////////////////////////////////////
 
             switch (msg.what) {
                 case MEDIA_PREPARED:
@@ -1104,9 +1118,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                     player.mVideoSarDen = msg.arg2;
                     player.notifyOnVideoSizeChanged(player.mVideoWidth, player.mVideoHeight,
                             player.mVideoSarNum, player.mVideoSarDen);
-                    break;
-                case MEDIA_IP:
-                    player.notifyIpFind((String) msg.obj);
                     break;
 
                 default:
@@ -1344,6 +1355,53 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         }
     }
 
+    // added
+    private void StartPostLocalMessage() {
+        mPostMessage = true;
+
+        new Thread() {
+            @Override
+            public void run() {
+                while (mPostMessage) {
+                    String strFreeMem = native_getFreeMemory();
+                    if (strFreeMem != null) {
+                        notifyOnExtraInfo(MEDIA_EXTRAINFO_TRACE_FREE_MEMORY, 0, strFreeMem);
+                    }
+
+                    String strUsedCPU = native_getUsedCPU();
+                    if (strUsedCPU != null) {
+                        notifyOnExtraInfo(MEDIA_EXTRAINFO_TRACE_USED_CPU, 0, strUsedCPU);
+                    }
+
+                    mEndTime = System.currentTimeMillis() / 1000;
+
+                    long Interval = mEndTime - mStartTime;
+
+                    if (Interval > 1) //not download rate message for two seconds
+                    {
+                        String strDownloadRate = "download rate: 0.0 kbps";
+                        notifyOnExtraInfo(MEDIA_EXTRAINFO_TRACE_HTTP_DOWNLOAD_RATE, 0, strDownloadRate);
+                    }
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+        }.start();
+    }
+
+    // added
+    private void StopPostLocalMessage() {
+        mPostMessage = false;
+    }
+
+    private native String native_getFreeMemory();
+
+    private native String native_getUsedCPU();
 
     public static native void native_profileBegin(String libName);
 

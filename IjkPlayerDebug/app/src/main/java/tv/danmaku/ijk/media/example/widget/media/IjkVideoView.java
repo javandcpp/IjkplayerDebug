@@ -334,12 +334,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             mMediaPlayer.setOnCompletionListener(mCompletionListener);
             mMediaPlayer.setOnErrorListener(mErrorListener);
             mMediaPlayer.setOnInfoListener(mInfoListener);
-            mMediaPlayer.setIpFindListener(new OnIpFindListener() {
-                @Override
-                public void ipHostFind(String msg) {
-                    ipTv.setText(msg);
-                }
-            });
+
             mMediaPlayer.setOnBufferingUpdateListener(mBufferingUpdateListener);
             mMediaPlayer.setOnSeekCompleteListener(mSeekCompleteListener);
             mMediaPlayer.setOnTimedTextListener(mOnTimedTextListener);
@@ -1050,6 +1045,13 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                 IjkMediaPlayer ijkMediaPlayer = null;
                 if (mUri != null) {
                     ijkMediaPlayer = new IjkMediaPlayer();
+                    ijkMediaPlayer.setOnExtraInfoListener(new IMediaPlayer.OnExtraInfoListener() {
+                        @Override
+                        public boolean onExtraInfo(IMediaPlayer mp, int what, int extra, String str) {
+                            Log.d("extraInfo","what:"+what+"    ,extra:"+extra+"     ,info:"+str);
+                            return false;
+                        }
+                    });
                     ijkMediaPlayer.native_setLogLevel(IjkMediaPlayer.IJK_LOG_DEBUG);
 
                     if (mSettings.getUsingMediaCodec()) {

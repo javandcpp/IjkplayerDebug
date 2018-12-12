@@ -28,13 +28,8 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
     private OnVideoSizeChangedListener mOnVideoSizeChangedListener;
     private OnErrorListener mOnErrorListener;
     private OnInfoListener mOnInfoListener;
-    private OnTimedTextListener mOnTimedTextListener;
-    protected OnIpFindListener mOnIpFindListener;
     private OnExtraInfoListener mOnExtraInfoListener;
-
-    public final void setOnExtraInfoListener(OnExtraInfoListener listener) {
-        mOnExtraInfoListener = listener;
-    }
+    private OnTimedTextListener mOnTimedTextListener;
 
     public final void setOnPreparedListener(OnPreparedListener listener) {
         mOnPreparedListener = listener;
@@ -66,12 +61,12 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
         mOnInfoListener = listener;
     }
 
-    public final void setOnTimedTextListener(OnTimedTextListener listener) {
-        mOnTimedTextListener = listener;
+    public final void setOnExtraInfoListener(OnExtraInfoListener listener) {
+        mOnExtraInfoListener = listener;
     }
 
-    public final void setIpFindListener(OnIpFindListener listener){
-        mOnIpFindListener=listener;
+    public final void setOnTimedTextListener(OnTimedTextListener listener) {
+        mOnTimedTextListener = listener;
     }
 
     public void resetListeners() {
@@ -82,6 +77,7 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
         mOnVideoSizeChangedListener = null;
         mOnErrorListener = null;
         mOnInfoListener = null;
+        mOnExtraInfoListener = null;
         mOnTimedTextListener = null;
     }
 
@@ -120,15 +116,13 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
         return mOnInfoListener != null && mOnInfoListener.onInfo(this, what, extra);
     }
 
+    protected final boolean notifyOnExtraInfo(int what, int extra, String str) {
+        return mOnExtraInfoListener != null && mOnExtraInfoListener.onExtraInfo(this, what, extra, str);
+    }
+
     protected final void notifyOnTimedText(IjkTimedText text) {
         if (mOnTimedTextListener != null)
             mOnTimedTextListener.onTimedText(this, text);
-    }
-
-    protected final void notifyIpFind(String msg){
-        if(null!=mOnIpFindListener){
-            mOnIpFindListener.ipHostFind(msg);
-        }
     }
 
     public void setDataSource(IMediaDataSource mediaDataSource) {
