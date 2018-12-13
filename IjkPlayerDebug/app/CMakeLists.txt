@@ -57,6 +57,7 @@ file(GLOB native_soundtouch_srcs "src/main/cpp/ijksoundtouch/*.c")
 file(GLOB native_soundtouchother_srcs "src/main/cpp/ijksoundtouch/*.cpp")
 file(GLOB native_soundtouchotherother_srcs "src/main/cpp/ijksoundtouch/source/SoundTouch/*.cpp")
 file(GLOB native_ijkprofsrcs "src/main/cpp/ijkprof/*.c")
+file(GLOB native_xx_srcs "src/main/cpp/test/*.c")
 
 
 add_library(ffmpeg SHARED IMPORTED)
@@ -79,7 +80,17 @@ set_target_properties(ijkplayer
 # default, you only need to specify the name of the public NDK library
 # you want to add. CMake verifies that the library exists before
 # completing its build.
+add_library( # Sets the name of the library.
+             ijkplayerMedia
 
+             # Sets the library as a shared library.
+             SHARED
+
+             # Provides a relative path to your source file(s).
+            # completing its build.
+
+            ${native_xx_srcs}
+          )
 
 find_library( # Sets the name of the path variable.
               log-lib

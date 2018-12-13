@@ -249,8 +249,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mHudViewHolder = new InfoHudViewHolder(getContext(), tableLayout);
     }
 
-    public void setIpTv(TextView tv){
-        this.ipTv=tv;
+    public void setIpTv(TextView tv) {
+        this.ipTv = tv;
     }
 
     /**
@@ -345,7 +345,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                     (TextUtils.isEmpty(scheme) || scheme.equalsIgnoreCase("file"))) {
                 IMediaDataSource dataSource = new FileMediaDataSource(new File(mUri.toString()));
                 mMediaPlayer.setDataSource(dataSource);
-            }  else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
                 mMediaPlayer.setDataSource(mAppContext, mUri, mHeaders);
             } else {
                 mMediaPlayer.setDataSource(mUri.toString());
@@ -532,7 +532,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                             Log.d(TAG, "MEDIA_INFO_AUDIO_RENDERING_START:");
                             break;
                         case 1000:
-                            Log.e("native ip","");
+                            Log.e("native ip", "");
                             break;
                     }
                     return true;
@@ -1048,14 +1048,14 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                     ijkMediaPlayer.setOnExtraInfoListener(new IMediaPlayer.OnExtraInfoListener() {
                         @Override
                         public boolean onExtraInfo(IMediaPlayer mp, int what, int extra, String str) {
-                            Log.d("extraInfo","what:"+what+"    ,extra:"+extra+"     ,info:"+str);
+                            Log.d("extraInfo", "what:" + what + "    ,extra:" + extra + "     ,info:" + str);
                             return false;
                         }
                     });
                     ijkMediaPlayer.native_setLogLevel(IjkMediaPlayer.IJK_LOG_DEBUG);
 
+
                     if (mSettings.getUsingMediaCodec()) {
-                        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec", 1);
                         if (mSettings.getUsingMediaCodecAutoRotate()) {
                             ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-auto-rotate", 1);
                         } else {
@@ -1083,12 +1083,17 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                         ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "overlay-format", pixelFormat);
                     }
                     ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "framedrop", 1);
-                    ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0);
 
-                    ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "http-detect-range-support", 0);
 
-                    ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_CODEC, "skip_loop_filter", 48);
                 }
+//                    ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 1);
+//                    ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "http-detect-range-support", 1);
+                    ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_CODEC, "skip_loop_filter", 48);
+                ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec", 0);
+                ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT,"max-buffer-size",102000000L);
+                ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT,"infbuf",1);
+                ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT,"flush_packets",1);
+
                 mediaPlayer = ijkMediaPlayer;
             }
             break;
