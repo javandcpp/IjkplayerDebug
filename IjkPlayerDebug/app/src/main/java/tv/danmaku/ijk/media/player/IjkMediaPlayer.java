@@ -181,19 +181,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private static long mStartTime = 0;
     private static long mEndTime = 0;
 
-    private static void postExtraEventFromNative(Object ijkmediaplayer_ref, int what, int extra, int reserved, String obj) {
-        IjkMediaPlayer sp = (IjkMediaPlayer) ((WeakReference) ijkmediaplayer_ref).get();
-        if (sp == null) {
-            return;
-        }
 
-        //Log.i(TAG, "halimin2018 ==========> event: what=" + what + ", extra=" + extra + ", str=" + obj.toString());
-
-        if (sp.mEventHandler != null) {
-            Message m = sp.mEventHandler.obtainMessage(what, extra, reserved, obj);
-            sp.mEventHandler.sendMessage(m);
-        }
-    }
 
     /*
     private class EventHandler extends Handler
@@ -242,7 +230,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
                 libLoader.loadLibrary("ijkffmpeg");
                 libLoader.loadLibrary("ijksdl");
-                libLoader.loadLibrary("ijkplayer");
+//                libLoader.loadLibrary("ijkplayer");
+                libLoader.loadLibrary("ijkplayerMedia");
                 mIsLibLoaded = true;
             }
         }

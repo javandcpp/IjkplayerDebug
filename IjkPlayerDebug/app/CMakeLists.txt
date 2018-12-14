@@ -81,6 +81,29 @@ set_target_properties(ijkplayer
 # completing its build.
 
 
+add_library( # Sets the name of the library.
+             ijkplayerMedia
+
+             # Sets the library as a shared library.
+             SHARED
+
+             # Provides a relative path to your source file(s).
+
+             ${native_ijkj_srcs}
+             ${native_player_srcs}
+             ${native_ijkj_android_srcs}
+             ${native_ijkavformat_srcs}
+             ${native_ijkavutil_srcs}
+             ${native_ijkplayer_pipeline_srcs}
+             ${native_pipeline_srcs}
+             ${native_soundtouch_srcs}
+             ${native_soundtouchother_srcs}
+             ${native_soundtouchotherother_srcs}
+             ${native_ijkavutilcpp_srcs}
+             ${native_ijkprofsrcs}
+             )
+
+
 find_library( # Sets the name of the path variable.
               log-lib
 
