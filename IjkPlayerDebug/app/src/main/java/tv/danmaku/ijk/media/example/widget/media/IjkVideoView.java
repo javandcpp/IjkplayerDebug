@@ -1073,6 +1073,13 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                     ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_CODEC, "skip_loop_filter", 48);
                 }
                 mediaPlayer = ijkMediaPlayer;
+                mediaPlayer.setOnExtraInfoListener(new IMediaPlayer.OnExtraInfoListener() {
+                    @Override
+                    public boolean onExtraInfo(IMediaPlayer mp, int what, int extra, String str) {
+                        Log.d("extrainfo",what+"   ,  "+str);
+                        return false;
+                    }
+                });
             }
             break;
         }

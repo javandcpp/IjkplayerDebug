@@ -283,6 +283,11 @@ public class MediaPlayerProxy implements IMediaPlayer {
     }
 
     @Override
+    public void setOnExtraInfoListener(OnExtraInfoListener listener) {
+
+    }
+
+    @Override
     public void setOnTimedTextListener(OnTimedTextListener listener) {
         if (listener != null) {
             final OnTimedTextListener finalListener = listener;

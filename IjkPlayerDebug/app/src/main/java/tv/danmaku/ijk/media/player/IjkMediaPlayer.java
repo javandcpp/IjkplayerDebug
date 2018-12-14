@@ -23,8 +23,8 @@ import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
-import android.graphics.SurfaceTexture;
 import android.graphics.Rect;
+import android.graphics.SurfaceTexture;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.media.RingtoneManager;
@@ -49,6 +49,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -59,6 +60,8 @@ import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
 import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 import tv.danmaku.ijk.media.player.misc.IjkTrackInfo;
 import tv.danmaku.ijk.media.player.pragma.DebugLog;
+
+import static java.lang.System.currentTimeMillis;
 
 /**
  * @author bbcallen
@@ -77,6 +80,9 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private static final int MEDIA_TIMED_TEXT = 99;
     private static final int MEDIA_ERROR = 100;
     private static final int MEDIA_INFO = 200;
+
+    private static final int MEDIA_WHAT_BEGIN = 1000;
+    private static final int MEDIA_WHAT_END = 2000;
 
     protected static final int MEDIA_SET_VIDEO_SAR = 10001;
 
@@ -169,6 +175,54 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
     private String mDataSource;
 
+    private boolean mPostMessage;
+
+    private static long mStartTime = 0;
+    private static long mEndTime = 0;
+
+    private static void postExtraEventFromNative(Object ijkmediaplayer_ref, int what, int extra, int reserved, String obj)
+    {
+        IjkMediaPlayer sp = (IjkMediaPlayer)((WeakReference)ijkmediaplayer_ref).get();
+        if (sp == null)
+        {
+            return;
+        }
+
+        //Log.i(TAG, "n2018 ==========> event: what=" + what + ", extra=" + extra + ", str=" + obj.toString());
+
+        if (sp.mEventHandler != null)
+        {
+            Message m = sp.mEventHandler.obtainMessage(what, extra, reserved, obj);
+            sp.mEventHandler.sendMessage(m);
+        }
+    }
+
+    /*
+    private class EventHandler extends Handler
+    {
+        private IjkMediaPlayer mIjkMediaPlayer;
+
+        public EventHandler(IjkMediaPlayer player, Looper looper)
+        {
+            super(looper);
+            mIjkMediaPlayer = player;
+        }
+
+        @Override
+        public void handleMessage(Message msg)
+        {
+            Log.i(TAG, "n2018 message: what=" + msg.what + ", extra=" + msg.arg1);
+
+            switch (msg.what)
+            {
+
+
+                default:
+                    break;
+            }
+        }
+    }*/
+
     /**
      * Default library loader
      * Load them by yourself, if your libraries are not installed at default place.
@@ -189,8 +243,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
                 libLoader.loadLibrary("ijkffmpeg");
                 libLoader.loadLibrary("ijksdl");
-//                libLoader.loadLibrary("ijkplayer");
-                libLoader.loadLibrary("ijkplayerMedia");
+                libLoader.loadLibrary("ijkplayer");
                 mIsLibLoaded = true;
             }
         }
@@ -522,6 +575,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     public void start() throws IllegalStateException {
         stayAwake(true);
         _start();
+
+        StartPostLocalMessage();
     }
 
     private native void _start() throws IllegalStateException;
@@ -530,6 +585,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     public void stop() throws IllegalStateException {
         stayAwake(false);
         _stop();
+
+        StopPostLocalMessage();
     }
 
     private native void _stop() throws IllegalStateException;
@@ -699,6 +756,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      */
     @Override
     public void release() {
+        StopPostLocalMessage();
         stayAwake(false);
         updateSurfaceScreenOn();
         resetListeners();
@@ -959,24 +1017,43 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         _setPropertyLong(FFP_PROP_INT64_SHARE_CACHE_DATA, (long)share);
     }
 
-    private static class EventHandler extends Handler {
+    private static class EventHandler extends Handler
+    {
         private final WeakReference<IjkMediaPlayer> mWeakPlayer;
 
-        public EventHandler(IjkMediaPlayer mp, Looper looper) {
+        public EventHandler(IjkMediaPlayer mp, Looper looper)
+        {
             super(looper);
             mWeakPlayer = new WeakReference<IjkMediaPlayer>(mp);
         }
 
         @Override
-        public void handleMessage(Message msg) {
+        public void handleMessage(Message msg)
+        {
             IjkMediaPlayer player = mWeakPlayer.get();
-            if (player == null || player.mNativeMediaPlayer == 0) {
-                DebugLog.w(TAG,
-                        "IjkMediaPlayer went away with unhandled events");
+            if (player == null || player.mNativeMediaPlayer == 0)
+            {
+                DebugLog.w(TAG, "IjkMediaPlayer went away with unhandled events");
                 return;
             }
 
-            switch (msg.what) {
+            ///////////////////////////////////////////////////////////////////////
+            //n added
+            if(msg.what >= MEDIA_WHAT_BEGIN && msg.what <= MEDIA_WHAT_END)
+            {
+                if(msg.what == MEDIA_EXTRAINFO_TRACE_HTTP_DOWNLOAD_RATE)
+                {
+                    mStartTime = System.currentTimeMillis() / 1000;
+                }
+
+                player.notifyOnExtraInfo(msg.what, msg.arg1, msg.obj.toString());
+                return;
+            }
+
+            ///////////////////////////////////////////////////////////////////////
+
+            switch (msg.what)
+            {
             case MEDIA_PREPARED:
                 player.notifyOnPrepared();
                 return;
@@ -988,16 +1065,20 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
             case MEDIA_BUFFERING_UPDATE:
                 long bufferPosition = msg.arg1;
-                if (bufferPosition < 0) {
+                if (bufferPosition < 0)
+                {
                     bufferPosition = 0;
                 }
 
                 long percent = 0;
                 long duration = player.getDuration();
-                if (duration > 0) {
+                if (duration > 0)
+                {
                     percent = bufferPosition * 100 / duration;
                 }
-                if (percent >= 100) {
+
+                if (percent >= 100)
+                {
                     percent = 100;
                 }
 
@@ -1018,14 +1099,16 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
             case MEDIA_ERROR:
                 DebugLog.e(TAG, "Error (" + msg.arg1 + "," + msg.arg2 + ")");
-                if (!player.notifyOnError(msg.arg1, msg.arg2)) {
+                if (!player.notifyOnError(msg.arg1, msg.arg2))
+                {
                     player.notifyOnCompletion();
                 }
                 player.stayAwake(false);
                 return;
 
             case MEDIA_INFO:
-                switch (msg.arg1) {
+                switch (msg.arg1)
+                {
                     case MEDIA_INFO_VIDEO_RENDERING_START:
                         DebugLog.i(TAG, "Info: MEDIA_INFO_VIDEO_RENDERING_START\n");
                         break;
@@ -1034,9 +1117,12 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                 // No real default action so far.
                 return;
             case MEDIA_TIMED_TEXT:
-                if (msg.obj == null) {
+                if (msg.obj == null)
+                {
                     player.notifyOnTimedText(null);
-                } else {
+                }
+                else
+                {
                     IjkTimedText text = new IjkTimedText(new Rect(0, 0, 1, 1), (String)msg.obj);
                     player.notifyOnTimedText(text);
                 }
@@ -1282,7 +1368,68 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         }
     }
 
+    //n added
+    private void StartPostLocalMessage()
+    {
+        mPostMessage = true;
+
+        new Thread()
+        {
+            @Override
+            public void run()
+            {
+                while(mPostMessage)
+                {
+                    String strFreeMem = native_getFreeMemory();
+                    if(strFreeMem != null)
+                    {
+                        notifyOnExtraInfo(MEDIA_EXTRAINFO_TRACE_FREE_MEMORY, 0, strFreeMem);
+                    }
+
+                    String strUsedCPU = native_getUsedCPU();
+                    if(strUsedCPU != null)
+                    {
+                        notifyOnExtraInfo(MEDIA_EXTRAINFO_TRACE_USED_CPU, 0, strUsedCPU);
+                    }
+
+                    mEndTime = System.currentTimeMillis() / 1000;
+
+                    long Interval = mEndTime - mStartTime;
+
+                    if(Interval > 1) //not download rate message for two seconds
+                    {
+                        String strDownloadRate = "download rate: 0.0 kbps";
+                        notifyOnExtraInfo(MEDIA_EXTRAINFO_TRACE_HTTP_DOWNLOAD_RATE, 0, strDownloadRate);
+                    }
+
+                    try
+                    {
+                        Thread.sleep(1000);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+        }.start();
+    }
+
+    //n added
+    private void StopPostLocalMessage()
+    {
+        mPostMessage = false;
+    }
+
+    private native String native_getFreeMemory();
+    private native String native_getUsedCPU();
+
     public static native void native_profileBegin(String libName);
     public static native void native_profileEnd();
     public static native void native_setLogLevel(int level);
+
+    public void setLogLevel(int level) throws IllegalStateException {
+        native_setLogLevel(level);
+    }
 }
