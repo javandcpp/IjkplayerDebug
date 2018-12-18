@@ -27,7 +27,7 @@ public:
     AVPacket audioPacket = {0};
 
     //最大的队列缓冲
-    int maxList = 100;
+    int maxList = 500;
 
 
     static AudioEncoder *Get();

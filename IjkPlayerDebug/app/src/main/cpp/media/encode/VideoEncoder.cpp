@@ -88,31 +88,40 @@ void VideoEncoder::main() {
             continue;
         }
 
-        const shared_ptr<AVData> &ptr = aVideoframeQueue.wait_and_pop();
+        const shared_ptr <AVData> &ptr = aVideoframeQueue.wait_and_pop();
         AVData *pData = ptr.get();
         int ret = -1;
         int totalSize = pData->width * pData->height * 3 / 2;
         int ySize = pData->width * pData->height;
-        memcpy(outputYUVFrame->data[0], *(pData->datas), ySize);//Y
-        memcpy(outputYUVFrame->data[1], *(pData->datas) + ySize, ySize / 4);//U
-        memcpy(outputYUVFrame->data[2], *(pData->datas) + (ySize * 5 / 4),
-               ySize / 4);
-        outputYUVFrame->linesize[0] = videoCodecContext->width;
-        outputYUVFrame->linesize[1] = videoCodecContext->width / 2;
-        outputYUVFrame->linesize[2] = videoCodecContext->width / 2;
-        LOGE("video encode %d", pData->size);
-        if (ret < 0) {
-            LOGE("video fill frame failed!");
-            continue;
-        }
+        memcpy(outputYUVFrame->data, pData->datas, sizeof(outputYUVFrame->data));//Y
+//        memcpy(outputYUVFrame->data[1], pData->datas, sizeof(outputYUVFrame->data[0]));//Y
+//        memcpy(outputYUVFrame->data[1], *(pData->datas), sizeof(outputYUVFrame->data[0]));//Y
+//        memcpy(outputYUVFrame->data[1], *(pData->datas) + ySize, ySize / 4);//U
+//        memcpy(outputYUVFrame->data[2], *(pData->datas) + (ySize * 5 / 4),
+//               ySize / 4);
+//        outputYUVFrame->linesize[0] = videoCodecContext->width;
+//        outputYUVFrame->linesize[1] = videoCodecContext->width / 2;
+//        outputYUVFrame->linesize[2] = videoCodecContext->width / 2;
+        outputYUVFrame->linesize[0] = pData->linesize[0];
+        outputYUVFrame->linesize[1] = pData->linesize[1];
+        outputYUVFrame->linesize[2] = pData->linesize[2];
+//        LOGD("line size【0】 ：%d", outputYUVFrame->linesize[0]);
+//        LOGD("line size【1】 ：%d", outputYUVFrame->linesize[1]);
+//        LOGD("line size【2】 ：%d", outputYUVFrame->linesize[2]);
+//
+//        LOGE("video encode %d", pData->size);
+//        if (ret < 0) {
+//            LOGE("video fill frame failed!");
+//            continue;
+//        }
         //发送数据到解码线程，一个数据包，可能解码多个结果
         ret = avcodec_send_frame(videoCodecContext, outputYUVFrame);
         LOGE("video enencode avcodec_send_frame result:%d", ret);
         if (ret == 0) {
-//            while (!isExit) {
+            while (!isExit) {
             //获取解码数据
             ret = avcodec_receive_packet(videoCodecContext, &videoPacket);
-            if (ret != 0) continue;
+            if (ret != 0) break;
 
             AVData avData;
             LOGD("video encode sucess  pts:%ld", pData->pts);
@@ -122,7 +131,7 @@ void VideoEncoder::main() {
             avData.data = (unsigned char *) avPacket;
             av_packet_unref(&videoPacket);
             this->notifyObserver(avData);
-//            }
+            }
         }
 //        pData->Drop();
     }
@@ -286,7 +295,7 @@ int VideoEncoder::StartEncode() {
 }
 
 int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
-    std::lock_guard<std::mutex> lk(mtx);
+    std::lock_guard <std::mutex> lk(mtx);
     int ret = 0;
     avCodec = avcodec_find_encoder_by_name("libx264");
     if (!avCodec) {
@@ -305,8 +314,8 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     videoCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER; //全局参数
     videoCodecContext->codec_id = avCodec->id;
     videoCodecContext->bit_rate = 100 * 1024 * 8;//压缩后每秒视频的bit位大小 50kB
-    videoCodecContext->width = 480;
-    videoCodecContext->height = 640;
+    videoCodecContext->width = 1920;
+    videoCodecContext->height = 1080;
     videoCodecContext->framerate = {25, 1};
     videoCodecContext->gop_size = 50;
     videoCodecContext->max_b_frames = 0;
@@ -371,7 +380,7 @@ bool VideoEncoder::GetEncodeState() {
 }
 
 int VideoEncoder::CloseEncode() {
-    std::lock_guard<std::mutex> lk(mtx);
+    std::lock_guard <std::mutex> lk(mtx);
     if (isEncoding) {
         isEncoding = false;
         avcodec_close(videoCodecContext);

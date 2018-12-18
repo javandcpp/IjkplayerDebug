@@ -102,10 +102,10 @@ void AudioEncoder::main() {
         ret = avcodec_send_frame(audioCodecContext, outputFrame);
         LOGE("audio enencode avcodec_send_frame result:%d", ret);
         if (ret == 0) {
-//            while (!isExit) {
+            while (!isExit) {
                 //获取解码数据
                 ret = avcodec_receive_packet(audioCodecContext, &audioPacket);
-                if (ret != 0) continue;
+                if (ret != 0) break;
 
                 AVData avData;
                 LOGD("audio encode sucess  pts:%ld",pData->pts);
@@ -115,7 +115,7 @@ void AudioEncoder::main() {
                 avData.data = (unsigned char *) avPacket;
                 av_packet_unref(&audioPacket);
                 this->notifyObserver(avData);
-//            }
+            }
         }
 //        pData->Drop();
     }

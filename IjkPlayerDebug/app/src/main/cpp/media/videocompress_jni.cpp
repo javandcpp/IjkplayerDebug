@@ -41,13 +41,13 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
         videoCompressComponent->getAudioDecode()->openCodec(*(pDemux->getAudioParameters()));
         videoCompressComponent->getVideoDecode()->openCodec(*(pDemux->getVideoParamters()));
         //音频编码
-//        videoCompressComponent->getAudioEncode()->InitEncode(videoCompressComponent->getDemux()->getAudioParameters()->codecParameters);
-//        videoCompressComponent->getAudioEncode()->startThread();
+        videoCompressComponent->getAudioEncode()->InitEncode(videoCompressComponent->getDemux()->getAudioParameters()->codecParameters);
+        videoCompressComponent->getAudioEncode()->startThread();
         //视频编码
         videoCompressComponent->getVideoEncode()->InitEncode(videoCompressComponent->getDemux()->getVideoParamters()->codecParameters);
-//        videoCompressComponent->getVideoEncode()->startThread();
+        videoCompressComponent->getVideoEncode()->startThread();
         //开启解码
-//        videoCompressComponent->getAudioDecode()->startThread();
+        videoCompressComponent->getAudioDecode()->startThread();
         videoCompressComponent->getVideoDecode()->startThread();
 //        开始解复用
         videoCompressComponent->getDemux()->startThread();

@@ -139,6 +139,9 @@ AVData FFmpegDecode::receiveFrame() {
         avData.width = avFrame->width;
         avData.height = avFrame->height;
         avData.isAudio=false;
+        avData.linesize[0]=avFrame->linesize[0];
+        avData.linesize[1]=avFrame->linesize[1];
+        avData.linesize[2]=avFrame->linesize[2];
     }
 
     avData.format = avFrame->format;

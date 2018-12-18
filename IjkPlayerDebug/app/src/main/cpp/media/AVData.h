@@ -29,6 +29,8 @@ public:
     bool end;
 
     int size = 0;
+
+    int linesize[8];
 };
 
 

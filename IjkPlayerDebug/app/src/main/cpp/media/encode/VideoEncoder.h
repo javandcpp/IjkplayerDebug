@@ -45,7 +45,7 @@ public:
 
     VideoEncoder();
 
-    int maxList=100;
+    int maxList=500;
 
     ~VideoEncoder();
 
