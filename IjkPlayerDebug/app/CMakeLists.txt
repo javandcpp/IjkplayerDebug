@@ -63,6 +63,7 @@ file(GLOB media_demux_cpp "src/main/cpp/media/demux/*.cpp")
 file(GLOB media_decode_cpp "src/main/cpp/media/decode/*.cpp")
 file(GLOB media_audio_cpp "src/main/cpp/media/audio/*.cpp")
 file(GLOB media_encode_cpp "src/main/cpp/media/encode/*.cpp")
+file(GLOB media_stream_cpp "src/main/cpp/media/streamer/*.cpp")
 
 
 
@@ -82,7 +83,7 @@ set_target_properties(ijkplayer
                       IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/src/main/jniLibs/armeabi-v7a/libijkplayer.so)
 
 add_library( # Sets the name of the library.
-             ijkplayerMedia
+             coremedia
 
              # Sets the library as a shared library.
              SHARED
@@ -96,8 +97,8 @@ add_library( # Sets the name of the library.
             ${media_decode_cpp}
             ${media_audio_cpp}
             ${media_encode_cpp}
-
-             )
+            ${media_stream_cpp}
+            )
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -121,7 +122,7 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-                       ijkplayerMedia
+                       coremedia
 
                        # Links the target library to the log library
                        # included in the NDK.

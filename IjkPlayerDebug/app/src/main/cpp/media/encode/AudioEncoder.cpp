@@ -111,8 +111,9 @@ void AudioEncoder::main() {
                 LOGD("audio encode sucess  pts:%ld",pData->pts);
                 avData.pts = pData->pts;
                 AVPacket *avPacket=av_packet_alloc();
-                memcpy(avPacket,&audioPacket, sizeof(avPacket));
+                memcpy(avPacket,&audioPacket, sizeof(audioPacket));
                 avData.data = (unsigned char *) avPacket;
+                avData.isAudio=true;
                 av_packet_unref(&audioPacket);
                 this->notifyObserver(avData);
             }
@@ -283,5 +284,8 @@ int AudioEncoder::CloseEncode() {
 
 bool AudioEncoder::GetEncodeState() {
     return isEncoding;
+}
+AVCodecContext* AudioEncoder::getAudioCodecContext() {
+    return audioCodecContext;
 }
 

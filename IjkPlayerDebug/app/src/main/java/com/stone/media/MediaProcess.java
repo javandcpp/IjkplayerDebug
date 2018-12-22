@@ -8,8 +8,7 @@ public final class MediaProcess {
     }
 
     private void loadNativelibrary() {
-//        System.loadLibrary("ijkffmpeg");
-        System.loadLibrary("ijkplayerMedia");
+        System.loadLibrary("coremedia");
     }
 
     private static MediaProcess mInstance = null;

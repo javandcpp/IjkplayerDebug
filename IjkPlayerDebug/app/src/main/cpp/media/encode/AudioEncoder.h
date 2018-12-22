@@ -87,6 +87,10 @@ public:
     virtual void update(AVData avData);
 
     virtual void main();
+
+    AVCodecContext *getAudioCodecContext();
+
+
 };
 
 

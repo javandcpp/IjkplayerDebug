@@ -13,6 +13,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavutil/avutil.h"
 #include "libavcodec/jni.h"
+#include "libavutil/time.h"
 #include <stdio.h>
 };
 

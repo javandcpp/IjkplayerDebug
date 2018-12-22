@@ -88,7 +88,7 @@ void VideoEncoder::main() {
             continue;
         }
 
-        const shared_ptr <AVData> &ptr = aVideoframeQueue.wait_and_pop();
+        const shared_ptr<AVData> &ptr = aVideoframeQueue.wait_and_pop();
         AVData *pData = ptr.get();
         int ret = -1;
         int totalSize = pData->width * pData->height * 3 / 2;
@@ -119,18 +119,19 @@ void VideoEncoder::main() {
         LOGE("video enencode avcodec_send_frame result:%d", ret);
         if (ret == 0) {
             while (!isExit) {
-            //获取解码数据
-            ret = avcodec_receive_packet(videoCodecContext, &videoPacket);
-            if (ret != 0) break;
+                //获取解码数据
+                av_packet_unref(&videoPacket);
+                ret = avcodec_receive_packet(videoCodecContext, &videoPacket);
+                if (ret != 0) break;
 
-            AVData avData;
-            LOGD("video encode sucess  pts:%ld", pData->pts);
-            avData.pts = pData->pts;
-            AVPacket *avPacket = av_packet_alloc();
-            memcpy(avPacket, &videoPacket, sizeof(avPacket));
-            avData.data = (unsigned char *) avPacket;
-            av_packet_unref(&videoPacket);
-            this->notifyObserver(avData);
+                AVData avData;
+                LOGD("video encode sucess  pts:%ld", pData->pts);
+                avData.pts = pData->pts;
+                AVPacket *avPacket = av_packet_alloc();
+                memcpy(avPacket, &videoPacket, sizeof(videoPacket));
+                avData.data = (unsigned char *) avPacket;
+                avData.isAudio = false;
+                this->notifyObserver(avData);
             }
         }
 //        pData->Drop();
@@ -295,7 +296,7 @@ int VideoEncoder::StartEncode() {
 }
 
 int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
-    std::lock_guard <std::mutex> lk(mtx);
+    std::lock_guard<std::mutex> lk(mtx);
     int ret = 0;
     avCodec = avcodec_find_encoder_by_name("libx264");
     if (!avCodec) {
@@ -324,10 +325,10 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     videoCodecContext->time_base = {1, 1000000};//AUDIO VIDEO 两边时间基数要相同
     videoCodecContext->pix_fmt = AV_PIX_FMT_YUV420P;
 
-    videoCodecContext->level = 41;
-    videoCodecContext->me_method = ME_HEX;
-    videoCodecContext->refs = 1;
-    videoCodecContext->chromaoffset = 2;
+//    videoCodecContext->level = 41;
+//    videoCodecContext->me_method = ME_HEX;
+//    videoCodecContext->refs = 1;
+//    videoCodecContext->chromaoffset = 2;
 //    }
 
     /**
@@ -339,7 +340,7 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
      */
 
     AVDictionary *opts = NULL;
-    av_dict_set(&opts, "preset", "ultrafast", 0);//编码器的速度会影响推流音视频同步,所以这里需要设置下
+//    av_dict_set(&opts, "preset", "ultrafast", 0);//编码器的速度会影响推流音视频同步,所以这里需要设置下
 //    av_dict_set(&opts, "tune", "zerolatency", 0);//如果开0延迟可能会影响视频质量
     av_dict_set(&opts, "profile", "baseline", 0);//I/P帧
 
@@ -380,13 +381,17 @@ bool VideoEncoder::GetEncodeState() {
 }
 
 int VideoEncoder::CloseEncode() {
-    std::lock_guard <std::mutex> lk(mtx);
+    std::lock_guard<std::mutex> lk(mtx);
     if (isEncoding) {
         isEncoding = false;
         avcodec_close(videoCodecContext);
         LOGD("Close Video Encode!");
     }
     return 0;
+}
+
+AVCodecContext *VideoEncoder::getVideoCodecContext() {
+    return videoCodecContext;
 }
 
 

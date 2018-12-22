@@ -116,6 +116,8 @@ public:
 
     virtual void main();
 
+    AVCodecContext *getVideoCodecContext();
+
 };
 
 
