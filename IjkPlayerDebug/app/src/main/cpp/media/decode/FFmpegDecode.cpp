@@ -178,7 +178,11 @@ AVData FFmpegDecode::receiveFrame() {
 
         int i = codecContext->height * codecContext->width;
         fwrite(inAvFrame->data[0],1,i,pFILE);
+
+
         fwrite(inAvFrame->data[1],1,i/4,pFILE);
+
+
         fwrite(inAvFrame->data[2],1,i/4,pFILE);
         fflush(pFILE);
     }
