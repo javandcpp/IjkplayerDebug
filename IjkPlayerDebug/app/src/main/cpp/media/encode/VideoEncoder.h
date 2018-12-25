@@ -28,7 +28,7 @@ private:
     int InitFilter();
 
 public:
-
+    FILE *pFILE=NULL;
 
     bool isEncoding = false;
 

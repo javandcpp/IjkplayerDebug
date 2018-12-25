@@ -39,28 +39,28 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
         videoCompressComponent->openSource(url);
         FFmpegDemux *pDemux = videoCompressComponent->getDemux();
         //打开音视频解码器
-//        videoCompressComponent->getAudioDecode()->openCodec(*(pDemux->getAudioParameters()));
+        videoCompressComponent->getAudioDecode()->openCodec(*(pDemux->getAudioParameters()));
         videoCompressComponent->getVideoDecode()->openCodec(*(pDemux->getVideoParamters()));
         //音频编码
-//        videoCompressComponent->getAudioEncode()->InitEncode(videoCompressComponent->getDemux()->getAudioParameters()->codecParameters);
+        videoCompressComponent->getAudioEncode()->InitEncode(videoCompressComponent->getDemux()->getAudioParameters()->codecParameters);
         videoCompressComponent->getVideoEncode()->InitEncode(videoCompressComponent->getDemux()->getVideoParamters()->codecParameters);
 
         //IO
-        FileStreamer *fileStreamer=FileStreamer::Get();
-        videoCompressComponent->getVideoEncode()->addObserver(fileStreamer);
+//        FileStreamer *fileStreamer=FileStreamer::Get();
+//        videoCompressComponent->getVideoEncode()->addObserver(fileStreamer);
 //        videoCompressComponent->getAudioEncode()->addObserver(fileStreamer);
 
-        fileStreamer->setVideoEncoder(videoCompressComponent->getVideoEncode());
+//        fileStreamer->setVideoEncoder(videoCompressComponent->getVideoEncode());
 //        fileStreamer->setAudioEncoder(videoCompressComponent->getAudioEncode());
 
-        fileStreamer->InitStreamer("/mnt/sdcard/output1.mp4");
-        fileStreamer->StartPushStream();
+//        fileStreamer->InitStreamer("/mnt/sdcard/output1.mp4");
+//        fileStreamer->StartPushStream();
 
         //视频编码
-//        videoCompressComponent->getAudioEncode()->startThread();
+        videoCompressComponent->getAudioEncode()->startThread();
         videoCompressComponent->getVideoEncode()->startThread();
 //        开启解码
-//        videoCompressComponent->getAudioDecode()->startThread();
+        videoCompressComponent->getAudioDecode()->startThread();
         videoCompressComponent->getVideoDecode()->startThread();
 //        开始解复用
         videoCompressComponent->getDemux()->startThread();

@@ -15,6 +15,8 @@ VideoEncoder *VideoEncoder::Get() {
 
 VideoEncoder::VideoEncoder() {
 
+    pFILE = fopen("/mnt/sdcard/test.yuv", "wb+");
+
 }
 
 
@@ -54,6 +56,9 @@ VideoEncoder::~VideoEncoder() {
         videoCodecContext = NULL;
     }
 
+    if (pFILE)
+        fclose(pFILE);
+
     LOGD("delete VideoEncoder");
 }
 
@@ -92,7 +97,7 @@ void VideoEncoder::main() {
         AVData *pData = ptr.get();
         int ret = -1;
         int totalSize = pData->width * pData->height * 3 / 2;
-        int ySize = pData->width * pData->height;
+        unsigned int ySize = (unsigned int) (pData->width * pData->height);
         memcpy(outputYUVFrame->data, pData->datas, sizeof(outputYUVFrame->data));//Y
 //        memcpy(outputYUVFrame->data[1], pData->datas, sizeof(outputYUVFrame->data[0]));//Y
 //        memcpy(outputYUVFrame->data[1], *(pData->datas), sizeof(outputYUVFrame->data[0]));//Y
@@ -105,6 +110,14 @@ void VideoEncoder::main() {
         outputYUVFrame->linesize[0] = pData->linesize[0];
         outputYUVFrame->linesize[1] = pData->linesize[1];
         outputYUVFrame->linesize[2] = pData->linesize[2];
+
+#if 1
+//        if (pFILE) {
+//            fwrite(outputYUVFrame->data[0], 1, ySize, pFILE);
+//            fflush(pFILE);
+//        }
+#endif
+
 //        LOGD("line size【0】 ：%d", outputYUVFrame->linesize[0]);
 //        LOGD("line size【1】 ：%d", outputYUVFrame->linesize[1]);
 //        LOGD("line size【2】 ：%d", outputYUVFrame->linesize[2]);
@@ -315,8 +328,8 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     videoCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER; //全局参数
     videoCodecContext->codec_id = avCodec->id;
     videoCodecContext->bit_rate = 100 * 1024 * 8;//压缩后每秒视频的bit位大小 50kB
-    videoCodecContext->width = 1920;
-    videoCodecContext->height = 1080;
+    videoCodecContext->width = 1280;
+    videoCodecContext->height = 720;
     videoCodecContext->framerate = {25, 1};
     videoCodecContext->gop_size = 50;
     videoCodecContext->max_b_frames = 0;

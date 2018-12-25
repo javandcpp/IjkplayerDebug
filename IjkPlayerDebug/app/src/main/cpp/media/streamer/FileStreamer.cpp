@@ -59,7 +59,7 @@ int FileStreamer::InitStreamer(const char *url) {
     std::lock_guard<std::mutex> lk(mtx);
     this->outputUrl = url;
     int ret = 0;
-    ret = avformat_alloc_output_context2(&iAvFormatContext, NULL, NULL, outputUrl);
+    ret = avformat_alloc_output_context2(&iAvFormatContext, NULL, "mp4", outputUrl);
     if (ret < 0) {
         char buf[1024] = {0};
         av_strerror(ret, buf, sizeof(buf));
@@ -427,6 +427,8 @@ void FileStreamer::startThread() {
 }
 
 void FileStreamer::stopThread() {
+
+
 
 
 }

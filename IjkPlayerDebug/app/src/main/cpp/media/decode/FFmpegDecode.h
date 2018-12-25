@@ -8,7 +8,7 @@
 
 #include "IFFmpegDecode.h"
 
-
+struct SwsContext;
 
 class FFmpegDecode : public IFFmpegDecode {
 
@@ -27,9 +27,16 @@ public:
 
     AVData receiveCacheFrame();
 
+    SwsContext *sws_ctx= nullptr;
+
 protected:
     AVCodecContext *codecContext=NULL;
-    AVFrame *avFrame = NULL;
+    AVFrame *inAvFrame = NULL;
+
+    AVFrame *outAvFrame= NULL;
+    FILE *pFILE;
+
+    uint8_t *video_out_buffer=NULL;
 };
 
 

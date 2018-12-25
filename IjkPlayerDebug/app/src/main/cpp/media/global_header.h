@@ -14,6 +14,8 @@ extern "C" {
 #include "libavutil/avutil.h"
 #include "libavcodec/jni.h"
 #include "libavutil/time.h"
+#include "libavutil/imgutils.h"
+#include "libswscale/swscale.h"
 #include <stdio.h>
 };
 
