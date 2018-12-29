@@ -390,7 +390,7 @@ int FileStreamer::SendFrame(AVData *pData, int streamIndex) {
     AVRational dtime;
     AVPacket *packet = (AVPacket *) pData->data;
     packet->stream_index = streamIndex;
-    LOGD("write packet index:%d    index:%d   pts:%lld", packet->stream_index, streamIndex,
+    LOGD("write packet index:%d    index:%d   pts:%lud", packet->stream_index, streamIndex,
          packet->pts);
     //判断是音频还是视频
     if (packet->stream_index == videoStreamIndex) {

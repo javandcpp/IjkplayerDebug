@@ -59,7 +59,7 @@ bool FFmpegDecode::openCodec(AVParameters parameters) {
         LOGE("avcodec open error :%s", av_err2str(ret));
         return false;
     }
-
+    outAvFrame = av_frame_alloc();
     if (codecContext->codec_type == AVMEDIA_TYPE_AUDIO) {
         isAudio = true;
         LOGD("avcodec audio open2 success!");
@@ -71,7 +71,7 @@ bool FFmpegDecode::openCodec(AVParameters parameters) {
                                codecContext->width, codecContext->height, AV_PIX_FMT_YUV420P,
                                SWS_BICUBIC, NULL, NULL, NULL);
 
-        outAvFrame = av_frame_alloc();
+
         int buffer_size = av_image_get_buffer_size(AV_PIX_FMT_YUV420P, codecContext->width,
                                                    codecContext->height, 1);
         video_out_buffer = (uint8_t *) av_malloc(buffer_size);
@@ -102,6 +102,7 @@ AVData FFmpegDecode::receiveCacheFrame() {
             }
             int ret = avcodec_receive_frame(codecContext, inAvFrame);
             if (ret == AVERROR_EOF) {
+
 //                LOGE("------->avcodec receive cached end");
                 isRunning = true;
                 return AVData();
@@ -150,11 +151,14 @@ AVData FFmpegDecode::receiveFrame() {
     }
     int ret = avcodec_receive_frame(codecContext, inAvFrame);
     if (ret != 0) {
+        char buf[100]={0};
+        av_strerror(ret,buf, sizeof(buf));
+        LOGE("avcodec receive error :%s",buf);
         return AVData();
     }
     AVData avData;
     avData.data = (unsigned char *) inAvFrame;
-    LOGE("------->avcodec receive frame success  pts:%lld", ((AVFrame *) avData.data)->pts);
+    LOGE("------->avcodec receive frame success  pts:%lld",inAvFrame->pts);
     if (codecContext->codec_type == AVMEDIA_TYPE_AUDIO) {
         //样本字节数 * 单通道样本数 * 通道数
         avData.size =
@@ -177,18 +181,18 @@ AVData FFmpegDecode::receiveFrame() {
         avData.linesize[2] = outAvFrame->linesize[2];
 
         int i = codecContext->height * codecContext->width;
-        fwrite(inAvFrame->data[0],1,i,pFILE);
+//        fwrite(inAvFrame->data[0],1,i,pFILE);
 
 
-        fwrite(inAvFrame->data[1],1,i/4,pFILE);
+//        fwrite(inAvFrame->data[1],1,i/4,pFILE);
 
 
-        fwrite(inAvFrame->data[2],1,i/4,pFILE);
-        fflush(pFILE);
+//        fwrite(inAvFrame->data[2],1,i/4,pFILE);
+//        fflush(pFILE);
     }
 
     avData.format = inAvFrame->format;
-    memcpy(avData.datas, inAvFrame->data, sizeof(avData.datas));
+    memcpy(avData.datas, inAvFrame->data, sizeof(inAvFrame->data));
     avData.pts = inAvFrame->pts;
 
     return avData;

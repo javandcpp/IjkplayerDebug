@@ -56,6 +56,7 @@ bool FFmpegDemux::open(const char *url) {
 
     LOGD("find stream index  videoStream:%d   audioStream:%d", getVideoStreamIndex(),
          getAudioStreamIndex());
+
     return true;
 
     fail:
@@ -91,11 +92,14 @@ AVData FFmpegDemux::readMediaData() {
     AVPacket *pkt = av_packet_alloc();
     int re = av_read_frame(avFormatContext, pkt);
     if (re != 0) {
-        av_packet_free(&pkt);
+        char buf[100]={0};
+        av_strerror(re,buf, sizeof(buf));
+        LOGD("av_read_frame:%s",buf);
         return AVData();
     }
-    avData.data = (unsigned char*)pkt;
+    avData.data = (unsigned char *) pkt;
     avData.size = pkt->size;
+
     if (pkt->stream_index == audioStreamIndex) {
         avData.isAudio = true;
     } else if (pkt->stream_index == videoStreamIndex) {

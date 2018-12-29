@@ -15,8 +15,36 @@ VideoEncoder *VideoEncoder::Get() {
 
 VideoEncoder::VideoEncoder() {
 
-    pFILE = fopen("/mnt/sdcard/test.yuv", "wb+");
+    pFILE = fopen("/mnt/sdcard/testdecode.h264", "wb+");
 
+}
+
+int vflush_encoder(AVFormatContext *fmt_ctx, unsigned int stream_index) {
+    int ret = 0;
+    int got_frame;
+    AVPacket enc_pkt;
+    if (!(fmt_ctx->streams[stream_index]->codec->codec->capabilities
+          & CODEC_CAP_DELAY))
+        return 0;
+    av_init_packet(&enc_pkt);
+    while (1) {
+        enc_pkt.data = NULL;
+        enc_pkt.size = 0;
+        ret = avcodec_encode_video2(fmt_ctx->streams[stream_index]->codec,
+                                    &enc_pkt, NULL, &got_frame);
+        if (ret < 0)
+            break;
+        if (!got_frame) {
+            ret = 0;
+            break;
+        }
+        ret = av_write_frame(fmt_ctx, &enc_pkt);
+        av_free_packet(&enc_pkt);
+        if (ret < 0)
+            break;
+    }
+
+    return ret;
 }
 
 
@@ -107,15 +135,18 @@ void VideoEncoder::main() {
 //        outputYUVFrame->linesize[0] = videoCodecContext->width;
 //        outputYUVFrame->linesize[1] = videoCodecContext->width / 2;
 //        outputYUVFrame->linesize[2] = videoCodecContext->width / 2;
+
         outputYUVFrame->linesize[0] = pData->linesize[0];
         outputYUVFrame->linesize[1] = pData->linesize[1];
         outputYUVFrame->linesize[2] = pData->linesize[2];
 
-#if 1
-//        if (pFILE) {
-//            fwrite(outputYUVFrame->data[0], 1, ySize, pFILE);
-//            fflush(pFILE);
-//        }
+#if 0
+        if (pFILE) {
+            fwrite(outputYUVFrame->data[0], 1, ySize, pFILE);
+            fwrite(outputYUVFrame->data[1], 1, ySize/4, pFILE);
+            fwrite(outputYUVFrame->data[2], 1, ySize/4, pFILE);
+            fflush(pFILE);
+        }
 #endif
 
 //        LOGD("line size【0】 ：%d", outputYUVFrame->linesize[0]);
@@ -138,10 +169,17 @@ void VideoEncoder::main() {
                 if (ret != 0) break;
 
                 AVData avData;
-                LOGD("video encode sucess  pts:%ld", pData->pts);
+
                 avData.pts = pData->pts;
                 AVPacket *avPacket = av_packet_alloc();
+#if 0
+                if(pFILE){
+                    fwrite(videoPacket.data, 1, (size_t) videoPacket.size, pFILE);
+                    fflush(pFILE);
+                }
+#endif
                 memcpy(avPacket, &videoPacket, sizeof(videoPacket));
+                LOGD("video encode sucess  pts:%ld pktsize:%d", pData->pts,videoPacket.size);
                 avData.data = (unsigned char *) avPacket;
                 avData.isAudio = false;
                 this->notifyObserver(avData);
@@ -338,10 +376,10 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     videoCodecContext->time_base = {1, 1000000};//AUDIO VIDEO 两边时间基数要相同
     videoCodecContext->pix_fmt = AV_PIX_FMT_YUV420P;
 
-//    videoCodecContext->level = 41;
-//    videoCodecContext->me_method = ME_HEX;
-//    videoCodecContext->refs = 1;
-//    videoCodecContext->chromaoffset = 2;
+    videoCodecContext->level = 41;
+    videoCodecContext->me_method = ME_HEX;
+    videoCodecContext->refs = 1;
+    videoCodecContext->chromaoffset = 2;
 //    }
 
     /**
