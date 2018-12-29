@@ -10,12 +10,12 @@ void IFFmpegDecode::update(AVData pkt) {
         return;
     }
     while (!isExit) {
-        if (threadsafeQueue.Size() < maxList) {
+//        if (threadsafeQueue.Size()) {
             threadsafeQueue.push(pkt);
             break;
         }
         xsleep(1);
-    }
+//    }
 }
 
 void IFFmpegDecode::main() {

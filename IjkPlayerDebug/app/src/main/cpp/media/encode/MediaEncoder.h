@@ -15,6 +15,10 @@ protected:
 
     mutable mutex mtx;
 
+    int audioPts=0;
+
+    int videoPts=0;
+
     MediaEncoder();
 
     virtual ~MediaEncoder();

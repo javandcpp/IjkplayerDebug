@@ -92,9 +92,9 @@ AVData FFmpegDemux::readMediaData() {
     AVPacket *pkt = av_packet_alloc();
     int re = av_read_frame(avFormatContext, pkt);
     if (re != 0) {
-        char buf[100]={0};
-        av_strerror(re,buf, sizeof(buf));
-        LOGD("av_read_frame:%s",buf);
+        char buf[100] = {0};
+        av_strerror(re, buf, sizeof(buf));
+        LOGD("av_read_frame:%s", buf);
         return AVData();
     }
     avData.data = (unsigned char *) pkt;
@@ -113,6 +113,13 @@ AVData FFmpegDemux::readMediaData() {
     pkt->dts = pkt->dts * (1000 * r2d(avFormatContext->streams[pkt->stream_index]->time_base));
     avData.pts = (int) pkt->pts;
     LOGD("read media data size:%d", avData.size);
+
+    if (avData.isAudio) {
+        audioPts = avData.pts;
+    } else {
+        videoPts = avData.pts;
+    }
+
     LOGD("pts:%lld", pkt->pts);
     return avData;
 }

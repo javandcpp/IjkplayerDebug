@@ -15,6 +15,10 @@ class FFmpegDemux : public IDemux {
 public:
     static bool isFirst;
 
+    int audioPts;
+
+    int videoPts;
+
     virtual bool open(const char *url);
 
     virtual AVParameters *getVideoParamters();

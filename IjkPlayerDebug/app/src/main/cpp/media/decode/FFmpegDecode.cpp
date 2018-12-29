@@ -44,7 +44,8 @@ bool FFmpegDecode::openCodec(AVParameters parameters) {
 //        codec = avcodec_find_decoder_by_name("h264_mediacodec");
         codec = avcodec_find_decoder(parameters.codecParameters->codec_id);
     } else {
-        codec = avcodec_find_decoder(parameters.codecParameters->codec_id);
+        codec=avcodec_find_decoder_by_name("libfdk_aac");
+//        codec = avcodec_find_decoder(parameters.codecParameters->codec_id);
     }
 
     if (!codec) {
@@ -182,11 +183,11 @@ AVData FFmpegDecode::receiveFrame() {
 
         int i = codecContext->height * codecContext->width;
 //        fwrite(inAvFrame->data[0],1,i,pFILE);
-
-
+//
+//
 //        fwrite(inAvFrame->data[1],1,i/4,pFILE);
-
-
+//
+//
 //        fwrite(inAvFrame->data[2],1,i/4,pFILE);
 //        fflush(pFILE);
     }
@@ -194,6 +195,7 @@ AVData FFmpegDecode::receiveFrame() {
     avData.format = inAvFrame->format;
     memcpy(avData.datas, inAvFrame->data, sizeof(inAvFrame->data));
     avData.pts = inAvFrame->pts;
+    avData.pkt_pts=inAvFrame->pkt_pts;
 
     return avData;
 }

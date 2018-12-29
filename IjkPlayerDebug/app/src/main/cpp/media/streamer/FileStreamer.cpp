@@ -9,18 +9,18 @@
 
 void FileStreamer::update(AVData avData) {
     std::lock_guard<std::mutex> lk(mtx);
-    while (!isExit) {
-        if (avData.isAudio && mAudioframeQueue.Size() < 50) {
+//    while (!isExit) {
+        if (avData.isAudio) {
             mAudioframeQueue.push(avData);
             LOGD("push audio to streamer");
-            break;
-        } else if (!avData.isAudio && mVideoframeQueue.Size() < 50) {
+//            break;
+        } else if (!avData.isAudio) {
             mVideoframeQueue.push(avData);
             LOGD("push video to streamer");
-            break;
+//            break;
         }
         xsleep(1);//减少CPU时间片
-    }
+//    }
 }
 
 FileStreamer::FileStreamer() {
@@ -59,7 +59,8 @@ int FileStreamer::InitStreamer(const char *url) {
     std::lock_guard<std::mutex> lk(mtx);
     this->outputUrl = url;
     int ret = 0;
-    ret = avformat_alloc_output_context2(&iAvFormatContext, NULL, "mp4", outputUrl);
+    ret = avformat_alloc_output_context2(&iAvFormatContext, NULL, "mp4",url);
+
     if (ret < 0) {
         char buf[1024] = {0};
         av_strerror(ret, buf, sizeof(buf));
@@ -390,7 +391,8 @@ int FileStreamer::SendFrame(AVData *pData, int streamIndex) {
     AVRational dtime;
     AVPacket *packet = (AVPacket *) pData->data;
     packet->stream_index = streamIndex;
-    LOGD("write packet index:%d    index:%d   pts:%lud", packet->stream_index, streamIndex,
+    LOGD("write packet index:%d    index:%d  packetsize:%d  pts:%lld", packet->stream_index,
+         streamIndex, packet->size,
          packet->pts);
     //判断是音频还是视频
     if (packet->stream_index == videoStreamIndex) {
@@ -427,8 +429,6 @@ void FileStreamer::startThread() {
 }
 
 void FileStreamer::stopThread() {
-
-
 
 
 }

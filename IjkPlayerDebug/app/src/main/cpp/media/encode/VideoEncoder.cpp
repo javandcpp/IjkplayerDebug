@@ -95,14 +95,14 @@ void VideoEncoder::update(AVData avData) {
         return;
     }
     while (!isExit) {
-        if (aVideoframeQueue.Size() < maxList) {
+//        if (aVideoframeQueue.Size()) {
             aVideoframeQueue.push(avData);
             LOGE("update push video queue data,pts:%ld   listsize:%d", avData.pts,
                  aVideoframeQueue.Size());
             break;
         }
         xsleep(1);
-    }
+//    }
 
 }
 
@@ -125,6 +125,8 @@ void VideoEncoder::main() {
         AVData *pData = ptr.get();
         int ret = -1;
         int totalSize = pData->width * pData->height * 3 / 2;
+
+
         unsigned int ySize = (unsigned int) (pData->width * pData->height);
         memcpy(outputYUVFrame->data, pData->datas, sizeof(outputYUVFrame->data));//Y
 //        memcpy(outputYUVFrame->data[1], pData->datas, sizeof(outputYUVFrame->data[0]));//Y
@@ -159,14 +161,23 @@ void VideoEncoder::main() {
 //            continue;
 //        }
         //发送数据到解码线程，一个数据包，可能解码多个结果
+        outputYUVFrame->pts=pData->pkt_pts;
+        videoPts=pData->pkt_pts;
         ret = avcodec_send_frame(videoCodecContext, outputYUVFrame);
         LOGE("video enencode avcodec_send_frame result:%d", ret);
         if (ret == 0) {
             while (!isExit) {
                 //获取解码数据
-                av_packet_unref(&videoPacket);
+//                av_packet_unref(&videoPacket);
                 ret = avcodec_receive_packet(videoCodecContext, &videoPacket);
-                if (ret != 0) break;
+                if (ret != 0) {
+                    char buf[100]={0};
+                    av_strerror(ret,buf, sizeof(buf));
+                    LOGE("video encode failed:%s",buf);
+                    break;
+                }
+
+
 
                 AVData avData;
 
@@ -179,7 +190,7 @@ void VideoEncoder::main() {
                 }
 #endif
                 memcpy(avPacket, &videoPacket, sizeof(videoPacket));
-                LOGD("video encode sucess  pts:%ld pktsize:%d", pData->pts,videoPacket.size);
+                LOGD("video encode sucess  pts:%ld pktsize:%d", pData->pts, videoPacket.size);
                 avData.data = (unsigned char *) avPacket;
                 avData.isAudio = false;
                 this->notifyObserver(avData);
@@ -349,7 +360,8 @@ int VideoEncoder::StartEncode() {
 int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     std::lock_guard<std::mutex> lk(mtx);
     int ret = 0;
-    avCodec = avcodec_find_encoder_by_name("libx264");
+    avCodec =avcodec_find_encoder(avCodecParameters->codec_id);
+//    avCodec = avcodec_find_encoder_by_name("libx264");
     if (!avCodec) {
         LOGE("avcodec not found!");
         return -1;
@@ -373,13 +385,13 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     videoCodecContext->max_b_frames = 0;
     videoCodecContext->qmin = 10;
     videoCodecContext->qmax = 50;
-    videoCodecContext->time_base = {1, 1000000};//AUDIO VIDEO 两边时间基数要相同
+    videoCodecContext->time_base = {1, 25};//AUDIO VIDEO 两边时间基数要相同
     videoCodecContext->pix_fmt = AV_PIX_FMT_YUV420P;
 
-    videoCodecContext->level = 41;
-    videoCodecContext->me_method = ME_HEX;
-    videoCodecContext->refs = 1;
-    videoCodecContext->chromaoffset = 2;
+//    videoCodecContext->level = 41;
+//    videoCodecContext->me_method = ME_HEX;
+//    videoCodecContext->refs = 1;
+//    videoCodecContext->chromaoffset = 2;
 //    }
 
     /**
@@ -391,8 +403,8 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
      */
 
     AVDictionary *opts = NULL;
-//    av_dict_set(&opts, "preset", "ultrafast", 0);//编码器的速度会影响推流音视频同步,所以这里需要设置下
-//    av_dict_set(&opts, "tune", "zerolatency", 0);//如果开0延迟可能会影响视频质量
+    av_dict_set(&opts, "preset", "fast", 0);//编码器的速度会影响推流音视频同步,所以这里需要设置下
+    av_dict_set(&opts, "tune", "zerolatency", 0);//如果开0延迟可能会影响视频质量
     av_dict_set(&opts, "profile", "baseline", 0);//I/P帧
 
     outputYUVFrame = av_frame_alloc();

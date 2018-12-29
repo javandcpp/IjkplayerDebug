@@ -60,14 +60,14 @@ void AudioEncoder::update(AVData avData) {
         return;
     }
     while (!isExit) {
-        if (aAudioframeQueue.Size() < maxList) {
+//        if (aAudioframeQueue.Size()) {
             aAudioframeQueue.push(avData);
             LOGE("update push audio queue data,pts:%ld   listsize:%d", avData.pts,
                  aAudioframeQueue.Size());
             break;
         }
         xsleep(1);
-    }
+//    }
 }
 
 
@@ -99,21 +99,28 @@ void AudioEncoder::main() {
             continue;
         }
         //发送数据到解码线程，一个数据包，可能解码多个结果
+        outputFrame->pts=pData->pkt_pts;
+        audioPts=pData->pkt_pts;
         ret = avcodec_send_frame(audioCodecContext, outputFrame);
         LOGE("audio enencode avcodec_send_frame result:%d", ret);
         if (ret == 0) {
             while (!isExit) {
                 //获取解码数据
                 ret = avcodec_receive_packet(audioCodecContext, &audioPacket);
-                if (ret != 0) break;
+                if (ret != 0) {
+                    char buf[100] = {0};
+                    av_strerror(ret, buf, sizeof(buf));
+                    LOGD("audio encode failed:%s", buf);
+                    break;
+                };
 
                 AVData avData;
-                LOGD("audio encode sucess  pts:%ld",pData->pts);
+                LOGD("audio encode sucess  pts:%ld", pData->pts);
                 avData.pts = pData->pts;
-                AVPacket *avPacket=av_packet_alloc();
-                memcpy(avPacket,&audioPacket, sizeof(audioPacket));
+                AVPacket *avPacket = av_packet_alloc();
+                memcpy(avPacket, &audioPacket, sizeof(audioPacket));
                 avData.data = (unsigned char *) avPacket;
-                avData.isAudio=true;
+                avData.isAudio = true;
                 av_packet_unref(&audioPacket);
                 this->notifyObserver(avData);
             }
@@ -241,7 +248,7 @@ int AudioEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     audioCodecContext->bit_rate = 50 * 1024 * 8;
     audioCodecContext->channels = 2;
     audioCodecContext->frame_size = 1024;
-    audioCodecContext->time_base = {1, 1000000};//AUDIO VIDEO 两边时间基数要相同
+    audioCodecContext->time_base = {1, 48000};//AUDIO VIDEO 两边时间基数要相同
     audioCodecContext->channel_layout = av_get_default_channel_layout(audioCodecContext->channels);
 
     outputFrame = av_frame_alloc();
@@ -285,7 +292,8 @@ int AudioEncoder::CloseEncode() {
 bool AudioEncoder::GetEncodeState() {
     return isEncoding;
 }
-AVCodecContext* AudioEncoder::getAudioCodecContext() {
+
+AVCodecContext *AudioEncoder::getAudioCodecContext() {
     return audioCodecContext;
 }
 
