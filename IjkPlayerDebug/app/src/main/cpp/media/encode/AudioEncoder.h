@@ -90,6 +90,8 @@ public:
 
     AVCodecContext *getAudioCodecContext();
 
+    FILE *pFile= nullptr;
+
 
 };
 

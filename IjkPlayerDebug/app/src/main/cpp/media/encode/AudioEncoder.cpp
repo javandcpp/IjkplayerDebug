@@ -11,7 +11,7 @@ AudioEncoder *AudioEncoder::Get() {
 }
 
 AudioEncoder::AudioEncoder() {
-
+    pFile = fopen("/mnt/sdcard/test1.pcm", "wb+");
 }
 
 AudioEncoder::~AudioEncoder() {
@@ -60,13 +60,16 @@ void AudioEncoder::update(AVData avData) {
         return;
     }
     while (!isExit) {
-//        if (aAudioframeQueue.Size()) {
+//        if (aAudioframeQueue.Size() < 100) {
             aAudioframeQueue.push(avData);
             LOGE("update push audio queue data,pts:%ld   listsize:%d", avData.pts,
                  aAudioframeQueue.Size());
-            break;
-        }
-        xsleep(1);
+        //xsleep(20);
+
+//    }
+        break;
+    }
+//    xsleep(1);
 //    }
 }
 
@@ -86,21 +89,34 @@ void AudioEncoder::main() {
             continue;
         }
 
-        const shared_ptr<AVData> &ptr = aAudioframeQueue.wait_and_pop();
-        AVData *pData = ptr.get();
+//        AVData avData;
+        const shared_ptr<AVData> &pts= aAudioframeQueue.wait_and_pop();
+        AVData *pData = pts.get();
+//        if(aData->size>0){
+//            fwrite(aData->datas[0], 1, 4096, pFile);
+//            fflush(pFile);
+            xsleep(1);
+//        }
+
+
+//
         int ret = -1;
+//        const uint8_t *buf
         ret = avcodec_fill_audio_frame(outputFrame,
                                        audioCodecContext->channels,
-                                       audioCodecContext->sample_fmt, *(pData->datas),
+                                       audioCodecContext->sample_fmt, pData->datas[0],
                                        pData->size, 0);
         LOGE("audio encode %d", pData->size);
         if (ret < 0) {
             LOGE("audio fill frame failed!");
             continue;
         }
+
+
+
         //发送数据到解码线程，一个数据包，可能解码多个结果
-        outputFrame->pts=pData->pkt_pts;
-        audioPts=pData->pkt_pts;
+        outputFrame->pts = pData->pts;
+        audioPts = pData->pts;
         ret = avcodec_send_frame(audioCodecContext, outputFrame);
         LOGE("audio enencode avcodec_send_frame result:%d", ret);
         if (ret == 0) {

@@ -8,7 +8,7 @@
 
 FFmpegDecode::FFmpegDecode() {
     LOGE("initFFmpegDecode");
-    pFILE = fopen("/mnt/sdcard/test.yuv", "wb+");
+    pFILE = fopen("/mnt/sdcard/test.pcm", "wb+");
 }
 
 FFmpegDecode::~FFmpegDecode() {
