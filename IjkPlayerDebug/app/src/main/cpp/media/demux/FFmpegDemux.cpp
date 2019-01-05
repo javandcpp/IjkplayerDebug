@@ -92,6 +92,12 @@ AVData FFmpegDemux::readMediaData() {
     AVPacket *pkt = av_packet_alloc();
     int re = av_read_frame(avFormatContext, pkt);
     if (re != 0) {
+        if(re==AVERROR_EOF){
+            isExit=true;
+            //读到结尾
+            LOGE("read frame eof");
+            return AVData();
+        }
         char buf[100] = {0};
         av_strerror(re, buf, sizeof(buf));
         LOGD("av_read_frame:%s", buf);
@@ -109,21 +115,35 @@ AVData FFmpegDemux::readMediaData() {
         return AVData();
     }
 
-    pkt->pts = pkt->pts * (1000 * r2d(avFormatContext->streams[pkt->stream_index]->time_base));
-    pkt->dts = pkt->dts * (1000 * r2d(avFormatContext->streams[pkt->stream_index]->time_base));
+
+    pkt->pts = pkt->pts* (1000*r2d(avFormatContext->streams[pkt->stream_index]->time_base));
+    pkt->dts = pkt->dts* (1000*r2d(avFormatContext->streams[pkt->stream_index]->time_base));
     avData.pts = (int) pkt->pts;
-    LOGD("read media data size:%d", avData.size);
+    if (avData.isAudio) {
+        LOGD("read audio media data size:%d pts:%lld ", avData.size, pkt->pts);
+    } else {
+        LOGD("read video media data size:%d pts:%lld ", avData.size, pkt->pts);
+    }
 
     if (avData.isAudio) {
         audioPts = avData.pts;
     } else {
         videoPts = avData.pts;
     }
-
-    LOGD("pts:%lld", pkt->pts);
+    if (pkt->pts/1000 > 100) {
+        if (streamer) {
+            ((FileStreamer *) streamer)->ClosePushStream();
+            isExit = true;
+//            streamer= nullptr;
+            LOGD("stop");
+        }
+    }
     return avData;
 }
 
+void FFmpegDemux::setStreamer(FileStreamer *pStreamer) {
+    this->streamer = pStreamer;
+}
 
 void FFmpegDemux::initAVCodec() {
     av_register_all();

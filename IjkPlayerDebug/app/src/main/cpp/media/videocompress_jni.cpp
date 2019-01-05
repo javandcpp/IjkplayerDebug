@@ -47,13 +47,15 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
 
         //IO
         FileStreamer *fileStreamer=FileStreamer::Get();
+        pDemux->setStreamer(fileStreamer);
+
         videoCompressComponent->getVideoEncode()->addObserver(fileStreamer);
         videoCompressComponent->getAudioEncode()->addObserver(fileStreamer);
 
         fileStreamer->setVideoEncoder(videoCompressComponent->getVideoEncode());
         fileStreamer->setAudioEncoder(videoCompressComponent->getAudioEncode());
 
-        fileStreamer->InitStreamer("/mnt/sdcard/output1.mp4");
+        fileStreamer->InitStreamer("/mnt/sdcard/output1.flv");
 
 
         //视频编码
@@ -65,7 +67,7 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
 //        开始解复用
         videoCompressComponent->getDemux()->startThread();
 
-        fileStreamer->StartPushStream();
+        fileStreamer->startThread();
     }
 
     env->ReleaseStringUTFChars(url_, url);

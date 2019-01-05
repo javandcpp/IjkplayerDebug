@@ -5,7 +5,6 @@
 #ifndef XMEDIAPLAYER_AVDATA_H
 #define XMEDIAPLAYER_AVDATA_H
 
-
 enum AVDataType {
     AVPACKET_TYPE = 0, UCHAR_TYPE = 1
 };
@@ -24,9 +23,9 @@ public:
     int format = 0;
     int height = 0;
 
-    AVFrame *avFrame= nullptr;
+    AVFrame *avFrame= 0;
 
-    AVPacket *avPacket = nullptr;
+    AVPacket *avPacket = 0;
 
     bool Alloc(int size, const char *data = 0);
 

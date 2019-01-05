@@ -13,7 +13,7 @@ void IDemux::main() {
         }else{
             LOGD("video stream   pts:%d   size:%d",data.pts,data.size);
         }
-        xsleep(80);
+        xsleep(10);
         if (data.size > 0) {
             notifyObserver(data);
         }

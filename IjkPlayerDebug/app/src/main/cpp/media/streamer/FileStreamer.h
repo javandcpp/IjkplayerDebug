@@ -13,6 +13,7 @@
 #include "../encode/VideoEncoder.h"
 #include <mutex>
 
+
 class FileStreamer : public IObserver {
 
 protected:
@@ -31,17 +32,15 @@ public:
 
     VideoEncoder *videoEncoder = nullptr;
 
-    AVFormatContext *iAvFormatContext = NULL;
+    AVFormatContext *iAvFormatContext = nullptr;
 
     AVCodecContext *mAudioCodecContext = nullptr;
 
     AVCodecContext *mVideoCodecContext = nullptr;
 
-    virtual void startThread();
 
-    virtual void stopThread();
 
-    virtual void main() {}
+    void main();
 
     virtual void update(AVData avData);
 
@@ -57,7 +56,7 @@ public:
     int AddStream(AVCodecContext *avCodecContext);
 
 
-    int SendFrame(AVData *pData, int streamIndex);
+    int SendFrame(AVPacket *avPacket, int streamIndex);
 
     static void *WriteHead(void *pObj);
 
@@ -92,6 +91,16 @@ public:
 
     int videoFrameCount = 0;
     int audioFrameCount = 0;
+
+    pthread_cond_t cond;
+    pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;
+//    pthread_mutex_t mutex_audio;
+
+    FILE *pFile=NULL;
+
+    int64_t audioPts=0;
+    int64_t videoPts=0;
+
 };
 
 

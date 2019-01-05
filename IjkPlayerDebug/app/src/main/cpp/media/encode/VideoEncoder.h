@@ -15,6 +15,10 @@
 
 #include <list>
 
+#define AV_PKT_FLAG_UNCODED_FRAME 0x2000
+#define UNCODED_FRAME_PACKET_SIZE (INT_MIN / 3 * 2 + (int)sizeof(AVFrame))
+#define CHUNK_START 0x1000
+
 using namespace std;
 
 class VideoEncoder : public MediaEncoder {

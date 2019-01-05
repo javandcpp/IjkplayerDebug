@@ -61,6 +61,6 @@ void IFFmpegDecode::main() {
             }
 
         }
-        pData->Drop();
+//        pData->Drop();
     }
 }

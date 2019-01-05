@@ -16,14 +16,14 @@ FFmpegDecode::~FFmpegDecode() {
         fclose(pFILE);
         pFILE = NULL;
     }
-    if(video_out_buffer){
+    if (video_out_buffer) {
         av_free(video_out_buffer);
     }
-    if(inAvFrame){
+    if (inAvFrame) {
         av_frame_free(&inAvFrame);
     }
 
-    if(outAvFrame){
+    if (outAvFrame) {
         av_frame_free(&outAvFrame);
     }
 }
@@ -41,10 +41,10 @@ bool FFmpegDecode::openCodec(AVParameters parameters) {
     }
     AVCodec *codec = NULL;
     if (parameters.codecParameters->codec_type == AVMEDIA_TYPE_VIDEO) {
-//        codec = avcodec_find_decoder_by_name("h264_mediacodec");
-        codec = avcodec_find_decoder(parameters.codecParameters->codec_id);
+        codec = avcodec_find_decoder_by_name("h264_mediacodec");
+//        codec = avcodec_find_decoder(parameters.codecParameters->codec_id);
     } else {
-        codec=avcodec_find_decoder_by_name("libfdk_aac");
+        codec = avcodec_find_decoder_by_name("libfdk_aac");
 //        codec = avcodec_find_decoder(parameters.codecParameters->codec_id);
     }
 
@@ -77,15 +77,17 @@ bool FFmpegDecode::openCodec(AVParameters parameters) {
                                                    codecContext->height, 1);
         video_out_buffer = (uint8_t *) av_malloc(buffer_size);
 
-        av_image_fill_arrays(outAvFrame->data,outAvFrame->linesize,video_out_buffer
-                ,AV_PIX_FMT_YUV420P,codecContext->width,codecContext->height,1);
+        av_image_fill_arrays(outAvFrame->data, outAvFrame->linesize, video_out_buffer,
+                             AV_PIX_FMT_YUV420P, codecContext->width, codecContext->height, 1);
 
     }
     return true;
 }
 
 bool FFmpegDecode::sendPacket(AVData pkt) {
-    int re = avcodec_send_packet(codecContext, (const AVPacket *) pkt.data);
+    AVPacket *packet = (AVPacket *) pkt.data;
+    int re = avcodec_send_packet(codecContext, packet);
+//    av_packet_free(&packet);
     if (re != 0) {
 //        LOGE("ffmpeg sendPacket failed :%s",av_err2str(re));
         return false;
@@ -144,22 +146,22 @@ AVData FFmpegDecode::receiveFrame() {
 //    *                         no more output frames
 //    *      AVERROR(EINVAL):   codec not opened, or it is an encoder
 //    *      other negative values: legitimate decoding errors
-    if (!codecContext||!outAvFrame) {
+    if (!codecContext || !outAvFrame) {
         return AVData();
     }
-    if (!inAvFrame) {
-        inAvFrame = av_frame_alloc();
-    }
+//    if (!inAvFrame) {
+    inAvFrame = av_frame_alloc();
+//    }
     int ret = avcodec_receive_frame(codecContext, inAvFrame);
     if (ret != 0) {
-        char buf[100]={0};
-        av_strerror(ret,buf, sizeof(buf));
-        LOGE("avcodec receive error :%s",buf);
+        char buf[100] = {0};
+        av_strerror(ret, buf, sizeof(buf));
+        LOGE("avcodec receive error :%s", buf);
         return AVData();
     }
     AVData avData;
     avData.data = (unsigned char *) inAvFrame;
-    LOGE("------->avcodec receive frame success  pts:%lld",inAvFrame->pts);
+    LOGE("------->avcodec receive frame success  pts:%lld", inAvFrame->pts);
     if (codecContext->codec_type == AVMEDIA_TYPE_AUDIO) {
         //样本字节数 * 单通道样本数 * 通道数
         avData.size =
@@ -168,11 +170,12 @@ AVData FFmpegDecode::receiveFrame() {
         avData.isAudio = true;
 
     } else if (codecContext->codec_type == AVMEDIA_TYPE_VIDEO) {
-        sws_scale(sws_ctx,(const uint8_t *const*)inAvFrame->data,
-                  inAvFrame->linesize,0,codecContext->height,
-                  outAvFrame->data,outAvFrame->linesize);
+        sws_scale(sws_ctx, (const uint8_t *const *) inAvFrame->data,
+                  inAvFrame->linesize, 0, codecContext->height,
+                  outAvFrame->data, outAvFrame->linesize);
 
-        avData.size = (outAvFrame->linesize[0] + outAvFrame->linesize[1] + outAvFrame->linesize[2]) *
+        avData.size =
+                (outAvFrame->linesize[0] + outAvFrame->linesize[1] + outAvFrame->linesize[2]) *
                 codecContext->height;
         avData.width = codecContext->width;
         avData.height = codecContext->height;
@@ -195,7 +198,9 @@ AVData FFmpegDecode::receiveFrame() {
     avData.format = inAvFrame->format;
     memcpy(avData.datas, inAvFrame->data, sizeof(inAvFrame->data));
     avData.pts = inAvFrame->pts;
-    avData.pkt_pts=inAvFrame->pkt_pts;
+    avData.pkt_pts = inAvFrame->pkt_pts;
+
+    av_frame_free(&inAvFrame);
 
     return avData;
 }

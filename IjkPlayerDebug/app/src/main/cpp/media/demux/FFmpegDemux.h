@@ -7,7 +7,7 @@
 
 #include "IDemux.h"
 #include "../global_header.h"
-
+#include "../streamer/FileStreamer.h"
 
 
 class FFmpegDemux : public IDemux {
@@ -18,6 +18,8 @@ public:
     int audioPts;
 
     int videoPts;
+
+    void *streamer= nullptr;
 
     virtual bool open(const char *url);
 
@@ -44,6 +46,10 @@ public:
     AVParameters *videoAvParameters = NULL;
     AVParameters *audioAvParameters = NULL;
 
+
+    void setStreamer(FileStreamer *pStreamer);
+
+    int64_t frameCount=0;
 
 protected:
 

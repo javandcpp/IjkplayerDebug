@@ -10,12 +10,19 @@
 #ifdef __cplusplus
 extern "C" {
 #include "libavformat/avformat.h"
+#include "libavformat/internal.h"
+#include "libavutil/timestamp.h"
+#include "libavutil/avassert.h"
+#include "libavutil/internal.h"
 #include "libavcodec/avcodec.h"
 #include "libavutil/avutil.h"
 #include "libavcodec/jni.h"
 #include "libavutil/time.h"
 #include "libavutil/imgutils.h"
 #include "libswscale/swscale.h"
+#include<stdio.h>
+#include<pthread.h>
+#include<stdlib.h>
 #include <stdio.h>
 };
 

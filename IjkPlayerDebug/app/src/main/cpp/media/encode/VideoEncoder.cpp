@@ -19,6 +19,7 @@ VideoEncoder::VideoEncoder() {
 
 }
 
+
 int vflush_encoder(AVFormatContext *fmt_ctx, unsigned int stream_index) {
     int ret = 0;
     int got_frame;
@@ -189,9 +190,10 @@ void VideoEncoder::main() {
                     fflush(pFILE);
                 }
 #endif
-                memcpy(avPacket, &videoPacket, sizeof(videoPacket));
+
+                av_packet_move_ref(avPacket,&videoPacket);//此处data指针指向重新分配的内存，并复制其他属性
                 LOGD("video encode sucess  pts:%ld pktsize:%d", pData->pts, videoPacket.size);
-                avData.data = (unsigned char *) avPacket;
+                avData.avPacket = avPacket;
                 avData.isAudio = false;
                 this->notifyObserver(avData);
             }
@@ -360,8 +362,8 @@ int VideoEncoder::StartEncode() {
 int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     std::lock_guard<std::mutex> lk(mtx);
     int ret = 0;
-    avCodec =avcodec_find_encoder(avCodecParameters->codec_id);
-//    avCodec = avcodec_find_encoder_by_name("libx264");
+//    avCodec =avcodec_find_encoder(avCodecParameters->codec_id);
+    avCodec = avcodec_find_encoder_by_name("libx264");
     if (!avCodec) {
         LOGE("avcodec not found!");
         return -1;
@@ -377,15 +379,15 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
 //    if (NULL != videoCapture->GetVideoEncodeArgs()) {
     videoCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER; //全局参数
     videoCodecContext->codec_id = avCodec->id;
-    videoCodecContext->bit_rate = 100 * 1024 * 8;//压缩后每秒视频的bit位大小 50kB
+    videoCodecContext->bit_rate = 10 * 1024 * 8;//压缩后每秒视频的bit位大小 50kB
     videoCodecContext->width = 1280;
     videoCodecContext->height = 720;
-    videoCodecContext->framerate = {25, 1};
+    videoCodecContext->framerate = (AVRational){25, 1};
     videoCodecContext->gop_size = 50;
     videoCodecContext->max_b_frames = 0;
     videoCodecContext->qmin = 10;
     videoCodecContext->qmax = 50;
-    videoCodecContext->time_base = {1, 25};//AUDIO VIDEO 两边时间基数要相同
+    videoCodecContext->time_base = (AVRational){1, 25};//AUDIO VIDEO 两边时间基数要相同
     videoCodecContext->pix_fmt = AV_PIX_FMT_YUV420P;
 
 //    videoCodecContext->level = 41;
@@ -403,8 +405,8 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
      */
 
     AVDictionary *opts = NULL;
-    av_dict_set(&opts, "preset", "fast", 0);//编码器的速度会影响推流音视频同步,所以这里需要设置下
-    av_dict_set(&opts, "tune", "zerolatency", 0);//如果开0延迟可能会影响视频质量
+    av_dict_set(&opts, "preset", "ultrafast", 0);//编码器的速度会影响推流音视频同步,所以这里需要设置下
+//    av_dict_set(&opts, "tune", "zerolatency", 0);//如果开0延迟可能会影响视频质量
     av_dict_set(&opts, "profile", "baseline", 0);//I/P帧
 
     outputYUVFrame = av_frame_alloc();

@@ -11,7 +11,7 @@ AudioEncoder *AudioEncoder::Get() {
 }
 
 AudioEncoder::AudioEncoder() {
-    pFile = fopen("/mnt/sdcard/test1.pcm", "wb+");
+    pFile = fopen("/mnt/sdcard/test1.aac", "wb+");
 }
 
 AudioEncoder::~AudioEncoder() {
@@ -61,9 +61,9 @@ void AudioEncoder::update(AVData avData) {
     }
     while (!isExit) {
 //        if (aAudioframeQueue.Size() < 100) {
-            aAudioframeQueue.push(avData);
-            LOGE("update push audio queue data,pts:%ld   listsize:%d", avData.pts,
-                 aAudioframeQueue.Size());
+        aAudioframeQueue.push(avData);
+        LOGE("update push audio queue data,pts:%ld   listsize:%d", avData.pts,
+             aAudioframeQueue.Size());
         //xsleep(20);
 
 //    }
@@ -90,12 +90,13 @@ void AudioEncoder::main() {
         }
 
 //        AVData avData;
-        const shared_ptr<AVData> &pts= aAudioframeQueue.wait_and_pop();
+        const shared_ptr<AVData> &pts = aAudioframeQueue.wait_and_pop();
         AVData *pData = pts.get();
-//        if(aData->size>0){
-//            fwrite(aData->datas[0], 1, 4096, pFile);
+//        if(pData->size>0) {
+//            fwrite(pData->datas[0], 1, 4096, pFile);
 //            fflush(pFile);
-            xsleep(1);
+//        }
+        xsleep(1);
 //        }
 
 
@@ -131,13 +132,15 @@ void AudioEncoder::main() {
                 };
 
                 AVData avData;
-                LOGD("audio encode sucess  pts:%ld", pData->pts);
-                avData.pts = pData->pts;
                 AVPacket *avPacket = av_packet_alloc();
-                memcpy(avPacket, &audioPacket, sizeof(audioPacket));
-                avData.data = (unsigned char *) avPacket;
+                av_packet_move_ref(avPacket, &audioPacket);//此处data指针指向重新分配的内存，并复制其他属性
+                LOGD("audio encode sucess  pts:%ld", pData->pts);
+                fwrite(avPacket->data, 1, avPacket->size, pFile);
+                fflush(pFile);
+
+                avData.pts = pData->pts;
+                avData.avPacket = avPacket;
                 avData.isAudio = true;
-                av_packet_unref(&audioPacket);
                 this->notifyObserver(avData);
             }
         }
@@ -261,7 +264,7 @@ int AudioEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     audioCodecContext->sample_fmt = AV_SAMPLE_FMT_S16;
     audioCodecContext->sample_rate = 48000;
     audioCodecContext->thread_count = 8;
-    audioCodecContext->bit_rate = 50 * 1024 * 8;
+    audioCodecContext->bit_rate = 10 * 1024 * 4;
     audioCodecContext->channels = 2;
     audioCodecContext->frame_size = 1024;
     audioCodecContext->time_base = {1, 48000};//AUDIO VIDEO 两边时间基数要相同
