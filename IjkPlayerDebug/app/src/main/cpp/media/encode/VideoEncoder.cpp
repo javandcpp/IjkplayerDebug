@@ -379,7 +379,7 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
 //    if (NULL != videoCapture->GetVideoEncodeArgs()) {
     videoCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER; //全局参数
     videoCodecContext->codec_id = avCodec->id;
-    videoCodecContext->bit_rate = 10 * 1024 * 8;//压缩后每秒视频的bit位大小 50kB
+    videoCodecContext->bit_rate = 10 * 1024 * 5;//压缩后每秒视频的bit位大小 50kB
     videoCodecContext->width = 1280;
     videoCodecContext->height = 720;
     videoCodecContext->framerate = (AVRational){25, 1};

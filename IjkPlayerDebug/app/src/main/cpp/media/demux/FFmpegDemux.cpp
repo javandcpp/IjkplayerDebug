@@ -130,14 +130,14 @@ AVData FFmpegDemux::readMediaData() {
     } else {
         videoPts = avData.pts;
     }
-    if (pkt->pts/1000 > 100) {
-        if (streamer) {
-            ((FileStreamer *) streamer)->ClosePushStream();
-            isExit = true;
-//            streamer= nullptr;
-            LOGD("stop");
-        }
-    }
+//    if (pkt->pts/1000 > 100) {
+//        if (streamer) {
+//            ((FileStreamer *) streamer)->ClosePushStream();
+//            isExit = true;
+////            streamer= nullptr;
+//            LOGD("stop");
+//        }
+//    }
     return avData;
 }
 
