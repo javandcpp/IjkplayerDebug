@@ -54,6 +54,8 @@ void IFFmpegDecode::main() {
                 }
 
                 pts = frame.pts;
+                frame.duration=pData->duration;
+                frame.pts=pData->pts;
                 xsleep(1);
                 //发送数据给观察者
                 this->notifyObserver(frame);

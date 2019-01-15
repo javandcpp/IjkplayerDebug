@@ -31,7 +31,7 @@ public:
 
     void Drop();
 
-    int pts = 0;
+    long long pts = 0;
 
     int pkt_pts=0;
 
@@ -40,6 +40,10 @@ public:
     int size = 0;
 
     int linesize[8];
+
+    int duration=0;
+
+    int videoRotate=0;
 };
 
 

@@ -27,6 +27,42 @@ FFmpegDemux::~FFmpegDemux() {
 
 }
 
+MetaData FFmpegDemux::getMetaData() {
+    MetaData metaData;
+    metaData.duration = mVideoDuration;
+    metaData.video_rotate = mVideoRotate;
+
+    return metaData;
+}
+
+
+/**
+ * 获取时长
+ */
+void FFmpegDemux::getDuration() {
+    if (avFormatContext) {
+        mVideoDuration = (avFormatContext->streams[videoStreamIndex]->duration *
+                          (1000 * r2d(avFormatContext->streams[videoStreamIndex]->time_base)));
+    }
+}
+
+
+/**
+ * 获取旋转角度
+ */
+void FFmpegDemux::getRotate() {
+    if (!hasRotateValue) {
+        AVDictionaryEntry *m = NULL;
+        m = av_dict_get(avFormatContext->streams[videoStreamIndex]->metadata, "rotate", m,
+                        AV_DICT_IGNORE_SUFFIX);
+        if (m) {
+            LOG_E("====Key:%s ===value:%s\n", m->key, m->value);
+            hasRotateValue = true;
+            mVideoRotate = m->value;
+        }
+    }
+}
+
 static int custom_interrupt_callback(void *arg) {
     FFmpegDemux *fFmpegDemux = (FFmpegDemux *) arg;
     return 0;//0继续阻塞
@@ -35,6 +71,11 @@ static int custom_interrupt_callback(void *arg) {
 
 bool FFmpegDemux::open(const char *url) {
     int ret = 0;
+    int rotate = 0;
+
+    AVDictionaryEntry *m = NULL;
+
+
     avFormatContext = avformat_alloc_context();
     if (!avFormatContext) {
         LOGE("Could not allocate context.\n");
@@ -51,11 +92,23 @@ bool FFmpegDemux::open(const char *url) {
         goto fail;
     }
 
+
     setVideoStreamIndex(av_find_best_stream(avFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, 0, 0));
     setAudioStreamIndex(av_find_best_stream(avFormatContext, AVMEDIA_TYPE_AUDIO, -1, -1, 0, 0));
 
+
+    getRotate();
+    getDuration();
+
+    audioStream = avFormatContext->streams[audioStreamIndex];
+    audioPtsRatio = audioStream->nb_frames / audioStream->codecpar->channels;;
+
+    videoStream = avFormatContext->streams[videoStreamIndex];
+    videoPtsRatio = videoStream->time_base.den / videoStream->r_frame_rate.num;
+
     LOGD("find stream index  videoStream:%d   audioStream:%d", getVideoStreamIndex(),
          getAudioStreamIndex());
+
 
     return true;
 
@@ -92,10 +145,11 @@ AVData FFmpegDemux::readMediaData() {
     AVPacket *pkt = av_packet_alloc();
     int re = av_read_frame(avFormatContext, pkt);
     if (re != 0) {
-        if(re==AVERROR_EOF){
-            isExit=true;
+        if (re == AVERROR_EOF) {
+            isExit = true;
             //读到结尾
             LOGE("read frame eof");
+            ((FileStreamer *) streamer)->ClosePushStream();
             return AVData();
         }
         char buf[100] = {0};
@@ -110,15 +164,18 @@ AVData FFmpegDemux::readMediaData() {
         avData.isAudio = true;
     } else if (pkt->stream_index == videoStreamIndex) {
         avData.isAudio = false;
+
     } else {
         av_packet_free(&pkt);
         return AVData();
     }
 
 
-    pkt->pts = pkt->pts* (1000*r2d(avFormatContext->streams[pkt->stream_index]->time_base));
-    pkt->dts = pkt->dts* (1000*r2d(avFormatContext->streams[pkt->stream_index]->time_base));
-    avData.pts = (int) pkt->pts;
+    pkt->pts = pkt->pts * (1000 * r2d(avFormatContext->streams[pkt->stream_index]->time_base));
+    pkt->dts = pkt->dts * (1000 * r2d(avFormatContext->streams[pkt->stream_index]->time_base));
+//    avData.duration = pkt->duration =
+//            pkt->duration * (1000 * r2d(avFormatContext->streams[pkt->stream_index]->time_base));
+//    avData.pts=pkt->pts;
     if (avData.isAudio) {
         LOGD("read audio media data size:%d pts:%lld ", avData.size, pkt->pts);
     } else {
@@ -126,18 +183,15 @@ AVData FFmpegDemux::readMediaData() {
     }
 
     if (avData.isAudio) {
-        audioPts = avData.pts;
+        audioPts += audioPtsRatio;
+        avData.pts = audioPts;
+        LOGD("audio pts:%lld   pts:%lld", avData.pts, audioPts);
+
     } else {
-        videoPts = avData.pts;
+        videoPts += videoPtsRatio;
+        avData.pts = videoPts;
+        LOGD("video pts:%lld   pts:%lld", avData.pts, videoPts);
     }
-//    if (pkt->pts/1000 > 100) {
-//        if (streamer) {
-//            ((FileStreamer *) streamer)->ClosePushStream();
-//            isExit = true;
-////            streamer= nullptr;
-//            LOGD("stop");
-//        }
-//    }
     return avData;
 }
 
@@ -165,4 +219,12 @@ int FFmpegDemux::getAudioStreamIndex() const {
 
 void FFmpegDemux::setAudioStreamIndex(int audioStreamIndex) {
     FFmpegDemux::audioStreamIndex = audioStreamIndex;
+}
+
+AVStream *FFmpegDemux::getAudioStream() const {
+    return audioStream;
+}
+
+AVStream *FFmpegDemux::getVideoStream() const {
+    return videoStream;
 }

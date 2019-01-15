@@ -9,11 +9,11 @@ void IDemux::main() {
     while (!isExit) {
         AVData data = readMediaData();
         if(data.isAudio){
-            LOGD("audio stream   pts:%d   size:%d",data.pts,data.size);
+            LOGD("audio stream   pts:%ld",data.pts);
         }else{
-            LOGD("video stream   pts:%d   size:%d",data.pts,data.size);
+            LOGD("video stream   pts:%ld",data.pts);
         }
-        xsleep(10);
+        xsleep(5);
         if (data.size > 0) {
             notifyObserver(data);
         }

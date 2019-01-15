@@ -34,6 +34,8 @@ bool VideoCompressComponent::initialize() {
     }
     if (!mVideoFfmpegDecode) {
         mVideoFfmpegDecode = new FFmpegDecode();
+        mVideoFfmpegDecode->setVideoScaleHeight(getMScaleHeight());
+        mVideoFfmpegDecode->setVideoScaleWidth(getMScaleWidth());
         mVideoFfmpegDecode->isAudio = false;
     }
     if (!mAudioFfmpegDecode) {
@@ -47,6 +49,8 @@ bool VideoCompressComponent::initialize() {
 
     if (!videoEncoder) {
         videoEncoder = new VideoEncoder();
+        videoEncoder->setVideoEncodeWidth(getMScaleWidth());
+        videoEncoder->setVideoEncodeHeight(getMScaleHeight());
     }
 
     if (mDemux) {
@@ -71,4 +75,20 @@ bool VideoCompressComponent::openSource(const char *url) {
     }
 
     return false;
+}
+
+long VideoCompressComponent::getMScaleWidth() {
+    return mScaleWidth;
+}
+
+void VideoCompressComponent::setMScaleWidth(long mScaleWidth) {
+    this->mScaleWidth = mScaleWidth;
+}
+
+long VideoCompressComponent::getMScaleHeight() {
+    return mScaleHeight;
+}
+
+void VideoCompressComponent::setMScaleHeight(long mScaleHeight) {
+    this->mScaleHeight = mScaleHeight;
 }

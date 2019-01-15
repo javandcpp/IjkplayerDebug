@@ -69,37 +69,11 @@ public:
     int CloseEncode();
 
 
-    int EncodeH264(AVData **originData);
 
     /**
      * 资源回收
      */
     int Release();
-
-    /**
-     * 设置数据采集
-     */
-//    void SetVideoCapture(VideoCapture *videoCapture);
-
-
-//    VideoCapture *GetVideoCapture();
-
-
-    /**
-     * 获取编码器状态
-     */
-    bool GetEncodeState();
-
-
-    /**
-     * 前置镜像
-     */
-    void YUVProcessMirror();
-
-    /**
-     * 初始化过滤器
-     */
-//    int SetFilter(DrawTextFilter *drawTextFilter);
 
     AVCodec *avCodec = NULL;
 
@@ -122,6 +96,12 @@ public:
 
     AVCodecContext *getVideoCodecContext();
 
+    void setVideoEncodeWidth(long i);
+
+    long mEncodeWidth;
+    long mEncodeHeight;
+
+    void setVideoEncodeHeight(long i);
 };
 
 

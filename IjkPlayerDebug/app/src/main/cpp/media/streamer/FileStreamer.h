@@ -11,6 +11,7 @@
 #include "../global_header.h"
 #include "../encode/AudioEncoder.h"
 #include "../encode/VideoEncoder.h"
+#include "../MetaData.h"
 #include <mutex>
 
 
@@ -38,7 +39,7 @@ public:
 
     AVCodecContext *mVideoCodecContext = nullptr;
 
-
+    MetaData metaData;
 
     void main();
 
@@ -100,6 +101,14 @@ public:
 
     int64_t audioPts=0;
     int64_t videoPts=0;
+
+    void setMetaData(MetaData data);
+
+    AVRational inAudioTimeBase={0,0};
+    AVRational inVideoTimeBase={0,0};
+
+    int recordKeyValue=1;
+
 
 };
 

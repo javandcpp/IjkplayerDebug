@@ -33,8 +33,13 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
 
     mtx.lock();
     const char *url = env->GetStringUTFChars(url_, 0);
+    long widthPram = width;
+    long heightParma = height;
+
     videoCompressComponent = new VideoCompressComponent();
     if (videoCompressComponent) {
+        videoCompressComponent->setMScaleWidth(widthPram);
+        videoCompressComponent->setMScaleHeight(heightParma);
         videoCompressComponent->initialize();
         videoCompressComponent->openSource(url);
         FFmpegDemux *pDemux = videoCompressComponent->getDemux();
@@ -42,12 +47,16 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
         videoCompressComponent->getAudioDecode()->openCodec(*(pDemux->getAudioParameters()));
         videoCompressComponent->getVideoDecode()->openCodec(*(pDemux->getVideoParamters()));
 //        音频编码
-        videoCompressComponent->getAudioEncode()->InitEncode(videoCompressComponent->getDemux()->getAudioParameters()->codecParameters);
-        videoCompressComponent->getVideoEncode()->InitEncode(videoCompressComponent->getDemux()->getVideoParamters()->codecParameters);
+        videoCompressComponent->getAudioEncode()->InitEncode(
+                videoCompressComponent->getDemux()->getAudioParameters()->codecParameters);
+        videoCompressComponent->getVideoEncode()->InitEncode(
+                videoCompressComponent->getDemux()->getVideoParamters()->codecParameters);
 
         //IO
-        FileStreamer *fileStreamer=FileStreamer::Get();
+        FileStreamer *fileStreamer = FileStreamer::Get();
         pDemux->setStreamer(fileStreamer);
+        fileStreamer->inAudioTimeBase = pDemux->getAudioStream()->time_base;
+        fileStreamer->inVideoTimeBase = pDemux->getVideoStream()->time_base;
 
         videoCompressComponent->getVideoEncode()->addObserver(fileStreamer);
         videoCompressComponent->getAudioEncode()->addObserver(fileStreamer);
@@ -55,7 +64,9 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
         fileStreamer->setVideoEncoder(videoCompressComponent->getVideoEncode());
         fileStreamer->setAudioEncoder(videoCompressComponent->getAudioEncode());
 
-        fileStreamer->InitStreamer("/mnt/sdcard/output1.flv");
+        fileStreamer->InitStreamer("/mnt/sdcard/output1.mp4");
+        fileStreamer->setMetaData(pDemux->getMetaData());
+//        fileStreamer->inAudioTimeBase=pDemux->
 
 
         //视频编码

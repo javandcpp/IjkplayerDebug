@@ -43,7 +43,19 @@ public:
 
     bool openSource(const char *url);
 
+    long mScaleWidth;
 
+    long mScaleHeight;
+
+
+    void setMScaleWidth(long mScaleWidth);
+
+
+    void setMScaleHeight(long mScaleHeight);
+
+    long getMScaleWidth();
+
+    long getMScaleHeight();
 };
 
 

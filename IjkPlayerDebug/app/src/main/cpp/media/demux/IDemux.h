@@ -8,6 +8,7 @@
 
 #include "../IObserver.h"
 #include "../AVParameters.h"
+#include "../MetaData.h"
 
 class IDemux : public IObserver {
 
@@ -19,6 +20,10 @@ public:
     virtual AVParameters * getAudioParameters()=0;
 
     virtual AVData readMediaData()=0;
+
+    virtual MetaData getMetaData()=0;
+
+
 
 protected:
     virtual void main();

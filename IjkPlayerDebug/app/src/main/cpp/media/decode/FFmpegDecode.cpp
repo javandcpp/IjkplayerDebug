@@ -8,7 +8,7 @@
 
 FFmpegDecode::FFmpegDecode() {
     LOGE("initFFmpegDecode");
-    pFILE = fopen("/mnt/sdcard/test.pcm", "wb+");
+    pFILE = fopen("/mnt/sdcard/test.yuv", "wb+");
 }
 
 FFmpegDecode::~FFmpegDecode() {
@@ -26,6 +26,9 @@ FFmpegDecode::~FFmpegDecode() {
     if (outAvFrame) {
         av_frame_free(&outAvFrame);
     }
+    if (sws_ctx) {
+        sws_freeContext(sws_ctx);
+    }
 }
 
 /**
@@ -41,8 +44,8 @@ bool FFmpegDecode::openCodec(AVParameters parameters) {
     }
     AVCodec *codec = NULL;
     if (parameters.codecParameters->codec_type == AVMEDIA_TYPE_VIDEO) {
-        codec = avcodec_find_decoder_by_name("h264_mediacodec");
-//        codec = avcodec_find_decoder(parameters.codecParameters->codec_id);
+//        codec = avcodec_find_decoder_by_name("h264_mediacodec");
+        codec = avcodec_find_decoder(parameters.codecParameters->codec_id);
     } else {
         codec = avcodec_find_decoder_by_name("libfdk_aac");
 //        codec = avcodec_find_decoder(parameters.codecParameters->codec_id);
@@ -52,6 +55,9 @@ bool FFmpegDecode::openCodec(AVParameters parameters) {
         LOGD("avcodec find decoder failed!");
         return false;
     }
+
+    long outputWidth = mScaleWidth;
+    long outputHeight = mScaleHeight;
     codecContext = avcodec_alloc_context3(codec);
     avcodec_parameters_to_context(codecContext, parameters.codecParameters);
     codecContext->thread_count = 8;
@@ -69,16 +75,16 @@ bool FFmpegDecode::openCodec(AVParameters parameters) {
         LOGD("avcodec video open2 success!");
         sws_ctx =
                 sws_getContext(codecContext->width, codecContext->height, codecContext->pix_fmt,
-                               codecContext->width, codecContext->height, AV_PIX_FMT_YUV420P,
+                               outputWidth, outputHeight, AV_PIX_FMT_YUV420P,
                                SWS_BICUBIC, NULL, NULL, NULL);
 
 
-        int buffer_size = av_image_get_buffer_size(AV_PIX_FMT_YUV420P, codecContext->width,
-                                                   codecContext->height, 1);
+        int buffer_size = av_image_get_buffer_size(AV_PIX_FMT_YUV420P, outputWidth,
+                                                   outputHeight, 1);
         video_out_buffer = (uint8_t *) av_malloc(buffer_size);
 
         av_image_fill_arrays(outAvFrame->data, outAvFrame->linesize, video_out_buffer,
-                             AV_PIX_FMT_YUV420P, codecContext->width, codecContext->height, 1);
+                             AV_PIX_FMT_YUV420P, outputWidth, outputHeight, 1);
 
     }
     return true;
@@ -126,6 +132,7 @@ AVData FFmpegDecode::receiveCacheFrame() {
                         inAvFrame->height;
                 avData.width = inAvFrame->width;
                 avData.height = inAvFrame->height;
+//                sws_scale();
             }
 
             avData.format = inAvFrame->format;
@@ -169,6 +176,13 @@ AVData FFmpegDecode::receiveFrame() {
                 inAvFrame->nb_samples * 2;
         avData.isAudio = true;
 
+        avData.format = inAvFrame->format;
+        memcpy(avData.datas, inAvFrame->data, sizeof(inAvFrame->data));
+        avData.pts = inAvFrame->pts;
+        avData.pkt_pts = inAvFrame->pkt_pts;
+
+
+
     } else if (codecContext->codec_type == AVMEDIA_TYPE_VIDEO) {
         sws_scale(sws_ctx, (const uint8_t *const *) inAvFrame->data,
                   inAvFrame->linesize, 0, codecContext->height,
@@ -184,24 +198,31 @@ AVData FFmpegDecode::receiveFrame() {
         avData.linesize[1] = outAvFrame->linesize[1];
         avData.linesize[2] = outAvFrame->linesize[2];
 
-        int i = codecContext->height * codecContext->width;
-//        fwrite(inAvFrame->data[0],1,i,pFILE);
-//
-//
-//        fwrite(inAvFrame->data[1],1,i/4,pFILE);
-//
-//
-//        fwrite(inAvFrame->data[2],1,i/4,pFILE);
+
+
+        int i = mScaleWidth * mScaleHeight;
+//        fwrite(outAvFrame->data[0],1,i,pFILE);
+//        fwrite(outAvFrame->data[1],1,i/4,pFILE);
+//        fwrite(outAvFrame->data[2],1,i/4,pFILE);
 //        fflush(pFILE);
+
+        avData.format = inAvFrame->format;
+        memcpy(avData.datas, outAvFrame->data, sizeof(outAvFrame->data));
+        avData.pts = inAvFrame->pts;
+        avData.pkt_pts = inAvFrame->pkt_pts;
     }
 
-    avData.format = inAvFrame->format;
-    memcpy(avData.datas, inAvFrame->data, sizeof(inAvFrame->data));
-    avData.pts = inAvFrame->pts;
-    avData.pkt_pts = inAvFrame->pkt_pts;
 
     av_frame_free(&inAvFrame);
 
     return avData;
+}
+
+void FFmpegDecode::setVideoScaleHeight(long i) {
+    this->mScaleHeight = i;
+}
+
+void FFmpegDecode::setVideoScaleWidth(long i) {
+    this->mScaleWidth = i;
 }
 

@@ -856,7 +856,8 @@ static int do_packet_auto_bsf(AVFormatContext *s, AVPacket *pkt) {
 int k_av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt) {
     int ret, flush = 0;
 
-    LOGE("prepare_input_packet   streamindex:%d size:%d pts:%lld",pkt->stream_index,pkt->size,pkt->pts);
+    LOGE("prepare_input_packet   streamindex:%d size:%d pts:%lld", pkt->stream_index, pkt->size,
+         pkt->pts);
     ret = prepare_input_packet(s, pkt);
     if (ret < 0)
         goto fail;
@@ -898,7 +899,7 @@ int k_av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt) {
             av_init_packet(pkt);
             pkt = NULL;
         }
-        LOGE("interleave_packet ret=%d  streamIndex:%d", ret,opkt.stream_index);
+        LOGE("interleave_packet ret=%d  streamIndex:%d", ret, opkt.stream_index);
         if (ret <= 0) //FIXME cleanup needed for ret<0 ?
             return ret;
 
@@ -908,7 +909,7 @@ int k_av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt) {
             s->streams[opkt.stream_index]->nb_frames++;
         LOGI("av_packet_unref");
         av_packet_unref(&opkt);
-        LOGE("write_packet ret=%d  streamIndex:%d", ret,opkt.stream_index);
+        LOGE("write_packet ret=%d  streamIndex:%d", ret, opkt.stream_index);
         if (ret < 0)
             return ret;
         if (s->pb && s->pb->error)
@@ -951,10 +952,16 @@ int FileStreamer::AddStream(AVCodecContext *avCodecContext) {
         LOGD("Add video stream success!");
         videoStream = pStream;
         mVideoCodecContext = avCodecContext;
+//        videoStream->start_time=0;
+//        videoStream->time_base=(AVRational){1,1000};
+//        videoStream->duration=43655L;
     } else if (avCodecContext->codec_type == AVMEDIA_TYPE_AUDIO) {
         LOGD("Add audio stream success!");
         audioStream = pStream;
         mAudioCodecContext = avCodecContext;
+//        audioStream->start_time=0;
+//        audioStream->time_base=(AVRational){1,1000};
+//        audioStream->duration=av_rescale_q_rnd(42647L,AVRational{1,1000},AVRational{1,48000},AV_ROUND_NEAR_INF);
     }
     return pStream->index;
 }
@@ -1047,35 +1054,37 @@ PushAudioStreamTask(void *pObj) {
 //    int64_t beginTime = av_gettime();
 
 //    while (!fileStreamer->isExit) {
-        if (fileStreamer->mAudioframeQueue.empty()) {
+    if (fileStreamer->mAudioframeQueue.empty()) {
 //            continue;
-            return 0;
-        }
+        return 0;
+    }
 //        pthread_mutex_lock(&(fileStreamer->mutex));
-        const shared_ptr<AVData> &ptr = fileStreamer->mAudioframeQueue.wait_and_pop();
-        AVData *pData = ptr.get();
-        if (pData && pData->avPacket) {
-            AVPacket *packet = pData->avPacket;
+    const shared_ptr<AVData> &ptr = fileStreamer->mAudioframeQueue.wait_and_pop();
+    AVData *pData = ptr.get();
+    if (pData && pData->avPacket) {
+        AVPacket *packet = pData->avPacket;
 //            av_packet_ref(dst, packet);
 //            av_copy_packet(dst,packet);
 //            if (packet->size > 0) {
 //                fileStreamer->SendFrame(packet, fileStreamer->audioStreamIndex);
-            //notice:双路流需保证音视频PTS递增
+        //notice:双路流需保证音视频PTS递增
 //            if(fileStreamer->videoPts>packet->pts){
 //                packet->pts=packet->pts+(fileStreamer->videoPts-packet->pts)+1;
 //            }
-            packet->dts = packet->pts;
-            fileStreamer->audioPts=packet->pts;
+        packet->pts = pData->pts;
+
+        packet->dts = packet->pts;
+//        fileStreamer->audioPts = packet->pts;
 //            packet->pts = av_rescale_q(packet->pts, fileStreamer->audioStream->time_base,AV_TIME_BASE_Q);
 //            packet->dts = av_rescale_q(packet->pts, fileStreamer->audioStream->time_base,AV_TIME_BASE_Q);
-            LOGE("send audio pts:%lld",fileStreamer->audioPts);
-            packet->stream_index=fileStreamer->audioStreamIndex;
-            packet->duration = 0;
-            fileStreamer->SendFrame(packet, fileStreamer->audioStreamIndex);
+//        LOGE("send audio pts:%lld", fileStreamer->audioPts);
+        packet->stream_index = fileStreamer->audioStreamIndex;
+        packet->duration = pData->duration;
+        fileStreamer->SendFrame(packet, fileStreamer->audioStreamIndex);
 //            }
 //            av_packet_free(&(*(pData->avPacket)));
 //            av_packet_unref(packet);
-        }
+    }
 //        pthread_mutex_unlock(&(fileStreamer->mutex));
 //        av_usleep(1000000);
 //    }
@@ -1095,17 +1104,17 @@ void *FileStreamer::PushVideoStreamTask(void *pObj) {
 //    }
 //    int64_t beginTime = av_gettime();
 //    while (!fileStreamer->isExit) {
-        if (fileStreamer->mVideoframeQueue.empty()) {
-            return 0;
+    if (fileStreamer->mVideoframeQueue.empty()) {
+        return 0;
 //            continue;
-        }
+    }
 //
-        const shared_ptr<AVData> &ptr = fileStreamer->mVideoframeQueue.wait_and_pop();
-        AVData *pData = ptr.get();
+    const shared_ptr<AVData> &ptr = fileStreamer->mVideoframeQueue.wait_and_pop();
+    AVData *pData = ptr.get();
 
-        if (pData && pData->avPacket) {
+    if (pData && pData->avPacket) {
 //            AVPacket *dst = av_packet_alloc();
-            AVPacket *packet = pData->avPacket;
+        AVPacket *packet = pData->avPacket;
 //            av_packet_move_ref(dst,packet);
 //            av_packet_free(&packet);
 
@@ -1117,25 +1126,27 @@ void *FileStreamer::PushVideoStreamTask(void *pObj) {
 //            AVPacket *avPacket = av_packet_alloc();
 //            av_packet_move_ref(avPacket, packet);
 
-            //notice:双路流需保证音视频PTS递增
+        //notice:双路流需保证音视频PTS递增
 //            if(fileStreamer->audioPts>packet->pts){
 //                packet->pts=fileStreamer->audioPts+1;
 //            }
-            packet->dts = packet->pts;
-            fileStreamer->videoPts=packet->pts;
-            packet->stream_index=fileStreamer->videoStreamIndex;
+        packet->pts = pData->pts;
+        packet->dts = packet->pts;
+        packet->duration = pData->duration;
+//        fileStreamer->videoPts = packet->pts;
+        packet->stream_index = fileStreamer->videoStreamIndex;
 
 
 //            packet->pts = av_rescale_q(packet->pts, fileStreamer->videoStream->time_base,AV_TIME_BASE_Q);
 //            packet->dts = av_rescale_q(packet->pts, fileStreamer->videoStream->time_base,AV_TIME_BASE_Q);
-            LOGE("send video pts:%lld",fileStreamer->videoPts);
-            packet->duration = 0;
-            fileStreamer->SendFrame(packet, fileStreamer->videoStreamIndex);
+//        LOGE("send video pts:%lld", fileStreamer->videoPts);
+//        packet->duration = 0;
+        fileStreamer->SendFrame(packet, fileStreamer->videoStreamIndex);
 //            int ret = av_interleaved_write_frame(fileStreamer->iAvFormatContext,packet);
 //            }
 //            av_packet_free(&packet);
 //            av_packet_free(&packet);
-        }
+    }
 //        pthread_mutex_unlock(&(fileStreamer->mutex));
 //        av_usleep(1000000);
 //    }
@@ -1243,30 +1254,145 @@ void FileStreamer::main() {
         audioStreamIndex = AddStream(audioEncoder->getAudioCodecContext());
     }
     WriteHead(this);
-    while(!isExit){
+    while (!isExit) {
         PushAudioStreamTask(this);
         PushVideoStreamTask(this);
     }
 
 }
 
-int FileStreamer::ClosePushStream() {
-//    if (isPushStream) {
-        isExit = true;
-//        pthread_join(t1, NULL);
-//        pthread_join(t2, NULL);
-//        pthread_mutex_destroy(&mutex);
-//
-        if (NULL != iAvFormatContext) {
-            av_write_trailer(iAvFormatContext);
-            avio_close(iAvFormatContext->pb);
-            LOGD("close");
+void FileStreamer::setMetaData(MetaData data) {
+    this->metaData = data;
+}
+
+
+int vflush_encoder(AVFormatContext *fmt_ctx, unsigned int stream_index) {
+    int ret = 0;
+    int got_frame;
+    AVPacket enc_pkt;
+    if (!(fmt_ctx->streams[stream_index]->codec->codec->capabilities
+          & CODEC_CAP_DELAY))
+        return 0;
+    av_init_packet(&enc_pkt);
+    while (1) {
+        enc_pkt.data = NULL;
+        enc_pkt.size = 0;
+        ret = avcodec_encode_video2(fmt_ctx->streams[stream_index]->codec,
+                                    &enc_pkt, NULL, &got_frame);
+        if (ret < 0)
+            break;
+        if (!got_frame) {
+            ret = 0;
+            break;
         }
-//    }
+        ret = av_write_frame(fmt_ctx, &enc_pkt);
+        av_free_packet(&enc_pkt);
+        if (ret < 0)
+            break;
+    }
+
+    return ret;
+}
+
+void av_opt_free(void *obj) {
+    const AVOption *o = NULL;
+    while ((o = av_opt_next(obj, o))) {
+        switch (o->type) {
+            case AV_OPT_TYPE_STRING:
+            case AV_OPT_TYPE_BINARY:
+                av_freep((uint8_t *) obj + o->offset);
+                break;
+
+            case AV_OPT_TYPE_DICT:
+                av_dict_free((AVDictionary **) (((uint8_t *) obj) + o->offset));
+                break;
+
+            default:
+                break;
+        }
+    }
+}
+
+int av_write_trailer(AVFormatContext *s) {
+    int ret, i;
+
+    for (;;) {
+        AVPacket pkt;
+        ret = interleave_packet(s, &pkt, NULL, 1);
+        if (ret < 0)
+            goto fail;
+        if (!ret)
+            break;
+
+        ret = write_packet(s, &pkt);
+        if (ret >= 0)
+            s->streams[pkt.stream_index]->nb_frames++;
+
+        av_packet_unref(&pkt);
+
+        if (ret < 0)
+            goto fail;
+        if (s->pb && s->pb->error)
+            goto fail;
+    }
+
+    if (!s->internal->header_written) {
+        ret = s->internal->write_header_ret ? s->internal->write_header_ret : write_header_internal(
+                s);
+        if (ret < 0)
+            goto fail;
+    }
+
+    fail:
+    if (s->internal->header_written && s->oformat->write_trailer) {
+        if (!(s->oformat->flags & AVFMT_NOFILE) && s->pb)
+            avio_write_marker(s->pb, AV_NOPTS_VALUE, AVIO_DATA_MARKER_TRAILER);
+        if (ret >= 0) {
+            ret = s->oformat->write_trailer(s);
+        } else {
+            s->oformat->write_trailer(s);
+        }
+    }
+
+    if (s->oformat->deinit)
+        s->oformat->deinit(s);
+
+    s->internal->header_written =
+    s->internal->initialized =
+    s->internal->streams_initialized = 0;
+
+    if (s->pb)
+        avio_flush(s->pb);
+    if (ret == 0)
+        ret = s->pb ? s->pb->error : 0;
+    for (i = 0; i < s->nb_streams; i++) {
+        av_freep(&s->streams[i]->priv_data);
+        av_freep(&s->streams[i]->index_entries);
+    }
+    if (s->oformat->priv_class)
+        av_opt_free(s->priv_data);
+    av_freep(&s->priv_data);
+    return ret;
+}
+
+int FileStreamer::ClosePushStream() {
+    isExit = true;
+
+    if (NULL != iAvFormatContext) {
+//        vflush_encoder(iAvFormatContext,videoStreamIndex);
+        av_write_trailer(iAvFormatContext);
+        avio_close(iAvFormatContext->pb);
+        LOG_D("close");
+    }
     writeHeadFinish = false;
     return 0;
 }
 
+int writeTraier(struct AVFormatContext *avFormatContext) {
+    LOG_E("write traier");
+
+    return 0;
+}
 
 
 /**
@@ -1284,8 +1410,10 @@ void *FileStreamer::WriteHead(void *pObj) {
         return 0;
     }
     LOGD("avio open success!");
-//    AVDictionary* opt = NULL;
-//    av_dict_set_int(&opt, "video_track_timescale", 25, 0);
+
+
+//    AVDictionary *opt = NULL;
+//    av_dict_set_int(&opt, "video_track_timescale", 12800, 0);
     ret = avformat_write_header(fileStreamer->iAvFormatContext, NULL);
     if (ret != 0) {
         char buf[1024] = {0};
@@ -1294,6 +1422,11 @@ void *FileStreamer::WriteHead(void *pObj) {
         return 0;
     }
 //    av_dump_format(fileStreamer->iAvFormatContext, 0, fileStreamer->outputUrl, 1);
+//    fileStreamer->iAvFormatContext->oformat->write_trailer = writeTraier;
+//    fileStreamer->iAvFormatContext->duration=42627L;
+//    fileStreamer->iAvFormatContext->streams[fileStreamer->audioStreamIndex]->duration=av_rescale_q_rnd(42647L,AVRational{1,1000},AVRational{1,48000},AV_ROUND_NEAR_INF);
+//    fileStreamer->iAvFormatContext->streams[fileStreamer->audioStreamIndex]->time_base=(AVRational){1,48000};
+
     fileStreamer->writeHeadFinish = true;
     return 0;
 }
@@ -1327,22 +1460,78 @@ int FileStreamer::SendFrame(AVPacket *packet, int streamIndex) {
 //        mtx.unlock();
 //        return -1;
 //    }
-    int64_t pts=packet->pts;
-    int ret = k_av_interleaved_write_frame(iAvFormatContext, packet);
+    int64_t pts = 0;
+    int64_t duration = packet->duration;
+    packet->duration = 0;
+
+    LOG_E("---------->pts:%lld", packet->pts);
+
+    if (streamIndex == videoStreamIndex) {
+//        packet->pts = av_rescale_q(packet->pts/1000,vtimeBase ,AV_TIME_BASE_Q);
+//        packet->dts = av_rescale_q(packet->pts/1000, vtimeBase, AV_TIME_BASE_Q);
+//        packet->duration = 0;
+
+        if (&metaData && metaData.video_rotate) {
+            int i = av_dict_set(&iAvFormatContext->streams[streamIndex]->metadata, "rotate",
+                                metaData.video_rotate, 0);
+            if (i < 0) {
+                LOG_E("set error");
+            }
+        }
+
+//        if (!(packet->flags & AV_PKT_FLAG_KEY)&&recordKeyValue) {
+//            recordKeyValue=1;
+//            LOG_D("is not KeyFrame");
+//            av_packet_unref(packet);
+//            return 0;
+//        }else{
+//            LOG_D("is KeyFrame");
+//            recordKeyValue=0;
+//        }
+//        packet->pts = packet->pts* (mVideoCodecContext->time_base.num * 1000 /
+//                                      mVideoCodecContext->time_base.den);
+//        packet->dts = packet->pts;
+//        packet->pts=packet->pts*25;
+        packet->pts = av_rescale_q_rnd(packet->pts, inVideoTimeBase, videoStream->time_base,
+                                       AV_ROUND_NEAR_INF);
+        packet->dts = packet->pts;
+        packet->duration = av_rescale_q(packet->duration, inVideoTimeBase, videoStream->time_base);
+//        packet->duration = 0;
+        pts = packet->pts;
+
+    } else if (streamIndex == audioStreamIndex) {
+//        packet->pts = av_rescale_q(packet->pts/1000, atimeBase, AV_TIME_BASE_Q);
+//        packet->dts = av_rescale_q(packet->pts/1000, atimeBase, AV_TIME_BASE_Q);
+//        packet->duration = 0;
+//        packet->pts = packet->pts *
+//                      (mAudioCodecContext->frame_size * 1000 / mAudioCodecContext->sample_rate);
+//        packet->dts = packet->pts;
+//        packet->pts=packet->pts/1000*48000;
+        packet->pts = av_rescale_q_rnd(packet->pts, inAudioTimeBase, audioStream->time_base,
+                                       AV_ROUND_NEAR_INF);
+        packet->dts = packet->dts;
+        packet->duration = av_rescale_q(packet->duration, inAudioTimeBase, audioStream->time_base);
+//        packet->duration = 0;
+        pts = packet->pts;
+    }
+
+    packet->pos = -1;
+    int ret = av_interleaved_write_frame(iAvFormatContext, packet);
     if (ret == 0) {
         if (streamIndex == audioStreamIndex) {
-            LOGE("---------->write @@@@@@@@@ frame success------->! pts:%lld",pts);
+            LOG_E("---------->write @@@@@@@@@ frame success------->! pts:%lld duration:%lld", pts,
+                  duration);
         } else if (streamIndex == videoStreamIndex) {
-            LOGE("---------->write ######### frame success------->! pts:%lld",pts);
+            LOG_E("---------->write ######### frame success------->! pts:%lld duration:%lld", pts,
+                  duration);
         }
     } else {
         char buf[1024] = {0};
         av_strerror(ret, buf, sizeof(buf));
-        LOGE("stream index %d writer frame failed! :%s", streamIndex, buf);
+        LOG_E("stream index %d writer frame failed! :%s", streamIndex, buf);
     }
     return 0;
 }
-
 
 
 void FileStreamer::setVideoEncoder(VideoEncoder *pEncoder) {

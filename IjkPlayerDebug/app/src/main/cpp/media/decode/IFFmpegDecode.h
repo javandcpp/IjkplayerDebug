@@ -36,7 +36,7 @@ public:
 
     //同步时间，再次打开文件要清理
     int syncAudioPts = 0;
-    int pts = 0;
+    long long  pts = 0;
 
 protected:
     virtual void main();

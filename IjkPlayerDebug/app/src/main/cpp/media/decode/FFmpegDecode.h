@@ -29,6 +29,12 @@ public:
 
     SwsContext *sws_ctx= nullptr;
 
+    void setVideoScaleHeight(long i);
+
+    void setVideoScaleWidth(long i);
+    long mScaleHeight;
+    long mScaleWidth;
+
 protected:
     AVCodecContext *codecContext=NULL;
     AVFrame *inAvFrame = NULL;
@@ -37,6 +43,7 @@ protected:
     FILE *pFILE;
 
     uint8_t *video_out_buffer=NULL;
+
 };
 
 

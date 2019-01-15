@@ -15,11 +15,11 @@ class FFmpegDemux : public IDemux {
 public:
     static bool isFirst;
 
-    int audioPts;
+    long long audioPts = 0;
 
-    int videoPts;
+    long long videoPts = 0;
 
-    void *streamer= nullptr;
+    void *streamer = nullptr;
 
     virtual bool open(const char *url);
 
@@ -43,13 +43,39 @@ public:
 
     void setAudioStreamIndex(int audioStreamIndex);
 
+    void getRotate();
+
+    void getDuration();
+
+    virtual MetaData getMetaData();
+
+
     AVParameters *videoAvParameters = NULL;
     AVParameters *audioAvParameters = NULL;
 
 
     void setStreamer(FileStreamer *pStreamer);
 
-    int64_t frameCount=0;
+    int64_t frameCount = 0;
+
+    AVDictionaryEntry avDictionaryEntry;
+
+    bool hasRotateValue = false;
+
+    char *mVideoRotate = nullptr;
+
+    int64_t mVideoDuration = 0;
+
+    int audioPtsRatio = 0;
+
+    int videoPtsRatio = 0;
+
+    AVStream *audioStream = NULL;
+    AVStream *videoStream = NULL;
+
+    AVStream *getAudioStream() const;
+
+    AVStream *getVideoStream() const;
 
 protected:
 

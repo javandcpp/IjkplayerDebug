@@ -134,13 +134,14 @@ void AudioEncoder::main() {
                 AVData avData;
                 AVPacket *avPacket = av_packet_alloc();
                 av_packet_move_ref(avPacket, &audioPacket);//此处data指针指向重新分配的内存，并复制其他属性
-                LOGD("audio encode sucess  pts:%ld", pData->pts);
+                LOGD("audio encode sucess  pts:%lld", pData->pts);
                 fwrite(avPacket->data, 1, avPacket->size, pFile);
                 fflush(pFile);
 
                 avData.pts = pData->pts;
                 avData.avPacket = avPacket;
                 avData.isAudio = true;
+                avData.duration=pData->duration;
                 this->notifyObserver(avData);
             }
         }
@@ -262,12 +263,12 @@ int AudioEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     }
     audioCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
     audioCodecContext->sample_fmt = AV_SAMPLE_FMT_S16;
-    audioCodecContext->sample_rate = 48000;
-    audioCodecContext->thread_count = 8;
-    audioCodecContext->bit_rate = 10 * 1024 * 4;
-    audioCodecContext->channels = 2;
+    audioCodecContext->sample_rate = avCodecParameters->sample_rate;
+    audioCodecContext->thread_count = 4;
+    audioCodecContext->bit_rate = avCodecParameters->bit_rate;
+    audioCodecContext->channels = avCodecParameters->channels;
     audioCodecContext->frame_size = 1024;
-    audioCodecContext->time_base = {1, 48000};//AUDIO VIDEO 两边时间基数要相同
+    audioCodecContext->time_base = (AVRational){1, avCodecParameters->sample_rate};//AUDIO VIDEO 两边时间基数要相同
     audioCodecContext->channel_layout = av_get_default_channel_layout(audioCodecContext->channels);
 
     outputFrame = av_frame_alloc();

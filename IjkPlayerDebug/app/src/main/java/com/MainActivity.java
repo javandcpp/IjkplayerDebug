@@ -25,12 +25,15 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.d("hardcodec:",isSupportMediaCodecHardDecoder()+"");
     }
 
 
 
     public void compress(View view){
-        MediaProcess.getMediaProcess().VideoCompress("/mnt/sdcard/output.mp4",120,20);
+
+        MediaProcess.getMediaProcess().VideoCompress("/mnt/sdcard/test5.mp4",1280,720);
+
     }
 
     public boolean isSupportMediaCodecHardDecoder() {

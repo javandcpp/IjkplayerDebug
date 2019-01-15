@@ -14,12 +14,15 @@ extern "C" {
 #include "libavutil/timestamp.h"
 #include "libavutil/avassert.h"
 #include "libavutil/internal.h"
+#include "libavutil/opt.h"
 #include "libavcodec/avcodec.h"
 #include "libavutil/avutil.h"
 #include "libavcodec/jni.h"
 #include "libavutil/time.h"
 #include "libavutil/imgutils.h"
 #include "libswscale/swscale.h"
+#include "x264.h"
+#include "x264_config.h"
 #include<stdio.h>
 #include<pthread.h>
 #include<stdlib.h>
@@ -27,13 +30,18 @@ extern "C" {
 };
 
 #include <mutex>
-#define TAG "hw_media"
 
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,TAG ,__VA_ARGS__)
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,TAG ,__VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN,TAG ,__VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__)
-#define LOGF(...) __android_log_print(ANDROID_LOG_FATAL,TAG ,__VA_ARGS__)
+#define TAG "hw_media"
+#define SWITCH 0
+
+#define LOGD(...) if(SWITCH){ __android_log_print(ANDROID_LOG_DEBUG,TAG ,__VA_ARGS__); }
+#define LOGI(...) if(SWITCH){__android_log_print(ANDROID_LOG_INFO,TAG ,__VA_ARGS__);}
+#define LOGW(...) if(0){__android_log_print(ANDROID_LOG_WARN,TAG ,__VA_ARGS__);}
+#define LOGE(...) if(SWITCH){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
+#define LOG_D(...) if(1){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
+#define LOG_E(...) if(SWITCH){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
+#define LOGF(...) if(0){__android_log_print(ANDROID_LOG_FATAL,TAG ,__VA_ARGS__);}
+
 
 #endif
 
