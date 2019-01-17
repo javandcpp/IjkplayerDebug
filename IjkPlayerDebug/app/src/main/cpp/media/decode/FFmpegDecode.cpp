@@ -90,12 +90,14 @@ bool FFmpegDecode::openCodec(AVParameters parameters) {
     return true;
 }
 
+
+
 bool FFmpegDecode::sendPacket(AVData pkt) {
     AVPacket *packet = (AVPacket *) pkt.data;
     int re = avcodec_send_packet(codecContext, packet);
 //    av_packet_free(&packet);
     if (re != 0) {
-//        LOGE("ffmpeg sendPacket failed :%s",av_err2str(re));
+        LOGE("ffmpeg sendPacket failed :%s",av_err2str(re));
         return false;
     }
 //    LOGE("ffmpeg sendPacket success size:%d pts:%d", pkt.size,pkt.pts);
@@ -201,10 +203,10 @@ AVData FFmpegDecode::receiveFrame() {
 
 
         int i = mScaleWidth * mScaleHeight;
-//        fwrite(outAvFrame->data[0],1,i,pFILE);
-//        fwrite(outAvFrame->data[1],1,i/4,pFILE);
-//        fwrite(outAvFrame->data[2],1,i/4,pFILE);
-//        fflush(pFILE);
+        fwrite(outAvFrame->data[0],1,i,pFILE);
+        fwrite(outAvFrame->data[1],1,i/4,pFILE);
+        fwrite(outAvFrame->data[2],1,i/4,pFILE);
+        fflush(pFILE);
 
         avData.format = inAvFrame->format;
         memcpy(avData.datas, outAvFrame->data, sizeof(outAvFrame->data));
@@ -226,3 +228,11 @@ void FFmpegDecode::setVideoScaleWidth(long i) {
     this->mScaleWidth = i;
 }
 
+void FFmpegDecode::addAudioEncode(AudioEncoder *pEncoder) {
+    this->mAudioEncoder=pEncoder;
+}
+
+
+void FFmpegDecode::addVideoEncode(VideoEncoder *pEncoder) {
+    this->mVideoEncoder=pEncoder;
+}

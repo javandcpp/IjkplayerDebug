@@ -8,6 +8,13 @@
 
 using namespace std;
 
+
+
+long long NativeThread::readAudioPts=0;
+long long NativeThread::writeAudioPts=0;
+long long NativeThread::readVideoPts=0;
+long long NativeThread::writeVideoPts=0;
+
 void xsleep(int mills) {
     chrono::milliseconds milliseconds(mills);
     this_thread::sleep_for(milliseconds);

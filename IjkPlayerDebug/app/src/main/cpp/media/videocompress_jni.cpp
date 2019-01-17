@@ -66,8 +66,8 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
 
         fileStreamer->InitStreamer("/mnt/sdcard/output1.mp4");
         fileStreamer->setMetaData(pDemux->getMetaData());
-//        fileStreamer->inAudioTimeBase=pDemux->
 
+        fileStreamer->startThread();
 
         //视频编码
         videoCompressComponent->getAudioEncode()->startThread();
@@ -78,7 +78,6 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
 //        开始解复用
         videoCompressComponent->getDemux()->startThread();
 
-        fileStreamer->startThread();
     }
 
     env->ReleaseStringUTFChars(url_, url);

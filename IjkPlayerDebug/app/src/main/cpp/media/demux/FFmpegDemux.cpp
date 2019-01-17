@@ -147,10 +147,22 @@ AVData FFmpegDemux::readMediaData() {
     if (re != 0) {
         if (re == AVERROR_EOF) {
             isExit = true;
-            //读到结尾
             LOGE("read frame eof");
-            ((FileStreamer *) streamer)->ClosePushStream();
-            return AVData();
+            AVData avData;
+             do{
+                LOG_D("writeaudiopts %lld", writeAudioPts);
+                LOG_D("writevideopts %lld", writeVideoPts);
+                LOG_D("readAudioPts %lld", readAudioPts);
+                LOG_D("readVideoPtS %lld", readVideoPts);
+                if (writeVideoPts == readVideoPts && readAudioPts == writeAudioPts) {
+                    xsleep(2000);
+                    ((FileStreamer *) streamer)->ClosePushStream();
+                    break;
+                }
+
+            }while (1);
+
+            return avData;
         }
         char buf[100] = {0};
         av_strerror(re, buf, sizeof(buf));
@@ -183,13 +195,14 @@ AVData FFmpegDemux::readMediaData() {
     }
 
     if (avData.isAudio) {
-        audioPts += audioPtsRatio;
+        audioPts += 1024;
         avData.pts = audioPts;
         LOGD("audio pts:%lld   pts:%lld", avData.pts, audioPts);
 
     } else {
         videoPts += videoPtsRatio;
         avData.pts = videoPts;
+        LOG_D("read packet size:%d  pts:%lld",pkt->size,pkt->pts);
         LOGD("video pts:%lld   pts:%lld", avData.pts, videoPts);
     }
     return avData;
@@ -227,4 +240,12 @@ AVStream *FFmpegDemux::getAudioStream() const {
 
 AVStream *FFmpegDemux::getVideoStream() const {
     return videoStream;
+}
+
+void FFmpegDemux::addVideoDecode(FFmpegDecode *pDecode) {
+    this->mVideoDecode = pDecode;
+}
+
+void FFmpegDemux::addAudioDecode(FFmpegDecode *pDecode) {
+    this->mAudioDecode = pDecode;
 }

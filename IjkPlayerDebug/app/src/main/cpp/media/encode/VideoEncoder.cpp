@@ -73,7 +73,7 @@ void VideoEncoder::update(AVData avData) {
                  aVideoframeQueue.Size());
             break;
         }
-        xsleep(1);
+//        xsleep(1);
 //    }
 
 }
@@ -133,7 +133,7 @@ void VideoEncoder::main() {
 //            continue;
 //        }
         //发送数据到解码线程，一个数据包，可能解码多个结果
-        outputYUVFrame->pts=pData->pkt_pts;
+//        outputYUVFrame->pts=pData->pkt_pts;
         videoPts=pData->pkt_pts;
         ret = avcodec_send_frame(videoCodecContext, outputYUVFrame);
         LOGE("video enencode avcodec_send_frame result:%d", ret);
@@ -162,8 +162,10 @@ void VideoEncoder::main() {
                 }
 #endif
 
+
+
                 av_packet_move_ref(avPacket,&videoPacket);//此处data指针指向重新分配的内存，并复制其他属性
-                LOGD("video encode sucess  pts:%lld pktsize:%d", pData->pts, videoPacket.size);
+                LOGD("video encode sucess  pts:%lld pktsize:%d  encodesize:%d", pData->pts, videoPacket.size,avPacket->size);
                 avData.avPacket = avPacket;
                 avData.isAudio = false;
                 avData.duration=pData->duration;
@@ -201,7 +203,7 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     LOGE("avcodec alloc context success!");
 
 
-    long long bitrate=1024*1000*10;
+    long long bitrate=1024*1000*20;
 
 //    if (NULL != videoCapture->GetVideoEncodeArgs()) {
     videoCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER; //全局参数
@@ -209,17 +211,17 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     videoCodecContext->bit_rate = bitrate;//压缩后每秒视频的bit位大小 50kB
     videoCodecContext->width = mEncodeWidth;
     videoCodecContext->height = mEncodeHeight;
-    videoCodecContext->framerate = (AVRational){25, 1};
+    videoCodecContext->framerate = (AVRational){30, 1};
     videoCodecContext->max_b_frames = 0;
     videoCodecContext->qmin = 10;
     videoCodecContext->qmax = 50;
-    videoCodecContext->qcompress=0.5;
+    videoCodecContext->qcompress=1;
     videoCodecContext->time_base = (AVRational){1, 12800};//AUDIO VIDEO 两边时间基数要相同
     videoCodecContext->pix_fmt = AV_PIX_FMT_YUV420P;
     videoCodecContext->sample_aspect_ratio=AVRational{1,1};
-//    videoCodecContext->thread_count=4;
+    videoCodecContext->thread_count=4;
 //    videoCodecContext->keyint_min=50;
-    videoCodecContext->gop_size=200;
+    videoCodecContext->gop_size=50;
     videoCodecContext->level = 41;
     videoCodecContext->me_method = ME_HEX;
     videoCodecContext->refs = 1;

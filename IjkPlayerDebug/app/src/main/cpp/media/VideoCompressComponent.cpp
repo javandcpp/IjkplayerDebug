@@ -55,12 +55,12 @@ bool VideoCompressComponent::initialize() {
 
     if (mDemux) {
         if (mVideoFfmpegDecode) {
-            mDemux->addObserver(mVideoFfmpegDecode);
+            mDemux->addVideoDecode(mVideoFfmpegDecode);
             mVideoFfmpegDecode->addObserver(videoEncoder);
         }
 
         if (mAudioFfmpegDecode) {
-            mDemux->addObserver(mAudioFfmpegDecode);//添加音频解码
+            mDemux->addAudioDecode(mAudioFfmpegDecode);//添加音频解码
             mAudioFfmpegDecode->addObserver(audioEncoder);// 添加音频编码
         }
     }

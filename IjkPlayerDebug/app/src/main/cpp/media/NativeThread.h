@@ -20,10 +20,17 @@ public:
 
     virtual void main(){}
 
+    static long long readAudioPts;
+    static long long writeAudioPts;
+    static long long readVideoPts;
+    static long long writeVideoPts;
+
 protected:
     bool isExit=false;
     bool isRunning =false;
     bool isEnd=false;
+
+
 private:
     void ThreadMainTask();
 };

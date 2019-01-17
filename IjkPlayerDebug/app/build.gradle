@@ -13,6 +13,8 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++11 -frtti -fexceptions"
+                cFlags "-O3"
+                arguments "-DANDROID_ARM_NEON=TRUE"
             }
         }
 

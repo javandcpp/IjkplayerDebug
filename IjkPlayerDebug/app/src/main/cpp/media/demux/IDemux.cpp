@@ -10,12 +10,18 @@ void IDemux::main() {
         AVData data = readMediaData();
         if(data.isAudio){
             LOGD("audio stream   pts:%ld",data.pts);
+            NativeThread::readAudioPts=data.pts;
+            mAudioDecode->update(data);
+            LOG_D("readaudio pts %lld",readAudioPts);
         }else{
             LOGD("video stream   pts:%ld",data.pts);
+            NativeThread::readVideoPts=data.pts;
+            mVideoDecode->update(data);
+            LOG_D("readview pts %lld",readVideoPts);
         }
         xsleep(5);
-        if (data.size > 0) {
-            notifyObserver(data);
-        }
+//        if (data.size > 0) {
+//            notifyObserver(data);
+//        }
     }
 }

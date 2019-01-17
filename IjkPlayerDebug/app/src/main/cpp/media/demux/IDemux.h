@@ -9,6 +9,7 @@
 #include "../IObserver.h"
 #include "../AVParameters.h"
 #include "../MetaData.h"
+#include "../decode/FFmpegDecode.h"
 
 class IDemux : public IObserver {
 
@@ -25,9 +26,14 @@ public:
 
 
 
+
+
 protected:
     virtual void main();
 
+
+    FFmpegDecode *mVideoDecode= nullptr;
+    FFmpegDecode *mAudioDecode= nullptr;
 
 };
 

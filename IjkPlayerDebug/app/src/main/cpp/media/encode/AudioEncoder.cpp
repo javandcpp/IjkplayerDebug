@@ -64,7 +64,7 @@ void AudioEncoder::update(AVData avData) {
         aAudioframeQueue.push(avData);
         LOGE("update push audio queue data,pts:%ld   listsize:%d", avData.pts,
              aAudioframeQueue.Size());
-        //xsleep(20);
+//        xsleep(1);
 
 //    }
         break;
@@ -96,7 +96,7 @@ void AudioEncoder::main() {
 //            fwrite(pData->datas[0], 1, 4096, pFile);
 //            fflush(pFile);
 //        }
-        xsleep(1);
+//        xsleep(1);
 //        }
 
 
@@ -116,7 +116,7 @@ void AudioEncoder::main() {
 
 
         //发送数据到解码线程，一个数据包，可能解码多个结果
-        outputFrame->pts = pData->pts;
+//        outputFrame->pts = pData->pts;
         audioPts = pData->pts;
         ret = avcodec_send_frame(audioCodecContext, outputFrame);
         LOGE("audio enencode avcodec_send_frame result:%d", ret);

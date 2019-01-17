@@ -14,7 +14,7 @@ void IFFmpegDecode::update(AVData pkt) {
             threadsafeQueue.push(pkt);
             break;
         }
-        xsleep(1);
+//        xsleep(1);
 //    }
 }
 
@@ -35,6 +35,7 @@ void IFFmpegDecode::main() {
 
         const shared_ptr<AVData> &ptr = threadsafeQueue.wait_and_pop();
         AVData *pData = ptr.get();
+        xsleep(1);
         //发送数据到解码线程，一个数据包，可能解码多个结果
         if (this->sendPacket(*pData)) {
             while (!isExit) {
@@ -47,17 +48,21 @@ void IFFmpegDecode::main() {
 
 
                 //XLOGE("RecvFrame %d",frame.size);
-                if (frame.isAudio) {
-                    LOGD("is Audio true");
-                } else {
-                    LOGD("is Audio false");
-                }
+
 
                 pts = frame.pts;
                 frame.duration=pData->duration;
                 frame.pts=pData->pts;
-                xsleep(1);
                 //发送数据给观察者
+                if(!frame.isAudio){
+                    LOG_D("video");
+                }else{
+                    LOG_D("audio");
+                }
+//                    mAudioEncoder->update(frame);
+//                }else{
+//                    mVideoEncoder->update(frame);
+//                }
                 this->notifyObserver(frame);
 
             }

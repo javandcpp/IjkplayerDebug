@@ -7,6 +7,8 @@
 
 
 #include "IFFmpegDecode.h"
+#include "../encode/VideoEncoder.h"
+#include "../encode/AudioEncoder.h"
 
 struct SwsContext;
 
@@ -34,6 +36,10 @@ public:
     void setVideoScaleWidth(long i);
     long mScaleHeight;
     long mScaleWidth;
+
+    void addVideoEncode(VideoEncoder *pEncoder);
+
+    void addAudioEncode(AudioEncoder *pEncoder);
 
 protected:
     AVCodecContext *codecContext=NULL;

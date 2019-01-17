@@ -10,6 +10,8 @@
 
 using namespace std;
 
+
+
 void FileStreamer::update(AVData avData) {
     std::lock_guard<std::mutex> lk(mtx);
     while (!isExit) {
@@ -46,10 +48,10 @@ FileStreamer::~FileStreamer() {
         avcodec_free_context(&mAudioCodecContext);
         mAudioCodecContext = NULL;
     }
-//    if (NULL != mVideoCodecContext) {
-//        avcodec_free_context(&mVideoCodecContext);
-//        mVideoCodecContext = NULL;
-//    }
+    if (NULL != mVideoCodecContext) {
+        avcodec_free_context(&mVideoCodecContext);
+        mVideoCodecContext = NULL;
+    }
     if (NULL != iAvFormatContext) {
         avformat_free_context(iAvFormatContext);
         iAvFormatContext = NULL;
@@ -1385,6 +1387,10 @@ int FileStreamer::ClosePushStream() {
         LOG_D("close");
     }
     writeHeadFinish = false;
+    writeVideoPts=0;
+    writeAudioPts=0;
+    readAudioPts=0;
+    readVideoPts=0;
     return 0;
 }
 
@@ -1492,12 +1498,15 @@ int FileStreamer::SendFrame(AVPacket *packet, int streamIndex) {
 //                                      mVideoCodecContext->time_base.den);
 //        packet->dts = packet->pts;
 //        packet->pts=packet->pts*25;
+        pts = packet->pts;
         packet->pts = av_rescale_q_rnd(packet->pts, inVideoTimeBase, videoStream->time_base,
                                        AV_ROUND_NEAR_INF);
         packet->dts = packet->pts;
         packet->duration = av_rescale_q(packet->duration, inVideoTimeBase, videoStream->time_base);
 //        packet->duration = 0;
-        pts = packet->pts;
+//        LOG_D("packet size:%d",packet->size);
+
+
 
     } else if (streamIndex == audioStreamIndex) {
 //        packet->pts = av_rescale_q(packet->pts/1000, atimeBase, AV_TIME_BASE_Q);
@@ -1507,29 +1516,33 @@ int FileStreamer::SendFrame(AVPacket *packet, int streamIndex) {
 //                      (mAudioCodecContext->frame_size * 1000 / mAudioCodecContext->sample_rate);
 //        packet->dts = packet->pts;
 //        packet->pts=packet->pts/1000*48000;
+        pts = packet->pts;
         packet->pts = av_rescale_q_rnd(packet->pts, inAudioTimeBase, audioStream->time_base,
                                        AV_ROUND_NEAR_INF);
         packet->dts = packet->dts;
         packet->duration = av_rescale_q(packet->duration, inAudioTimeBase, audioStream->time_base);
 //        packet->duration = 0;
-        pts = packet->pts;
+
     }
 
     packet->pos = -1;
     int ret = av_interleaved_write_frame(iAvFormatContext, packet);
     if (ret == 0) {
         if (streamIndex == audioStreamIndex) {
-            LOG_E("---------->write @@@@@@@@@ frame success------->! pts:%lld duration:%lld", pts,
+            writeAudioPts=pts;
+            LOG_D("---------->write @@@@@@@@@ frame success------->! pts:%lld duration:%lld", writeAudioPts,
                   duration);
         } else if (streamIndex == videoStreamIndex) {
-            LOG_E("---------->write ######### frame success------->! pts:%lld duration:%lld", pts,
+            writeVideoPts=pts;
+            LOG_D("---------->write ######### frame success------->! pts:%lld duration:%lld", writeVideoPts,
                   duration);
         }
     } else {
         char buf[1024] = {0};
         av_strerror(ret, buf, sizeof(buf));
-        LOG_E("stream index %d writer frame failed! :%s", streamIndex, buf);
+        LOG_D("stream index %d writer frame failed! :%s", streamIndex, buf);
     }
+
     return 0;
 }
 

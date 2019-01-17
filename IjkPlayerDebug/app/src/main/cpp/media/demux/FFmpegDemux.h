@@ -8,6 +8,7 @@
 #include "IDemux.h"
 #include "../global_header.h"
 #include "../streamer/FileStreamer.h"
+#include "../decode/FFmpegDecode.h"
 
 
 class FFmpegDemux : public IDemux {
@@ -77,12 +78,17 @@ public:
 
     AVStream *getVideoStream() const;
 
+    void addVideoDecode(FFmpegDecode *pDecode);
+
+    void addAudioDecode(FFmpegDecode *pDecode);
+
 protected:
 
     int videoStreamIndex = -1;
     int audioStreamIndex = -1;
 
     void initAVCodec();
+
 
 };
 
