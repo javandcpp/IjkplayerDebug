@@ -19,7 +19,7 @@ void IDemux::main() {
             mVideoDecode->update(data);
             LOG_D("readview pts %lld",readVideoPts);
         }
-        xsleep(5);
+        xsleep(10);
 //        if (data.size > 0) {
 //            notifyObserver(data);
 //        }

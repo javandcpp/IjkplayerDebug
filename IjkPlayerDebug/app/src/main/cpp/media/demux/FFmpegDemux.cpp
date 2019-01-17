@@ -183,8 +183,8 @@ AVData FFmpegDemux::readMediaData() {
     }
 
 
-    pkt->pts = pkt->pts * (1000 * r2d(avFormatContext->streams[pkt->stream_index]->time_base));
-    pkt->dts = pkt->dts * (1000 * r2d(avFormatContext->streams[pkt->stream_index]->time_base));
+//    pkt->pts = pkt->pts * (1000 * r2d(avFormatContext->streams[pkt->stream_index]->time_base));
+//    pkt->dts = pkt->dts * (1000 * r2d(avFormatContext->streams[pkt->stream_index]->time_base));
 //    avData.duration = pkt->duration =
 //            pkt->duration * (1000 * r2d(avFormatContext->streams[pkt->stream_index]->time_base));
 //    avData.pts=pkt->pts;
@@ -200,8 +200,12 @@ AVData FFmpegDemux::readMediaData() {
         LOGD("audio pts:%lld   pts:%lld", avData.pts, audioPts);
 
     } else {
-        videoPts += videoPtsRatio;
-        avData.pts = videoPts;
+//        avData.pts= av_rescale_q_rnd(pkt->pts, avFormatContext->streams[pkt->stream_index]->time_base, videoStream->time_base,
+//                                       AV_ROUND_NEAR_INF)+;
+        //时间基转换
+        videoPts+=videoPtsRatio;
+        avData.pts=videoPts;
+//         = videoPtsRatio;
         LOG_D("read packet size:%d  pts:%lld",pkt->size,pkt->pts);
         LOGD("video pts:%lld   pts:%lld", avData.pts, videoPts);
     }

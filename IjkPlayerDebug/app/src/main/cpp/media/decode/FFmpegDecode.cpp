@@ -91,13 +91,12 @@ bool FFmpegDecode::openCodec(AVParameters parameters) {
 }
 
 
-
 bool FFmpegDecode::sendPacket(AVData pkt) {
     AVPacket *packet = (AVPacket *) pkt.data;
     int re = avcodec_send_packet(codecContext, packet);
 //    av_packet_free(&packet);
     if (re != 0) {
-        LOGE("ffmpeg sendPacket failed :%s",av_err2str(re));
+        LOGE("ffmpeg sendPacket failed :%s", av_err2str(re));
         return false;
     }
 //    LOGE("ffmpeg sendPacket success size:%d pts:%d", pkt.size,pkt.pts);
@@ -134,6 +133,7 @@ AVData FFmpegDecode::receiveCacheFrame() {
                         inAvFrame->height;
                 avData.width = inAvFrame->width;
                 avData.height = inAvFrame->height;
+
 //                sws_scale();
             }
 
@@ -184,8 +184,14 @@ AVData FFmpegDecode::receiveFrame() {
         avData.pkt_pts = inAvFrame->pkt_pts;
 
 
-
     } else if (codecContext->codec_type == AVMEDIA_TYPE_VIDEO) {
+        //过滤B帧
+        if (inAvFrame->pict_type==AV_PICTURE_TYPE_B) {
+            av_frame_free(&inAvFrame);
+            LOGD("is b frame");
+            return AVData();
+        }
+
         sws_scale(sws_ctx, (const uint8_t *const *) inAvFrame->data,
                   inAvFrame->linesize, 0, codecContext->height,
                   outAvFrame->data, outAvFrame->linesize);
@@ -201,12 +207,11 @@ AVData FFmpegDecode::receiveFrame() {
         avData.linesize[2] = outAvFrame->linesize[2];
 
 
-
         int i = mScaleWidth * mScaleHeight;
-        fwrite(outAvFrame->data[0],1,i,pFILE);
-        fwrite(outAvFrame->data[1],1,i/4,pFILE);
-        fwrite(outAvFrame->data[2],1,i/4,pFILE);
-        fflush(pFILE);
+//        fwrite(outAvFrame->data[0], 1, i, pFILE);
+//        fwrite(outAvFrame->data[1], 1, i / 4, pFILE);
+//        fwrite(outAvFrame->data[2], 1, i / 4, pFILE);
+//        fflush(pFILE);
 
         avData.format = inAvFrame->format;
         memcpy(avData.datas, outAvFrame->data, sizeof(outAvFrame->data));
@@ -229,10 +234,10 @@ void FFmpegDecode::setVideoScaleWidth(long i) {
 }
 
 void FFmpegDecode::addAudioEncode(AudioEncoder *pEncoder) {
-    this->mAudioEncoder=pEncoder;
+    this->mAudioEncoder = pEncoder;
 }
 
 
 void FFmpegDecode::addVideoEncode(VideoEncoder *pEncoder) {
-    this->mVideoEncoder=pEncoder;
+    this->mVideoEncoder = pEncoder;
 }
