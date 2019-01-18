@@ -11,7 +11,6 @@
 using namespace std;
 
 
-
 void FileStreamer::update(AVData avData) {
     std::lock_guard<std::mutex> lk(mtx);
     while (!isExit) {
@@ -1157,97 +1156,6 @@ void *FileStreamer::PushVideoStreamTask(void *pObj) {
 
 
 
-/**
-* 音视频同时推流任务
-*/
-//void *FileStreamer::PushStreamTask(void *pObj) {
-//    FileStreamer *FileStreamer = (FileStreamer *) pObj;
-//    FileStreamer->isPushStream = true;
-//
-//    if (NULL == FileStreamer->videoEncoder || NULL == FileStreamer->audioEncoder) {
-//        return 0;
-//    }
-//    VideoCapture *pVideoCapture = FileStreamer->videoEncoder->GetVideoCapture();
-//    AudioCapture *pAudioCapture = FileStreamer->audioEncoder->GetAudioCapture();
-//
-//    if (NULL == pVideoCapture || NULL == pAudioCapture) {
-//        return 0;
-//    }
-//    int64_t beginTime = av_gettime();
-//    if (NULL != pVideoCapture) {
-//        pVideoCapture->videoCaputureframeQueue.clear();
-//    }
-//    if (NULL != pAudioCapture) {
-//        pAudioCapture->audioCaputureframeQueue.clear();
-//    }
-//    int64_t lastAudioPts = 0;
-//    while (true) {
-//
-//        if (!FileStreamer->isPushStream ||
-//            pVideoCapture->GetCaptureState() ||
-//            pAudioCapture->GetCaptureState()) {
-//            break;
-//        }
-//        OriginData *pVideoData = pVideoCapture->GetVideoData();
-//        OriginData *pAudioData = pAudioCapture->GetAudioData();
-//
-//        if (pAudioData != NULL && pAudioData->data) {
-//            pAudioData->pts = pAudioData->pts - beginTime;
-////            if (pAudioData->pts == lastAudioPts) {
-////                pAudioData->pts += 1300;
-////            }
-//            lastAudioPts = pAudioData->pts;
-//            LOGD("before audio encode pts:%lld", pAudioData->pts);
-//            FileStreamer->audioEncoder->EncodeAAC(&pAudioData);
-//            LOGD("after audio encode pts:%lld", pAudioData->avPacket->pts);
-//        }
-//
-//
-//        if (pAudioData != NULL && pAudioData->avPacket->size > 0) {
-//            FileStreamer->SendFrame(pAudioData, FileStreamer->audioStreamIndex);
-//        }
-//
-//        //h264 encode
-//        if (pVideoData != NULL && pVideoData->data) {
-//            pVideoData->pts = pVideoData->pts - beginTime;
-//            LOGD("before video encode pts:%lld", pVideoData->pts);
-//            FileStreamer->videoEncoder->EncodeH264(&pVideoData);
-//            LOGD("after video encode pts:%lld", pVideoData->avPacket->pts);
-//        }
-//
-//        if (pVideoData != NULL && pVideoData->avPacket->size > 0) {
-//            FileStreamer->SendFrame(pVideoData, FileStreamer->videoStreamIndex);
-//        }
-//    }
-//    return 0;
-//}
-
-int FileStreamer::StartPushStream() {
-    if (videoEncoder) {
-        videoStreamIndex = AddStream(videoEncoder->getVideoCodecContext());
-    }
-    if (audioEncoder) {
-        audioStreamIndex = AddStream(audioEncoder->getAudioCodecContext());
-    }
-    pthread_create(&t3, NULL, FileStreamer::WriteHead, this);
-    pthread_join(t3, NULL);
-
-    if (writeHeadFinish) {
-        if (audioEncoder) {
-            PushAudioStreamTask(this);
-//            pthread_create(&t1, NULL, FileStreamer::PushAudioStreamTask, this);
-        }
-        if (videoEncoder) {
-            PushVideoStreamTask(this);
-//            pthread_create(&t2, NULL, FileStreamer::PushVideoStreamTask, this);
-        }
-    } else {
-        return -1;
-    }
-
-    return 0;
-}
-
 void FileStreamer::main() {
     if (videoEncoder) {
         videoStreamIndex = AddStream(videoEncoder->getVideoCodecContext());
@@ -1387,10 +1295,14 @@ int FileStreamer::ClosePushStream() {
         LOG_D("close");
     }
     writeHeadFinish = false;
-    writeVideoPts=0;
-    writeAudioPts=0;
-    readAudioPts=0;
-    readVideoPts=0;
+    writeVideoPts = 0;
+    writeAudioPts = 0;
+    readAudioPts = 0;
+    readVideoPts = 0;
+    if (&mFunctionPoniter) {
+
+        mFunctionPoniter(p);
+    }
     return 0;
 }
 
@@ -1438,34 +1350,6 @@ void *FileStreamer::WriteHead(void *pObj) {
 }
 
 int FileStreamer::SendFrame(AVPacket *packet, int streamIndex) {
-//    mtx.lock();
-//    AVPacket *packet = (AVPacket *) pData->data;
-//    AVRational stime;
-//    AVRational dtime;
-//    packet->stream_index = streamIndex;
-//    LOGD("write packet index:%d    index:%d  packetsize:%d  pts:%lld", packet->stream_index,
-//         streamIndex, packet->size,
-//         packet->pts);
-//    //判断是音频还是视频
-//    if (packet->stream_index == videoStreamIndex) {
-//        stime = mVideoCodecContext->time_base;
-//        dtime = videoStream->time_base;
-//    } else if (packet->stream_index == audioStreamIndex) {
-//        stime = mAudioCodecContext->time_base;
-//        dtime = audioStream->time_base;
-//    } else {
-//        LOGE("unknow stream index");
-////        mtx.unlock();
-//        return -1;
-//    }
-//    packet->pts = av_rescale_q(packet->pts, stime, AV_TIME_BASE_Q);
-//    packet->dts = av_rescale_q(packet->pts, stime, AV_TIME_BASE_Q);
-//    packet->duration = 0;
-//    packet->pos=-1;
-//    if (packet->size <= 0) {
-//        mtx.unlock();
-//        return -1;
-//    }
     int64_t pts = 0;
     int64_t duration = packet->duration;
     packet->duration = 0;
@@ -1473,10 +1357,6 @@ int FileStreamer::SendFrame(AVPacket *packet, int streamIndex) {
     LOG_E("---------->pts:%lld", packet->pts);
 
     if (streamIndex == videoStreamIndex) {
-//        packet->pts = av_rescale_q(packet->pts/1000,vtimeBase ,AV_TIME_BASE_Q);
-//        packet->dts = av_rescale_q(packet->pts/1000, vtimeBase, AV_TIME_BASE_Q);
-//        packet->duration = 0;
-
         if (&metaData && metaData.video_rotate) {
             int i = av_dict_set(&iAvFormatContext->streams[streamIndex]->metadata, "rotate",
                                 metaData.video_rotate, 0);
@@ -1485,43 +1365,17 @@ int FileStreamer::SendFrame(AVPacket *packet, int streamIndex) {
             }
         }
 
-//        if (!(packet->flags & AV_PKT_FLAG_KEY)&&recordKeyValue) {
-//            recordKeyValue=1;
-//            LOG_D("is not KeyFrame");
-//            av_packet_unref(packet);
-//            return 0;
-//        }else{
-//            LOG_D("is KeyFrame");
-//            recordKeyValue=0;
-//        }
-//        packet->pts = packet->pts* (mVideoCodecContext->time_base.num * 1000 /
-//                                      mVideoCodecContext->time_base.den);
-//        packet->dts = packet->pts;
-//        packet->pts=packet->pts*25;
         pts = packet->pts;
         packet->pts = av_rescale_q_rnd(packet->pts, inVideoTimeBase, videoStream->time_base,
                                        AV_ROUND_NEAR_INF);
-        packet->dts = packet->pts;
+        packet->dts = packet->pts;//移除B帧
         packet->duration = av_rescale_q(packet->duration, inVideoTimeBase, videoStream->time_base);
-//        packet->duration = 0;
-//        LOG_D("packet size:%d",packet->size);
-
-
-
     } else if (streamIndex == audioStreamIndex) {
-//        packet->pts = av_rescale_q(packet->pts/1000, atimeBase, AV_TIME_BASE_Q);
-//        packet->dts = av_rescale_q(packet->pts/1000, atimeBase, AV_TIME_BASE_Q);
-//        packet->duration = 0;
-//        packet->pts = packet->pts *
-//                      (mAudioCodecContext->frame_size * 1000 / mAudioCodecContext->sample_rate);
-//        packet->dts = packet->pts;
-//        packet->pts=packet->pts/1000*48000;
         pts = packet->pts;
         packet->pts = av_rescale_q_rnd(packet->pts, inAudioTimeBase, audioStream->time_base,
                                        AV_ROUND_NEAR_INF);
         packet->dts = packet->dts;
         packet->duration = av_rescale_q(packet->duration, inAudioTimeBase, audioStream->time_base);
-//        packet->duration = 0;
 
     }
 
@@ -1529,12 +1383,14 @@ int FileStreamer::SendFrame(AVPacket *packet, int streamIndex) {
     int ret = av_interleaved_write_frame(iAvFormatContext, packet);
     if (ret == 0) {
         if (streamIndex == audioStreamIndex) {
-            writeAudioPts=pts;
-            LOG_D("---------->write @@@@@@@@@ frame success------->! pts:%lld duration:%lld", writeAudioPts,
+            writeAudioPts = pts;
+            LOG_D("---------->write @@@@@@@@@ frame success------->! pts:%lld duration:%lld",
+                  writeAudioPts,
                   duration);
         } else if (streamIndex == videoStreamIndex) {
-            writeVideoPts=pts;
-            LOG_D("---------->write ######### frame success------->! pts:%lld duration:%lld", writeVideoPts,
+            writeVideoPts = pts;
+            LOG_D("---------->write ######### frame success------->! pts:%lld duration:%lld",
+                  writeVideoPts,
                   duration);
         }
     } else {
@@ -1553,5 +1409,10 @@ void FileStreamer::setVideoEncoder(VideoEncoder *pEncoder) {
 
 void FileStreamer::setAudioEncoder(AudioEncoder *pEncoder) {
     this->audioEncoder = pEncoder;
+}
+
+void FileStreamer::setCloseCallBack(void (*fun)(void *),void *p) {
+    mFunctionPoniter = fun;
+    this->p=p;
 }
 

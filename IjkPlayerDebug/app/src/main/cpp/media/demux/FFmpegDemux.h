@@ -65,6 +65,8 @@ public:
 
     char *mVideoRotate = nullptr;
 
+    int videoRotate=0;
+
     int64_t mVideoDuration = 0;
 
     int audioPtsRatio = 0;
@@ -81,6 +83,8 @@ public:
     void addVideoDecode(FFmpegDecode *pDecode);
 
     void addAudioDecode(FFmpegDecode *pDecode);
+
+
 
 protected:
 

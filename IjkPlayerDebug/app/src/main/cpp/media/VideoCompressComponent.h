@@ -14,6 +14,8 @@
 
 using namespace std;
 
+typedef void(*pF)(void *);
+
 class VideoCompressComponent {
 private:
     FFmpegDemux *mDemux = nullptr;
@@ -21,13 +23,22 @@ private:
     FFmpegDecode *mAudioFfmpegDecode = nullptr;
     AudioEncoder *audioEncoder = nullptr;
     VideoEncoder *videoEncoder = nullptr;
+    FileStreamer *fileStreamer = nullptr;
 
     mutable mutex mut;
 
 public:
 
 
+    const char *destPath = nullptr;
+
+    bool isRunning = false;
+
     VideoCompressComponent();
+
+    virtual ~VideoCompressComponent();
+
+    FileStreamer *getFileStreamer() const;
 
     bool initialize();
 
@@ -56,6 +67,12 @@ public:
     long getMScaleWidth();
 
     long getMScaleHeight();
+
+    pF mPf = nullptr;
+
+    void setCallback(void(*pF)(void *));
+
+    void setDestPath(const char *string);
 };
 
 

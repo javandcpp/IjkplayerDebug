@@ -29,6 +29,8 @@ FFmpegDecode::~FFmpegDecode() {
     if (sws_ctx) {
         sws_freeContext(sws_ctx);
     }
+
+    LOG_E("ffmpegDecode release");
 }
 
 /**
@@ -187,9 +189,9 @@ AVData FFmpegDecode::receiveFrame() {
     } else if (codecContext->codec_type == AVMEDIA_TYPE_VIDEO) {
         //过滤B帧
         if (inAvFrame->pict_type==AV_PICTURE_TYPE_B) {
-            av_frame_free(&inAvFrame);
-            LOGD("is b frame");
-            return AVData();
+//            av_frame_free(&inAvFrame);
+//            LOG_E("is b frame");
+//            return AVData();
         }
 
         sws_scale(sws_ctx, (const uint8_t *const *) inAvFrame->data,

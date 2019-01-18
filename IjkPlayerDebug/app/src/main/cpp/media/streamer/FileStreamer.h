@@ -15,6 +15,9 @@
 #include <mutex>
 
 
+typedef void(*pFunc)(void *);
+
+
 class FileStreamer : public IObserver {
 
 protected:
@@ -94,22 +97,25 @@ public:
     int audioFrameCount = 0;
 
     pthread_cond_t cond;
-    pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 //    pthread_mutex_t mutex_audio;
 
-    FILE *pFile=NULL;
+    FILE *pFile = NULL;
 
-    int64_t audioPts=0;
-    int64_t videoPts=0;
+    int64_t audioPts = 0;
+    int64_t videoPts = 0;
 
     void setMetaData(MetaData data);
 
-    AVRational inAudioTimeBase={0,0};
-    AVRational inVideoTimeBase={0,0};
+    AVRational inAudioTimeBase = {0, 0};
+    AVRational inVideoTimeBase = {0, 0};
 
-    int recordKeyValue=1;
+    int recordKeyValue = 1;
 
+    pFunc mFunctionPoniter;
 
+    void *p= nullptr;
+    void setCloseCallBack(void (*fun)(void *), void *p);
 };
 
 

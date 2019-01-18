@@ -20,14 +20,6 @@ void IFFmpegDecode::update(AVData pkt) {
 
 void IFFmpegDecode::main() {
     while (!isExit) {
-        //判断音视频同步
-//        if (!isAudio && syncAudioPts > 0) {
-//            //如果音频PTS小于视频，停止视频编码
-//            if (syncAudioPts < pts) {
-//                continue;
-//            }
-//        }
-
         if (threadsafeQueue.empty()) {
             xsleep(1);
             continue;
@@ -46,10 +38,6 @@ void IFFmpegDecode::main() {
                     break;
                 }
 
-
-                //XLOGE("RecvFrame %d",frame.size);
-
-
                 pts = frame.pts;
                 frame.duration=pData->duration;
                 frame.pts=pData->pts;
@@ -59,10 +47,6 @@ void IFFmpegDecode::main() {
                 }else{
                     LOG_D("audio");
                 }
-//                    mAudioEncoder->update(frame);
-//                }else{
-//                    mVideoEncoder->update(frame);
-//                }
                 this->notifyObserver(frame);
 
             }

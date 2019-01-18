@@ -24,7 +24,17 @@ FFmpegDemux::FFmpegDemux() {
 }
 
 FFmpegDemux::~FFmpegDemux() {
-
+    LOG_E("ffmpegDemux release");
+    if (avFormatContext) {
+        avformat_free_context(avFormatContext);
+        avFormatContext = nullptr;
+    }
+    if (audioAvParameters) {
+        delete audioAvParameters;
+    }
+    if (videoAvParameters) {
+        delete videoAvParameters;
+    }
 }
 
 MetaData FFmpegDemux::getMetaData() {
@@ -149,7 +159,7 @@ AVData FFmpegDemux::readMediaData() {
             isExit = true;
             LOGE("read frame eof");
             AVData avData;
-             do{
+            do {
                 LOG_D("writeaudiopts %lld", writeAudioPts);
                 LOG_D("writevideopts %lld", writeVideoPts);
                 LOG_D("readAudioPts %lld", readAudioPts);
@@ -160,7 +170,7 @@ AVData FFmpegDemux::readMediaData() {
                     break;
                 }
 
-            }while (1);
+            } while (1);
 
             return avData;
         }
@@ -195,18 +205,17 @@ AVData FFmpegDemux::readMediaData() {
     }
 
     if (avData.isAudio) {
-        audioPts += 1024;
-        avData.pts = audioPts;
+//        audioPts += 1024;
+        avData.pts = pkt->pts;
         LOGD("audio pts:%lld   pts:%lld", avData.pts, audioPts);
 
     } else {
-//        avData.pts= av_rescale_q_rnd(pkt->pts, avFormatContext->streams[pkt->stream_index]->time_base, videoStream->time_base,
-//                                       AV_ROUND_NEAR_INF)+;
-        //时间基转换
-        videoPts+=videoPtsRatio;
-        avData.pts=videoPts;
+        if (pkt->pts > pkt->dts) {//B Frame
+            pkt->pts = pkt->dts;
+        }
+        avData.pts = pkt->pts;
 //         = videoPtsRatio;
-        LOG_D("read packet size:%d  pts:%lld",pkt->size,pkt->pts);
+        LOG_D("read packet size:%d  pts:%lld", pkt->size, pkt->pts);
         LOGD("video pts:%lld   pts:%lld", avData.pts, videoPts);
     }
     return avData;
@@ -253,3 +262,4 @@ void FFmpegDemux::addVideoDecode(FFmpegDecode *pDecode) {
 void FFmpegDemux::addAudioDecode(FFmpegDecode *pDecode) {
     this->mAudioDecode = pDecode;
 }
+

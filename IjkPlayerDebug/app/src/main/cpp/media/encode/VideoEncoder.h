@@ -9,6 +9,7 @@
 #include "../global_header.h"
 #include "../AVData.h"
 #include "../threadsafe_queue.cpp"
+#include "../MetaData.h"
 
 #include <string>
 #include <iostream>
@@ -23,20 +24,14 @@ using namespace std;
 
 class VideoEncoder : public MediaEncoder {
 
-private:
-//    VideoCapture *videoCapture = NULL;
-
-    /**
-  *
-  */
-    int InitFilter();
 
 public:
     FILE *pFILE=NULL;
 
     bool isEncoding = false;
 
-    static VideoEncoder *Get();
+
+
 
     static void *EncodeTask(void *obj);
 
@@ -51,7 +46,7 @@ public:
 
     int maxList=500;
 
-    ~VideoEncoder();
+    virtual ~VideoEncoder();
 
     /**
      * 开启编码
@@ -102,6 +97,9 @@ public:
     long mEncodeHeight;
 
     void setVideoEncodeHeight(long i);
+
+
+    MetaData metaData;
 };
 
 

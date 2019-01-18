@@ -4,15 +4,38 @@
 #include "VideoCompressComponent.h"
 #include "streamer/FileStreamer.h"
 
+VideoCompressComponent *videoCompressComponent = NULL;
+jmethodID jMethodComplete = NULL;
+JNIEnv *env = NULL;
+jclass globalClazz = NULL;
+jobject pJobject = NULL;
+
+
+void stream_close(void *) {
+
+    //TODO
+    if (videoCompressComponent) {
+        const char *path = videoCompressComponent->destPath;
+//        if (globalClazz) {
+//            env->CallStaticVoidMethod(globalClazz, jMethodComplete,
+//                                            env->NewStringUTF(path));/**/
+//            if (pJobject) {
+//                env->DeleteGlobalRef(pJobject);
+//            }
+//        }
+        delete videoCompressComponent;
+    }
+
+}
+
 using namespace std;
 mutex mtx;
 
-VideoCompressComponent *videoCompressComponent = NULL;
 static int init;
 
 
 extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
-    JNIEnv *env = NULL;
+
     jint result = -1;
 
     if (vm->GetEnv((void **) &env, JNI_VERSION_1_4) != JNI_OK) {
@@ -23,65 +46,53 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         init = 1;
         LOGE("init ffmpeg");
     }
+
     return JNI_VERSION_1_4;
 }
 
 
+
+
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, jstring url_,
-                                                 jint width, jint height) {
+                                                 jint width, jint height, jstring dest_) {
 
     mtx.lock();
+    globalClazz = env->FindClass("com/stone/media/VideoCompress");
+    pJobject = env->NewGlobalRef(globalClazz);
+    jMethodComplete = env->GetStaticMethodID(globalClazz, "completeFromNative",
+                                             "(Ljava/lang/String;)V");
+
     const char *url = env->GetStringUTFChars(url_, 0);
+    const char *destPath = env->GetStringUTFChars(dest_, 0);
     long widthPram = width;
     long heightParma = height;
-
+    if (videoCompressComponent && videoCompressComponent->isRunning) {
+        if (globalClazz) {
+            jmethodID pID = env->GetStaticMethodID(globalClazz, "callbackFromNative", "(Z)V");
+            jboolean i = 0;
+            env->CallStaticVoidMethod(globalClazz, pID, i);/**/
+//            if (pJobject) {
+//                env->DeleteGlobalRef(pJobject);
+//            }
+        }
+        mtx.unlock();
+        return 0;
+    }
     videoCompressComponent = new VideoCompressComponent();
     if (videoCompressComponent) {
         videoCompressComponent->setMScaleWidth(widthPram);
         videoCompressComponent->setMScaleHeight(heightParma);
         videoCompressComponent->initialize();
+        videoCompressComponent->setCallback(stream_close);
+        videoCompressComponent->setDestPath(destPath);
         videoCompressComponent->openSource(url);
-        FFmpegDemux *pDemux = videoCompressComponent->getDemux();
-        //打开音视频解码器
-        videoCompressComponent->getAudioDecode()->openCodec(*(pDemux->getAudioParameters()));
-        videoCompressComponent->getVideoDecode()->openCodec(*(pDemux->getVideoParamters()));
-//        音频编码
-        videoCompressComponent->getAudioEncode()->InitEncode(
-                videoCompressComponent->getDemux()->getAudioParameters()->codecParameters);
-        videoCompressComponent->getVideoEncode()->InitEncode(
-                videoCompressComponent->getDemux()->getVideoParamters()->codecParameters);
-
-        //IO
-        FileStreamer *fileStreamer = FileStreamer::Get();
-        pDemux->setStreamer(fileStreamer);
-        fileStreamer->inAudioTimeBase = pDemux->getAudioStream()->time_base;
-        fileStreamer->inVideoTimeBase = pDemux->getVideoStream()->time_base;
-
-        videoCompressComponent->getVideoEncode()->addObserver(fileStreamer);
-        videoCompressComponent->getAudioEncode()->addObserver(fileStreamer);
-
-        fileStreamer->setVideoEncoder(videoCompressComponent->getVideoEncode());
-        fileStreamer->setAudioEncoder(videoCompressComponent->getAudioEncode());
-
-        fileStreamer->InitStreamer("/mnt/sdcard/output1.mp4");
-        fileStreamer->setMetaData(pDemux->getMetaData());
-
-        fileStreamer->startThread();
-
-        //视频编码
-        videoCompressComponent->getAudioEncode()->startThread();
-        videoCompressComponent->getVideoEncode()->startThread();
-//        开启解码
-        videoCompressComponent->getAudioDecode()->startThread();
-        videoCompressComponent->getVideoDecode()->startThread();
-//        开始解复用
-        videoCompressComponent->getDemux()->startThread();
-
     }
-
     env->ReleaseStringUTFChars(url_, url);
+    env->ReleaseStringUTFChars(dest_, destPath);
     mtx.unlock();
+
     return 0;
+
 }
 

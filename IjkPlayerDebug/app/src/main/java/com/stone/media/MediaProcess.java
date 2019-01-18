@@ -25,9 +25,8 @@ public final class MediaProcess {
     }
 
 
-    public void VideoCompress(String url, int width, int height) {
-
-        new VideoCompress().videoCompress(url, width, height);
+    public void VideoCompress(String url, String destPath,int width, int height) {
+        new VideoCompress().videoCompress(url, width, height,destPath);
     }
 
 

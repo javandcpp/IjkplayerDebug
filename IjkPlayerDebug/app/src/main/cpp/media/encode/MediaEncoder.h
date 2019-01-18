@@ -27,13 +27,9 @@ protected:
 
     void RegisterAVNetwork();
 
-    virtual int StartEncode() = 0;
 
     virtual int InitEncode(AVCodecParameters* avCodecParameters) = 0;
 
-    virtual int CloseEncode() = 0;
-
-    virtual int Release() = 0;
 
     static bool first;
 

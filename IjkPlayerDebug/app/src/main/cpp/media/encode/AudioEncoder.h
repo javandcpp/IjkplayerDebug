@@ -16,9 +16,6 @@ using namespace std;
 
 class AudioEncoder : public MediaEncoder {
 
-private:
-//    AudioCapture *audioCapture = NULL;
-
 public:
     AVCodec *avCodec = NULL;
     AVStream *outStream = NULL;
@@ -29,13 +26,8 @@ public:
     //最大的队列缓冲
     int maxList = 500;
 
-
-    static AudioEncoder *Get();
-
-
     bool isEncoding = false;
 
-    static void *EncodeTask(void *p);
 
     /**
       * 音频已编码数据队列
@@ -43,21 +35,14 @@ public:
     threadsafe_queue<AVData> aAudioframeQueue;
 
 
-//    list<OriginData *> AudioDatalist;
-
     AudioEncoder();
 
     ~AudioEncoder();
 
     /**
-     * 开启编码
-     */
-    virtual int StartEncode();
-
-    /**
      * 初始化视频编码器
      */
-    int InitEncode(AVCodecParameters* avCodecParameters);
+    int InitEncode(AVCodecParameters *avCodecParameters);
 
     /**
     * 关闭编码器
@@ -65,19 +50,10 @@ public:
     int CloseEncode();
 
 
-     int EncodeAAC(AVData **originData);
-
     /**
      * 资源回收
      */
     int Release();
-
-    /**
-     * 设置数据采集
-     */
-//    void SetAudioCapture(AudioCapture *audioCapture);
-
-//    AudioCapture *GetAudioCapture();
 
     /**
     * 获取编码器状态
@@ -90,7 +66,7 @@ public:
 
     AVCodecContext *getAudioCodecContext();
 
-    FILE *pFile= nullptr;
+    FILE *pFile = nullptr;
 
 
 };
