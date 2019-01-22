@@ -1300,7 +1300,6 @@ int FileStreamer::ClosePushStream() {
     readAudioPts = 0;
     readVideoPts = 0;
     if (&mFunctionPoniter) {
-
         mFunctionPoniter(p);
     }
     return 0;

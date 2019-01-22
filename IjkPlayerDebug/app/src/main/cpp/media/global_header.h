@@ -16,6 +16,8 @@ extern "C" {
 #include "libavutil/internal.h"
 #include "libavutil/opt.h"
 #include "libavcodec/avcodec.h"
+#include "libavutil/eval.h"
+#include "libavutil/display.h"
 #include "libavutil/avutil.h"
 #include "libavcodec/jni.h"
 #include "libavutil/time.h"
@@ -32,15 +34,15 @@ extern "C" {
 #include <mutex>
 
 #define TAG "hw_media"
-#define SWITCH 1
+#define SWITCH 0
 
 #define LOGD(...) if(SWITCH){ __android_log_print(ANDROID_LOG_DEBUG,TAG ,__VA_ARGS__); }
 #define LOGI(...) if(SWITCH){__android_log_print(ANDROID_LOG_INFO,TAG ,__VA_ARGS__);}
-#define LOGW(...) if(0){__android_log_print(ANDROID_LOG_WARN,TAG ,__VA_ARGS__);}
+#define LOGW(...) if(SWITCH){__android_log_print(ANDROID_LOG_WARN,TAG ,__VA_ARGS__);}
 #define LOGE(...) if(SWITCH){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
-#define LOG_D(...) if(1){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
-#define LOG_E(...) if(1){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
-#define LOGF(...) if(0){__android_log_print(ANDROID_LOG_FATAL,TAG ,__VA_ARGS__);}
+#define LOG_D(...) if(SWITCH){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
+#define LOG_E(...) if(SWITCH){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
+#define LOGF(...) if(SWITCH){__android_log_print(ANDROID_LOG_FATAL,TAG ,__VA_ARGS__);}
 
 
 #endif

@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
 
     public void compress(View view){
 
-        MediaProcess.getMediaProcess().VideoCompress("/mnt/sdcard/test5.mp4","/mnt/sdcard/output2.mp4",640,360);
+        MediaProcess.getMediaProcess().VideoCompress("/mnt/sdcard/test.mp4","/mnt/sdcard/output1.mp4",640,360);
     }
 
     public boolean isSupportMediaCodecHardDecoder() {

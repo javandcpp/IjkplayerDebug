@@ -65,6 +65,7 @@ file(GLOB media_audio_cpp "src/main/cpp/media/audio/*.cpp")
 file(GLOB media_encode_cpp "src/main/cpp/media/encode/*.cpp")
 file(GLOB media_stream_cpp "src/main/cpp/media/streamer/*.cpp")
 
+file(GLOB ffmpeg "src/main/cpp/ffmpeg/*.c")
 
 
 add_library(ffmpeg SHARED IMPORTED)

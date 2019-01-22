@@ -9,7 +9,7 @@ VideoCompressComponent::VideoCompressComponent() {
 }
 
 VideoCompressComponent::~VideoCompressComponent() {
-
+    LOG_E("videoCompressComponent release");
 }
 
 FFmpegDemux *VideoCompressComponent::getDemux() {
@@ -102,6 +102,7 @@ bool VideoCompressComponent::openSource(const char *url) {
     if (metaData.video_rotate) {
         rotate = atoi(metaData.video_rotate);
     }
+
     if (rotate == 0 || rotate == 180) {
         getVideoDecode()->setVideoScaleWidth(getMScaleHeight());
         getVideoDecode()->setVideoScaleHeight(getMScaleWidth());
