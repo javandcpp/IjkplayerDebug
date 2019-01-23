@@ -76,6 +76,13 @@ int FileStreamer::InitStreamer(const char *url) {
 
         return -1;
     }
+
+    if (videoEncoder) {
+        videoStreamIndex = AddStream(videoEncoder->getVideoCodecContext());
+    }
+    if (audioEncoder) {
+        audioStreamIndex = AddStream(audioEncoder->getAudioCodecContext());
+    }
     LOGD("InitStreamer Success!");
     return 0;
 }
@@ -932,7 +939,7 @@ int FileStreamer::InitStreamer(const char *url) {
 //}
 
 int FileStreamer::AddStream(AVCodecContext *avCodecContext) {
-    std::lock_guard<std::mutex> lk(mtx);
+//    std::lock_guard<std::mutex> lk(mtx);
     AVStream *pStream = avformat_new_stream(iAvFormatContext, avCodecContext->codec);
     if (!pStream) {
         LOGD("avformat_new_stream failed!");
@@ -1157,12 +1164,7 @@ void *FileStreamer::PushVideoStreamTask(void *pObj) {
 
 
 void FileStreamer::main() {
-    if (videoEncoder) {
-        videoStreamIndex = AddStream(videoEncoder->getVideoCodecContext());
-    }
-    if (audioEncoder) {
-        audioStreamIndex = AddStream(audioEncoder->getAudioCodecContext());
-    }
+
     WriteHead(this);
     while (!isExit) {
         PushAudioStreamTask(this);
