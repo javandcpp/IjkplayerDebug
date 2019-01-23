@@ -27,17 +27,6 @@ void NativeThread::startThread() {
     t1.detach();
 }
 
-void NativeThread::stopThread() {
-    isExit = true;
-    for (int i = 0; i < 200; i++) {
-        if (!isRunning) {
-            LOGD("Stop 停止线程成功!");
-            return;
-        }
-        xsleep(1);
-    }
-    LOGD("Stop 停止线程超时!");
-}
 
 void NativeThread::ThreadMainTask() {
     isRunning = true;

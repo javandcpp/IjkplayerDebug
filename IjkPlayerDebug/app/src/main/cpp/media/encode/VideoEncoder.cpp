@@ -196,16 +196,16 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     videoCodecContext->framerate = (AVRational) {30, 1};
     videoCodecContext->max_b_frames = 0;
     videoCodecContext->qmin = 10;
-    videoCodecContext->qmax = 30;
-    videoCodecContext->qcompress = 1;
+    videoCodecContext->qmax = 40;
+    videoCodecContext->qcompress = 0.5;
     videoCodecContext->time_base = (AVRational) {1, 12800};//AUDIO VIDEO 两边时间基数要相同
     videoCodecContext->pix_fmt = AV_PIX_FMT_YUV420P;
     videoCodecContext->sample_aspect_ratio = AVRational{1, 1};
     videoCodecContext->thread_count = 8;
 //    videoCodecContext->keyint_min=50;
     videoCodecContext->gop_size = 100;
+//    videoCodecContext->compression_level
 //    videoCodecContext->level = 41;
-//    videoCodecContext->me_method = ME_HEX;
 //    videoCodecContext->refs = 1;
 //    videoCodecContext->chromaoffset = 2;
 
