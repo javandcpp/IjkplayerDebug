@@ -79,13 +79,7 @@ void VideoEncoder::update(AVData avData) {
 
 void VideoEncoder::main() {
     while (!isExit) {
-        //判断音视频同步
-//        if (!isAudio && syncAudioPts > 0) {
-//            //如果音频PTS小于视频，停止视频编码
-//            if (syncAudioPts < pts) {
-//                continue;
-//            }
-//        }
+
 
         if (aVideoframeQueue.empty()) {
             xsleep(1);
@@ -183,9 +177,8 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     LOGE("avcodec alloc context success!");
 
 
-    long long bitrate = 1024 * 1000 * 200;
+    long long bitrate = 1024 * 1000;
 
-//    if (NULL != videoCapture->GetVideoEncodeArgs()) {
     videoCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER; //全局参数
     videoCodecContext->codec_id = avCodec->id;
     videoCodecContext->bit_rate = bitrate;//压缩后每秒视频的bit位大小 50kB
@@ -194,21 +187,26 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     videoCodecContext->height = mEncodeHeight;
 
     videoCodecContext->framerate = (AVRational) {30, 1};
-    videoCodecContext->max_b_frames = 0;
+
+    videoCodecContext->max_b_frames = 0;//0表示不使用B Frame
     videoCodecContext->qmin = 10;
     videoCodecContext->qmax = 40;
     videoCodecContext->qcompress = 0.5;
     videoCodecContext->time_base = (AVRational) {1, 12800};//AUDIO VIDEO 两边时间基数要相同
+    videoCodecContext->time_base.den=30;
+    videoCodecContext->time_base.num=1;
     videoCodecContext->pix_fmt = AV_PIX_FMT_YUV420P;
     videoCodecContext->sample_aspect_ratio = AVRational{1, 1};
     videoCodecContext->thread_count = 8;
 //    videoCodecContext->keyint_min=50;
     videoCodecContext->gop_size = 100;
-//    videoCodecContext->compression_level
+    videoCodecContext->compression_level=0;
+
 //    videoCodecContext->level = 41;
 //    videoCodecContext->refs = 1;
 //    videoCodecContext->chromaoffset = 2;
 
+    videoCodecContext->bit_rate_tolerance = 8000;//CBR 固定允许的码率误差，数值越大，视频越小
     videoCodecContext->bit_rate = bitrate;
     videoCodecContext->rc_min_rate = bitrate;
     videoCodecContext->rc_max_rate = bitrate;

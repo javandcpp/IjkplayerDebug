@@ -16,8 +16,6 @@ class NativeThread {
 public:
     virtual void startThread();
 
-    virtual void stopThread();
-
     virtual void main(){}
 
     static long long readAudioPts;

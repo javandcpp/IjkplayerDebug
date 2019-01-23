@@ -27,7 +27,6 @@ void NativeThread::startThread() {
     t1.detach();
 }
 
-
 void NativeThread::ThreadMainTask() {
     isRunning = true;
     main();

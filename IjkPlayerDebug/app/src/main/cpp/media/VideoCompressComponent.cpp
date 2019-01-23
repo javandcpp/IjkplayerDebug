@@ -148,13 +148,13 @@ bool VideoCompressComponent::openSource(const char *url) {
 
     //文件写入
     getFileStreamer()->startThread();
-    //视频编码
+//    //视频编码
     getAudioEncode()->startThread();
     getVideoEncode()->startThread();
     //开启解码
     getAudioDecode()->startThread();
     getVideoDecode()->startThread();
-    //开始解复用
+//    //开始解复用
     getDemux()->startThread();
 
 

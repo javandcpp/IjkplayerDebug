@@ -71,15 +71,9 @@ public:
 
     static void *PushVideoStreamTask(void *pObj);
 
-    int StartPushStream();
 
     int ClosePushStream();
 
-    pthread_t t2;
-
-    pthread_t t3;
-
-    pthread_t t1;
 
 
     bool isPushStream;

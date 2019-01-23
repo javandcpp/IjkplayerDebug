@@ -6,11 +6,12 @@ public final class MediaProcess {
 
 
     private MediaProcess() {
-        loadNativelibrary();
+
     }
 
-    private void loadNativelibrary() {
+    static {
         System.loadLibrary("coremedia");
+        System.loadLibrary("ijkffmpeg");
     }
 
     private static MediaProcess mInstance = null;
