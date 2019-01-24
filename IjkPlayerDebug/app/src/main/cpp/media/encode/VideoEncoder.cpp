@@ -7,6 +7,8 @@
 #include "VideoEncodeArgs.h"
 #include <stdio.h>
 
+#include <time.h>
+
 
 VideoEncoder::VideoEncoder() {
 
@@ -78,6 +80,13 @@ void VideoEncoder::update(AVData avData) {
 }
 
 void VideoEncoder::main() {
+
+#if 0
+    struct  timeval    tv;
+    gettimeofday(&tv,NULL);
+    int frameCount=0;
+#endif
+
     while (!isExit) {
 
 
@@ -118,6 +127,8 @@ void VideoEncoder::main() {
 //        }
         //发送数据到解码线程，一个数据包，可能解码多个结果
 //        outputYUVFrame->pts=pData->pkt_pts;
+
+
         videoPts = pData->pkt_pts;
         ret = avcodec_send_frame(videoCodecContext, outputYUVFrame);
         LOGE("video enencode avcodec_send_frame result:%d  pts:%lld", ret, pData->pts);
@@ -132,7 +143,21 @@ void VideoEncoder::main() {
                     LOGE("video encode failed:%s", buf);
                     break;
                 }
+#if 0
+                struct  timeval    endval;
+                gettimeofday(&endval,NULL);
+                long diff = 1000000 * (endval.tv_sec-tv.tv_sec)+ endval.tv_usec-tv.tv_usec;
+                LOG_E("diff:%ld",diff);
+                if(diff/1000000>=3){
+                    long i = diff / 1000/1000;
+                    LOG_E("interval time:%ld  video framecount:%d",i,frameCount/i);
+                    frameCount=0;
+                    gettimeofday(&tv,NULL);
+                    gettimeofday(&endval,NULL);
+                }
 
+                frameCount++;
+#endif
 
                 AVData avData;
 

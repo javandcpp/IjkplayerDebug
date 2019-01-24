@@ -29,6 +29,12 @@ void AudioEncoder::update(AVData avData) {
 
 
 void AudioEncoder::main() {
+#if 0
+    struct  timeval    tv;
+    gettimeofday(&tv,NULL);
+    int frameCount=0;
+#endif
+
     while (!isExit) {
 
         if (aAudioframeQueue.empty()) {
@@ -67,7 +73,21 @@ void AudioEncoder::main() {
                     LOGD("audio encode failed:%s", buf);
                     break;
                 };
+#if 0
+                struct  timeval    endval;
+                gettimeofday(&endval,NULL);
+                long diff = 1000000 * (endval.tv_sec-tv.tv_sec)+ endval.tv_usec-tv.tv_usec;
+                LOG_E("diff:%ld",diff);
+                if(diff/1000000>=3){
+                    long i = diff / 1000/1000;
+                    LOG_E("interval time:%ld  audio framecount:%d",i,frameCount/i);
+                    frameCount=0;
+                    gettimeofday(&tv,NULL);
+                    gettimeofday(&endval,NULL);
+                }
 
+                frameCount++;
+#endif
                 AVData avData;
                 AVPacket *avPacket = av_packet_alloc();
                 av_packet_move_ref(avPacket, &audioPacket);//此处data指针指向重新分配的内存，并复制其他属性

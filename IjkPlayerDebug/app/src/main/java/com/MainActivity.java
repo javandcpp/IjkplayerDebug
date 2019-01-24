@@ -20,6 +20,10 @@ import tv.danmaku.ijk.media.example.R;
 
 public class MainActivity extends Activity {
 
+    static {
+        System.loadLibrary("coremedia");
+        System.loadLibrary("ijkffmpeg");
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +36,7 @@ public class MainActivity extends Activity {
 
     public void compress(View view){
 
-        MediaProcess.getMediaProcess().VideoCompress("/mnt/sdcard/test.mp4","/mnt/sdcard/output1.mp4",568,320);
+        MediaProcess.getMediaProcess().VideoCompress("/mnt/sdcard/video.mp4","/mnt/sdcard/output1.mp4",568,320);
     }
 
     public boolean isSupportMediaCodecHardDecoder() {

@@ -9,10 +9,7 @@ public final class MediaProcess {
 
     }
 
-    static {
-        System.loadLibrary("coremedia");
-        System.loadLibrary("ijkffmpeg");
-    }
+
 
     private static MediaProcess mInstance = null;
 

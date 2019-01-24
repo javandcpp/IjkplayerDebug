@@ -1395,9 +1395,9 @@ int FileStreamer::SendFrame(AVPacket *packet, int streamIndex) {
                   duration);
         }
     } else {
-        char buf[1024] = {0};
-        av_strerror(ret, buf, sizeof(buf));
-        LOG_D("stream index %d writer frame failed! :%s", streamIndex, buf);
+//        char buf[1024] = {0};
+//        av_strerror(ret, buf, sizeof(buf));
+//        LOG_D("stream index %d writer frame failed! :%s", streamIndex, buf);
     }
 
     return 0;
