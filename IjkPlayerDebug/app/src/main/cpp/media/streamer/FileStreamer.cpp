@@ -167,7 +167,7 @@ static int compute_muxer_pkt_fields(AVFormatContext *s, AVStream *st, AVPacket *
             av_log(s, AV_LOG_WARNING, "Encoder did not produce proper pts, making some up.\n");
             warned = 1;
         }
-        if(!st->priv_pts){
+        if (!st->priv_pts) {
             LOG_E("IS NULL");
         }
         pkt->dts =
@@ -875,6 +875,8 @@ int k_av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt) {
 
     if (pkt) {
         AVStream *st = s->streams[pkt->stream_index];
+        st->priv_pts;
+        LOGI("priv_pts:%p streamindex:%d", st->priv_pts, st->index);
         LOGI("do_packet_auto_bsf");
         ret = do_packet_auto_bsf(s, pkt);
         if (ret == 0)
@@ -962,13 +964,12 @@ int FileStreamer::AddStream(AVCodecContext *avCodecContext) {
     if (avCodecContext->codec_type == AVMEDIA_TYPE_VIDEO) {
         LOGD("Add video stream success!");
         videoStream = pStream;
-        FFFrac *p= (FFFrac *) malloc(sizeof(FFFrac));
-        p->den=videoStream->time_base.den;
-        p->num=videoStream->time_base.num;
-        videoStream->priv_pts= p;
-        
-        LOG_E("video priv_pts:%p",videoStream->priv_pts);
-        LOG_E("video priv_pts:%p",videoStream->pts);
+//        FFFrac *p= (FFFrac *) malloc(sizeof(FFFrac));
+//        p->den=videoStream->time_base.den;
+//        p->num=videoStream->time_base.num;
+//        videoStream->priv_pts= p;
+
+        LOGI("video priv_pts:%p", videoStream->priv_pts);
         mVideoCodecContext = avCodecContext;
 //        videoStream->start_time=0;
 //        videoStream->time_base=(AVRational){1,1000};
@@ -976,12 +977,11 @@ int FileStreamer::AddStream(AVCodecContext *avCodecContext) {
     } else if (avCodecContext->codec_type == AVMEDIA_TYPE_AUDIO) {
         LOGD("Add audio stream success!");
         audioStream = pStream;
-        FFFrac *p= (FFFrac *) malloc(sizeof(FFFrac));
-        p->den=audioStream->time_base.den;
-        p->num=audioStream->time_base.num;
-        audioStream->priv_pts= p;
-        LOG_E("audio priv_pts:%p",audioStream->priv_pts);
-        LOG_E("video priv_pts:%p",audioStream->pts);
+//        FFFrac *p= (FFFrac *) malloc(sizeof(FFFrac));
+//        p->den=audioStream->time_base.den;
+//        p->num=audioStream->time_base.num;
+//        audioStream->priv_pts= p;
+        LOGI("audio priv_pts:%p", audioStream->priv_pts);
         mAudioCodecContext = avCodecContext;
 //        audioStream->start_time=0;
 //        audioStream->time_base=(AVRational){1,1000};
@@ -1180,10 +1180,12 @@ void *FileStreamer::PushVideoStreamTask(void *pObj) {
 
 void FileStreamer::main() {
 
-    WriteHead(this);
+//    WriteHead(this);
     while (!isExit) {
-        PushAudioStreamTask(this);
-        PushVideoStreamTask(this);
+        if (writeHeadFinish) {
+            PushAudioStreamTask(this);
+            PushVideoStreamTask(this);
+        }
     }
 
 }
@@ -1340,10 +1342,10 @@ void *FileStreamer::WriteHead(void *pObj) {
     if (ret < 0) {
         char buf[1024] = {0};
         av_strerror(ret, buf, sizeof(buf));
-        LOGD("avio open failed: %s", buf);
+        LOGI("avio open failed: %s", buf);
         return 0;
     }
-    LOGD("avio open success!");
+    LOGI("avio open success!");
 
 
 //    AVDictionary *opt = NULL;
@@ -1352,7 +1354,7 @@ void *FileStreamer::WriteHead(void *pObj) {
     if (ret != 0) {
         char buf[1024] = {0};
         av_strerror(ret, buf, sizeof(buf));
-        LOGD("avformat write header failed!: %s", buf);
+        LOGI("avformat write header failed!: %s", buf);
         return 0;
     }
 //    av_dump_format(fileStreamer->iAvFormatContext, 0, fileStreamer->outputUrl, 1);
@@ -1369,8 +1371,8 @@ int FileStreamer::SendFrame(AVPacket *packet, int streamIndex) {
     int64_t pts = 0;
     int64_t duration = packet->duration;
     packet->duration = 0;
-    if(packet->pts==0){
-        packet->pts=1;
+    if (packet->pts == 0) {
+        packet->pts = 1;
     }
     LOG_E("---------->pts:%lld", packet->pts);
 
@@ -1400,7 +1402,7 @@ int FileStreamer::SendFrame(AVPacket *packet, int streamIndex) {
 
     packet->pos = -1;
     int ret;
-    ret = k_av_interleaved_write_frame(iAvFormatContext, packet);
+    ret = av_interleaved_write_frame(iAvFormatContext, packet);
     if (ret == 0) {
         if (streamIndex == audioStreamIndex) {
             writeAudioPts = pts;

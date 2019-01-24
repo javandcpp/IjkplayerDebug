@@ -1,8 +1,12 @@
 package com;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 
@@ -24,19 +28,28 @@ public class MainActivity extends Activity {
         System.loadLibrary("coremedia");
         System.loadLibrary("ijkffmpeg");
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.d("hardcodec:",isSupportMediaCodecHardDecoder()+"");
+        String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        Log.d("hardcodec:", isSupportMediaCodecHardDecoder() + "");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int i = ContextCompat.checkSelfPermission(this, permissions[0]);
+            // 权限是否已经 授权 GRANTED---授权  DINIED---拒绝
+            if (i != PackageManager.PERMISSION_GRANTED) {
+                // 如果没有授予该权限，就去提示用户请求
+            }
+        }
     }
 
 
+    public void compress(View view) {
 
-    public void compress(View view){
-
-        MediaProcess.getMediaProcess().VideoCompress("/mnt/sdcard/video.mp4","/mnt/sdcard/output1.mp4",568,320);
+        MediaProcess.getMediaProcess().VideoCompress("/mnt/sdcard/video.mp4", "/mnt/sdcard/output1.mp4", 568, 320);
     }
 
     public boolean isSupportMediaCodecHardDecoder() {

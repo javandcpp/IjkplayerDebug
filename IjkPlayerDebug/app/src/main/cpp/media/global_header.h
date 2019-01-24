@@ -34,7 +34,7 @@ extern "C" {
 #include <mutex>
 
 #define TAG "hw_media"
-#define SWITCH 1
+#define SWITCH 0
 
 #define LOGD(...) if(SWITCH){ __android_log_print(ANDROID_LOG_DEBUG,TAG ,__VA_ARGS__); }
 #define LOGI(...) if(SWITCH){__android_log_print(ANDROID_LOG_INFO,TAG ,__VA_ARGS__);}

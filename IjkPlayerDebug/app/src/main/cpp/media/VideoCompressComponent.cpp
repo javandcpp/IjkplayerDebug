@@ -145,6 +145,7 @@ bool VideoCompressComponent::openSource(const char *url) {
 
     getFileStreamer()->InitStreamer(destPath);
     getFileStreamer()->setMetaData(pDemux->getMetaData());
+    getFileStreamer()->WriteHead(getFileStreamer());
 
 
 //    //视频编码
