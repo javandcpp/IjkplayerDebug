@@ -12,8 +12,8 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++11 -frtti -fexceptions -DSHOW_LOG -std=gnu++11 -fpic -O3 -fpermissive -ferror-limit=200 -dANDROID"
-                cFlags "-O3 -fpic -Wno-error=format-security"
+                cppFlags "-std=c++11 -frtti -fexceptions"
+                cFlags "-O3"
                 arguments "-DANDROID_ARM_NEON=TRUE"
             }
         }

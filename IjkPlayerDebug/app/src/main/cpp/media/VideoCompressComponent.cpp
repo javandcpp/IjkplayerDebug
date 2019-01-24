@@ -146,8 +146,7 @@ bool VideoCompressComponent::openSource(const char *url) {
     getFileStreamer()->InitStreamer(destPath);
     getFileStreamer()->setMetaData(pDemux->getMetaData());
 
-    //文件写入
-    getFileStreamer()->startThread();
+
 //    //视频编码
     getAudioEncode()->startThread();
     getVideoEncode()->startThread();
@@ -156,6 +155,8 @@ bool VideoCompressComponent::openSource(const char *url) {
     getVideoDecode()->startThread();
 //    //开始解复用
     getDemux()->startThread();
+    //文件写入
+    getFileStreamer()->startThread();
 
 
     return true;
