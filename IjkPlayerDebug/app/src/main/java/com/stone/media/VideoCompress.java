@@ -46,6 +46,16 @@ public class VideoCompress {
         }
     }
 
+    @CalledByNative
+    public static void progressFromNative(int progress,int currentMills) {
+        if (null != mEventHandler) {
+            Message message = mEventHandler.obtainMessage();
+            message.what = PROCESS_PROGESS;
+            message.obj = progress;
+            mEventHandler.sendMessage(message);
+        }
+    }
+
 
     public void videoCompress(String srcUrl,String destUrl, int width, int height,  CompressListener compressListener) {
         this.mCompressListener = compressListener;
@@ -96,6 +106,8 @@ public class VideoCompress {
                         mVideoCompress.mCompressListener.isRunning(running);
                         break;
                     case PROCESS_PROGESS:
+                        int progress = (int) msg.obj;
+                        mVideoCompress.mCompressListener.progress(progress);
                         break;
                 }
         }

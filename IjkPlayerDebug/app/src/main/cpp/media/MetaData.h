@@ -7,6 +7,7 @@
 
 
 #include <cstdint>
+#include <libavutil/rational.h>
 
 class MetaData {
 
@@ -26,6 +27,8 @@ public:
     int video_width=0;
 
     int video_height=0;
+
+    AVRational videoTimeBase;
 };
 
 

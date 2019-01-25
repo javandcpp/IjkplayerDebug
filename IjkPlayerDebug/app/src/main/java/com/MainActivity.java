@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.stone.media.MediaProcess;
@@ -27,6 +28,7 @@ import tv.danmaku.ijk.media.example.R;
 public class MainActivity extends Activity {
 
 
+    private TextView tvProgress;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,12 +45,13 @@ public class MainActivity extends Activity {
                 // 如果没有授予该权限，就去提示用户请求
             }
         }
+        tvProgress = findViewById(R.id.progress);
     }
 
 
     public void compress(View view) {
 
-        MediaProcess.getMediaProcess().getVideoCompress().videoCompress("/mnt/sdcard/test13.mp4", "/mnt/sdcard/output1.mp4", 568, 320, new VideoCompress.CompressListener() {
+        MediaProcess.getMediaProcess().getVideoCompress().videoCompress("/mnt/sdcard/test.mp4", "/mnt/sdcard/output1.mp4", 568, 320, new VideoCompress.CompressListener() {
             @Override
             public void complete(String url) {
                 Toast.makeText(getApplicationContext(),url,Toast.LENGTH_SHORT).show();
@@ -61,7 +64,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void progress(int progress) {
-
+                tvProgress.setText(progress+"%");
             }
         });
     }

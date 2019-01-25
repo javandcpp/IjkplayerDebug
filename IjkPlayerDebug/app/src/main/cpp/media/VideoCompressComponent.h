@@ -72,6 +72,8 @@ public:
 
     pF mpF1 = nullptr;
 
+    functionP functionP1= nullptr;
+
     void setCallback(void(*pF)(void *));
 
     void setDestPath(const char *string);
@@ -81,6 +83,8 @@ public:
     void stop();
 
     void setStopCallBack(void(*pF)(void *));
+
+    void setProgressCallBack(void (*fun)(long, long));
 };
 
 

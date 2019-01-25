@@ -53,8 +53,7 @@ MetaData FFmpegDemux::getMetaData() {
  */
 void FFmpegDemux::getDuration() {
     if (avFormatContext) {
-        mVideoDuration = (avFormatContext->streams[videoStreamIndex]->duration *
-                          (1000 * r2d(avFormatContext->streams[videoStreamIndex]->time_base)));
+        mVideoDuration = (avFormatContext->streams[videoStreamIndex]->duration);
     }
 }
 
@@ -191,7 +190,6 @@ AVData FFmpegDemux::readMediaData() {
     int re = av_read_frame(avFormatContext, pkt);
     if (re != 0) {
         if (re == AVERROR_EOF) {
-            isExit = true;
             LOGE("read frame eof");
             AVData avData;
             do {
@@ -202,10 +200,11 @@ AVData FFmpegDemux::readMediaData() {
                 if (writeVideoPts == readVideoPts && readAudioPts == writeAudioPts) {
                     xsleep(2000);
                     ((FileStreamer *) streamer)->ClosePushStream();
+                    isExit = true;
                     break;
                 }
 
-            } while (1);
+            } while (!isExit);
 
             return avData;
         }

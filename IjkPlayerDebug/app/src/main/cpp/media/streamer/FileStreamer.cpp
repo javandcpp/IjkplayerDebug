@@ -1405,12 +1405,16 @@ int FileStreamer::SendFrame(AVPacket *packet, int streamIndex) {
     ret = av_interleaved_write_frame(iAvFormatContext, packet);
     if (ret == 0) {
         if (streamIndex == audioStreamIndex) {
+
             writeAudioPts = pts;
             LOG_D("---------->write @@@@@@@@@ frame success------->! pts:%lld duration:%lld",
                   writeAudioPts,
                   duration);
         } else if (streamIndex == videoStreamIndex) {
             writeVideoPts = pts;
+            if(progressCall){
+                progressCall(metaData.duration,writeVideoPts);
+            }
             LOG_D("---------->write ######### frame success------->! pts:%lld duration:%lld",
                   writeVideoPts,
                   duration);
@@ -1420,6 +1424,7 @@ int FileStreamer::SendFrame(AVPacket *packet, int streamIndex) {
 //        av_strerror(ret, buf, sizeof(buf));
 //        LOG_D("stream index %d writer frame failed! :%s", streamIndex, buf);
     }
+
 
     return 0;
 }
@@ -1436,5 +1441,9 @@ void FileStreamer::setAudioEncoder(AudioEncoder *pEncoder) {
 void FileStreamer::setCloseCallBack(void (*fun)(void *), void *p) {
     mFunctionPoniter = fun;
     this->p = p;
+}
+
+void FileStreamer::setProgressCallBack(functionP p) {
+    this->progressCall=p;
 }
 

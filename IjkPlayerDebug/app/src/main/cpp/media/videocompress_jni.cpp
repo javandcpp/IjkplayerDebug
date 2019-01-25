@@ -5,10 +5,13 @@
 #include "streamer/FileStreamer.h"
 
 const char *CLASS_NAME = "com/stone/media/VideoCompress";
-
 VideoCompressComponent *videoCompressComponent = NULL;
 static JavaVM *g_vm;
 static jclass globalClazz = NULL;
+using namespace std;
+mutex mtx;
+static int init;
+static jmethodID progress = NULL;
 
 void stream_close(void *p) {
     JNIEnv *env = NULL;
@@ -25,6 +28,8 @@ void stream_close(void *p) {
                 jstring pJstring = env->NewStringUTF(videoCompressComponent->destPath);
                 env->CallStaticVoidMethod(globalClazz, jMethodComplete,
                                           pJstring);
+                env->CallStaticVoidMethod(globalClazz, progress,
+                                          100, 0);
                 env->DeleteLocalRef(pJstring);
             }
             env->DeleteGlobalRef(globalClazz);
@@ -51,10 +56,22 @@ void stream_stop(void *p) {
     }
 }
 
-using namespace std;
-mutex mtx;
-
-static int init;
+void stream_progress(long totalMills, long currentMills) {
+//    int totalSeconds = totalMills / 1000;
+    int perCent = (int) ((float) currentMills  / (float) totalMills*100);
+//    LOGE("total:%ld cur:%ld,progress:%d",totalMills,currentMills, perCent);
+    JNIEnv *env = NULL;
+    if (g_vm != NULL) {
+        jint status = g_vm->AttachCurrentThread(&env, NULL);
+        if (globalClazz) {
+            env->CallStaticVoidMethod(globalClazz, progress,
+                                      perCent, (int)currentMills);
+        }
+        if (status == JNI_OK) {
+            g_vm->DetachCurrentThread();
+        }
+    }
+}
 
 
 extern "C"
@@ -72,7 +89,6 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         LOGE("init ffmpeg");
     }
 
-
     return JNI_VERSION_1_6;
 }
 
@@ -80,7 +96,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
 
 
-
+//
 extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, jstring url_,
@@ -94,7 +110,8 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
 
     jclass tmp = env->FindClass(CLASS_NAME);
     globalClazz = (jclass) env->NewGlobalRef(tmp);//这一步很重要必须这么写，否则报错
-
+    progress = env->GetStaticMethodID(globalClazz, "progressFromNative",
+                                      "(II)V");
     if (videoCompressComponent && videoCompressComponent->isRunning) {
         if (globalClazz) {
             jmethodID pID = env->GetStaticMethodID(globalClazz, "callbackFromNative", "(Z)V");
@@ -112,6 +129,7 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
         videoCompressComponent->initialize();
         videoCompressComponent->setCallback(stream_close);
         videoCompressComponent->setStopCallBack(stream_stop);
+        videoCompressComponent->setProgressCallBack(stream_progress);
         videoCompressComponent->setDestPath(destPath);
         videoCompressComponent->openSource(url);
     }
@@ -125,10 +143,14 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_stone_media_VideoCompress_stop(JNIEnv *env, jobject instance) {
+Java_com_stone_media_VideoCompress_stop(JNIEnv
+                                        *env,
+                                        jobject instance) {
     mtx.lock();
+
     if (videoCompressComponent && videoCompressComponent->isRunning) {
         videoCompressComponent->stop();
     }
     mtx.unlock();
+
 }

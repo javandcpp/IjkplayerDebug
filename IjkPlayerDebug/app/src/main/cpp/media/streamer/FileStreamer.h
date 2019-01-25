@@ -109,7 +109,12 @@ public:
     pFunc mFunctionPoniter;
 
     void *p= nullptr;
+
+    functionP progressCall= nullptr;
+
     void setCloseCallBack(void (*fun)(void *), void *p);
+
+    void setProgressCallBack(void (*pFunction)(long, long));
 };
 
 

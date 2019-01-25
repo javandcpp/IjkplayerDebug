@@ -150,6 +150,7 @@ bool VideoCompressComponent::openSource(const char *url) {
 
     //IO
     fileStreamer = FileStreamer::Get();
+    fileStreamer->setProgressCallBack(functionP1);
     pDemux->setStreamer(fileStreamer);
     getFileStreamer()->setCloseCallBack(closeStreamCallBack, this);
 
@@ -213,4 +214,8 @@ void VideoCompressComponent::setDestPath(const char *string) {
 
 void VideoCompressComponent::setStopCallBack(void(*pF)(void *)) {
     mpF1 = pF;
+}
+
+void VideoCompressComponent::setProgressCallBack(void (*fun)(long, long)) {
+    functionP1 =fun;
 }
