@@ -43,7 +43,7 @@ void IDemux::main() {
             NativeThread::readVideoPts=data.pts;
             mVideoDecode->update(data);
             LOG_D("readview pts %lld",readVideoPts);
-//            xsleep(1);
+            xsleep(1);
 
 #if 0
             struct  timeval    endval;

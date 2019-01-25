@@ -29,11 +29,12 @@ public:
 
     AVData receiveCacheFrame();
 
-    SwsContext *sws_ctx= nullptr;
+    SwsContext *sws_ctx = nullptr;
 
     void setVideoScaleHeight(long i);
 
     void setVideoScaleWidth(long i);
+
     long mScaleHeight;
     long mScaleWidth;
 
@@ -42,16 +43,15 @@ public:
     void addAudioEncode(AudioEncoder *pEncoder);
 
 protected:
-    AVCodecContext *codecContext=NULL;
+    AVCodecContext *codecContext = NULL;
     AVFrame *inAvFrame = NULL;
 
-    AVFrame *outAvFrame= NULL;
+    AVFrame *outAvFrame = NULL;
     FILE *pFILE;
 
-    uint8_t *video_out_buffer=NULL;
+    uint8_t *video_out_buffer = NULL;
 
 };
-
 
 
 #endif //XMEDIAPLAYER_FFMPEGDECODE_H

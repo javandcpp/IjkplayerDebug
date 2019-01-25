@@ -22,6 +22,10 @@ public:
     char* getVideo_rotate() const;
 
     void setVideo_rotate(char* video_rotate);
+
+    int video_width=0;
+
+    int video_height=0;
 };
 
 

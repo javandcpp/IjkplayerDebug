@@ -1,9 +1,15 @@
 package com.stone.media;
 
+import android.provider.MediaStore;
 import android.util.Log;
 
 public final class MediaProcess {
 
+    static {
+        System.loadLibrary("coremedia");
+    }
+
+    private static VideoCompress videoCompress;
 
     private MediaProcess() {
 
@@ -17,6 +23,7 @@ public final class MediaProcess {
         if (null == mInstance) {
             synchronized (MediaProcess.class) {
                 if (null == mInstance) {
+                    videoCompress = new VideoCompress();
                     return (mInstance = new MediaProcess());
                 }
             }
@@ -24,24 +31,26 @@ public final class MediaProcess {
         return mInstance;
     }
 
-
-    public void VideoCompress(String url, String destPath,int width, int height) {
-        final long start=System.currentTimeMillis();
-        VideoCompress videoCompress = new VideoCompress();
-        videoCompress.setCompressListener(new VideoCompress.CompressListener() {
-            @Override
-            public void complete() {
-                long end=System.currentTimeMillis();
-                Log.e("duration","duration:"+((end-start)/1000));
-            }
-
-            @Override
-            public void isRunning() {
-
-            }
-        });
-        videoCompress.videoCompress(url, width, height,destPath);
+    public VideoCompress getVideoCompress(){
+        return videoCompress;
     }
+
+
+
+//        videoCompress.setCompressListener(new VideoCompress.CompressListener() {
+//            @Override
+//            public void complete() {
+//                long end=System.currentTimeMillis();
+//                Log.e("duration","duration:"+((end-start)/1000));
+//            }
+//
+//            @Override
+//            public void isRunning() {
+//
+//            }
+//        });
+//    }
+
 
 
 }

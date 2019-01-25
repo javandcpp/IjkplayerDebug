@@ -58,8 +58,7 @@ bool FFmpegDecode::openCodec(AVParameters parameters) {
         return false;
     }
 
-    long outputWidth = mScaleWidth;
-    long outputHeight = mScaleHeight;
+
     codecContext = avcodec_alloc_context3(codec);
     avcodec_parameters_to_context(codecContext, parameters.codecParameters);
     codecContext->thread_count = 8;
@@ -75,8 +74,8 @@ bool FFmpegDecode::openCodec(AVParameters parameters) {
     } else {
         isAudio = false;
         LOGD("avcodec video open2 success!");
-
-        LOGI("video width:%d  heigth:%d",codecContext->width,codecContext->height);
+        long outputWidth = mScaleWidth;
+        long outputHeight = mScaleHeight;
         sws_ctx =
                 sws_getContext(codecContext->width, codecContext->height, codecContext->pix_fmt,
                                outputWidth, outputHeight, AV_PIX_FMT_YUV420P,
@@ -86,7 +85,6 @@ bool FFmpegDecode::openCodec(AVParameters parameters) {
         int buffer_size = av_image_get_buffer_size(AV_PIX_FMT_YUV420P, outputWidth,
                                                    outputHeight, 1);
         video_out_buffer = (uint8_t *) av_malloc(buffer_size);
-
         av_image_fill_arrays(outAvFrame->data, outAvFrame->linesize, video_out_buffer,
                              AV_PIX_FMT_YUV420P, outputWidth, outputHeight, 1);
 
@@ -245,3 +243,5 @@ void FFmpegDecode::addAudioEncode(AudioEncoder *pEncoder) {
 void FFmpegDecode::addVideoEncode(VideoEncoder *pEncoder) {
     this->mVideoEncoder = pEncoder;
 }
+
+

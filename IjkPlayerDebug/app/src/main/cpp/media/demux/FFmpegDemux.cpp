@@ -41,6 +41,8 @@ MetaData FFmpegDemux::getMetaData() {
     MetaData metaData;
     metaData.duration = mVideoDuration;
     metaData.video_rotate = mVideoRotate;
+    metaData.video_width=video_src_width;
+    metaData.video_height=video_src_height;
 
     return metaData;
 }
@@ -142,6 +144,9 @@ bool FFmpegDemux::open(const char *url) {
     audioPtsRatio = audioStream->nb_frames / audioStream->codecpar->channels;;
 
     videoStream = avFormatContext->streams[videoStreamIndex];
+    video_src_width=videoStream->codecpar->width;
+    video_src_height=videoStream->codecpar->height;
+
     d = get_rotation(videoStream);
     LOG_E("d %lf", d);
     videoPtsRatio = videoStream->time_base.den / videoStream->r_frame_rate.num;

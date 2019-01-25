@@ -9,8 +9,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.stone.media.MediaProcess;
+import com.stone.media.VideoCompress;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -24,10 +26,7 @@ import tv.danmaku.ijk.media.example.R;
 
 public class MainActivity extends Activity {
 
-    static {
-        System.loadLibrary("coremedia");
-        System.loadLibrary("ijkffmpeg");
-    }
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,7 +48,22 @@ public class MainActivity extends Activity {
 
     public void compress(View view) {
 
-        MediaProcess.getMediaProcess().VideoCompress("/mnt/sdcard/test11.mp4", "/mnt/sdcard/output1.mp4", 568, 320);
+        MediaProcess.getMediaProcess().getVideoCompress().videoCompress("/mnt/sdcard/test13.mp4", "/mnt/sdcard/output1.mp4", 568, 320, new VideoCompress.CompressListener() {
+            @Override
+            public void complete(String url) {
+                Toast.makeText(getApplicationContext(),url,Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void isRunning(boolean isRunning) {
+                Toast.makeText(getApplicationContext(),isRunning+"",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void progress(int progress) {
+
+            }
+        });
     }
 
     public boolean isSupportMediaCodecHardDecoder() {
@@ -91,5 +105,9 @@ public class MainActivity extends Activity {
             }
         }
         return isHardcode;
+    }
+
+    public void stop(View view) {
+        MediaProcess.getMediaProcess().getVideoCompress().stop();
     }
 }

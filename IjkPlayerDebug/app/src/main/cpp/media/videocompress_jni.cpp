@@ -4,6 +4,8 @@
 #include "VideoCompressComponent.h"
 #include "streamer/FileStreamer.h"
 
+const char *CLASS_NAME = "com/stone/media/VideoCompress";
+
 VideoCompressComponent *videoCompressComponent = NULL;
 static JavaVM *g_vm;
 static jclass globalClazz = NULL;
@@ -33,13 +35,20 @@ void stream_close(void *p) {
             g_vm->DetachCurrentThread();
         }
     }
+}
 
-
-//    if (env->ExceptionCheck()) {
-//        env->ExceptionDescribe();
-//    }
-
-
+void stream_stop(void *p) {
+    JNIEnv *env = NULL;
+    if (g_vm != NULL) {
+        jint status = g_vm->AttachCurrentThread(&env, NULL);
+        if (globalClazz) {
+            env->DeleteGlobalRef(globalClazz);
+            LOGE("stream stop");
+        }
+    }
+    if (videoCompressComponent) {
+        delete videoCompressComponent;
+    }
 }
 
 using namespace std;
@@ -48,7 +57,8 @@ mutex mtx;
 static int init;
 
 
-extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+extern "C"
+JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     jint result = -1;
     JNIEnv *env;
@@ -71,7 +81,8 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
 
 
-extern "C" JNIEXPORT jboolean JNICALL
+extern "C"
+JNIEXPORT jboolean JNICALL
 Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, jstring url_,
                                                  jint width, jint height, jstring dest_) {
 
@@ -81,7 +92,7 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
     long widthPram = width;
     long heightParma = height;
 
-    jclass tmp = env->FindClass("com/stone/media/VideoCompress");
+    jclass tmp = env->FindClass(CLASS_NAME);
     globalClazz = (jclass) env->NewGlobalRef(tmp);//这一步很重要必须这么写，否则报错
 
     if (videoCompressComponent && videoCompressComponent->isRunning) {
@@ -100,6 +111,7 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
         videoCompressComponent->setMScaleHeight(heightParma);
         videoCompressComponent->initialize();
         videoCompressComponent->setCallback(stream_close);
+        videoCompressComponent->setStopCallBack(stream_stop);
         videoCompressComponent->setDestPath(destPath);
         videoCompressComponent->openSource(url);
     }
@@ -111,3 +123,12 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
 
 }
 
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_stone_media_VideoCompress_stop(JNIEnv *env, jobject instance) {
+    mtx.lock();
+    if (videoCompressComponent && videoCompressComponent->isRunning) {
+        videoCompressComponent->stop();
+    }
+    mtx.unlock();
+}

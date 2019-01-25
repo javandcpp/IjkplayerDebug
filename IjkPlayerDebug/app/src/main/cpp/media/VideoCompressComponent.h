@@ -70,9 +70,17 @@ public:
 
     pF mPf = nullptr;
 
+    pF mpF1 = nullptr;
+
     void setCallback(void(*pF)(void *));
 
     void setDestPath(const char *string);
+
+    void release();
+
+    void stop();
+
+    void setStopCallBack(void(*pF)(void *));
 };
 
 

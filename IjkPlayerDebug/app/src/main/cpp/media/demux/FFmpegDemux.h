@@ -69,6 +69,10 @@ public:
 
     int64_t mVideoDuration = 0;
 
+    int video_src_width=0;
+
+    int video_src_height=0;
+
     int audioPtsRatio = 0;
 
     int videoPtsRatio = 0;
