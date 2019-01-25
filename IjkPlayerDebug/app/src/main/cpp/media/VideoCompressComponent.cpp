@@ -103,7 +103,7 @@ bool VideoCompressComponent::openSource(const char *url) {
         rotate = atoi(metaData.video_rotate);
     }
 
-    if (rotate == 0 || rotate == 180) {
+    if (rotate == 90 || rotate == 270) {
         getVideoDecode()->setVideoScaleWidth(getMScaleHeight());
         getVideoDecode()->setVideoScaleHeight(getMScaleWidth());
         getVideoEncode()->setVideoEncodeWidth(getMScaleHeight());

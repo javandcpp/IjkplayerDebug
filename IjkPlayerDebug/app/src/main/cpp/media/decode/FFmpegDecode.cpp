@@ -75,6 +75,8 @@ bool FFmpegDecode::openCodec(AVParameters parameters) {
     } else {
         isAudio = false;
         LOGD("avcodec video open2 success!");
+
+        LOGI("video width:%d  heigth:%d",codecContext->width,codecContext->height);
         sws_ctx =
                 sws_getContext(codecContext->width, codecContext->height, codecContext->pix_fmt,
                                outputWidth, outputHeight, AV_PIX_FMT_YUV420P,

@@ -37,7 +37,7 @@ extern "C" {
 #define SWITCH 0
 
 #define LOGD(...) if(SWITCH){ __android_log_print(ANDROID_LOG_DEBUG,TAG ,__VA_ARGS__); }
-#define LOGI(...) if(SWITCH){__android_log_print(ANDROID_LOG_INFO,TAG ,__VA_ARGS__);}
+#define LOGI(...) if(1){__android_log_print(ANDROID_LOG_INFO,TAG ,__VA_ARGS__);}
 #define LOGW(...) if(SWITCH){__android_log_print(ANDROID_LOG_WARN,TAG ,__VA_ARGS__);}
 #define LOGE(...) if(SWITCH){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
 #define LOG_D(...) if(SWITCH){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
