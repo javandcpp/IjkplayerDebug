@@ -15,11 +15,8 @@ static jmethodID progress = NULL;
 
 void stream_close(void *p) {
     JNIEnv *env = NULL;
+      LOG_E("stream close");
     if (g_vm != NULL) {
-        JavaVMAttachArgs thread_args;
-        thread_args.name = "close callback";
-        thread_args.version = JNI_VERSION_1_6;
-        thread_args.group = NULL;
         jint status = g_vm->AttachCurrentThread(&env, NULL);
         if (globalClazz) {
             jmethodID jMethodComplete = env->GetStaticMethodID(globalClazz, "completeFromNative",
@@ -28,8 +25,6 @@ void stream_close(void *p) {
                 jstring pJstring = env->NewStringUTF(videoCompressComponent->destPath);
                 env->CallStaticVoidMethod(globalClazz, jMethodComplete,
                                           pJstring);
-                env->CallStaticVoidMethod(globalClazz, progress,
-                                          100, 0);
                 env->DeleteLocalRef(pJstring);
             }
             env->DeleteGlobalRef(globalClazz);
@@ -107,6 +102,9 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
     const char *destPath = env->GetStringUTFChars(dest_, 0);
     long widthPram = width;
     long heightParma = height;
+    size_t i1 = strlen(destPath);
+    char *path= (char *) malloc(i1);
+    strcpy(path,destPath);
 
     jclass tmp = env->FindClass(CLASS_NAME);
     globalClazz = (jclass) env->NewGlobalRef(tmp);//这一步很重要必须这么写，否则报错
@@ -130,7 +128,7 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
         videoCompressComponent->setCallback(stream_close);
         videoCompressComponent->setStopCallBack(stream_stop);
         videoCompressComponent->setProgressCallBack(stream_progress);
-        videoCompressComponent->setDestPath(destPath);
+        videoCompressComponent->setDestPath(path);
         videoCompressComponent->openSource(url);
     }
     env->ReleaseStringUTFChars(url_, url);
