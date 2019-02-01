@@ -111,6 +111,6 @@ public class MainActivity extends Activity {
     }
 
     public void stop(View view) {
-//        MediaProcess.getMediaProcess().getVideoCompress().stop();
+        MediaProcess.getMediaProcess().getVideoCompress().stopCompress();
     }
 }

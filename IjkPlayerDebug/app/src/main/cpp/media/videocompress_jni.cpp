@@ -25,6 +25,8 @@ void stream_close(void *p) {
                 jstring pJstring = env->NewStringUTF(videoCompressComponent->destPath);
                 env->CallStaticVoidMethod(globalClazz, jMethodComplete,
                                           pJstring);
+                env->CallStaticVoidMethod(globalClazz, progress,
+                                          100, (int)0);
                 env->DeleteLocalRef(pJstring);
             }
             env->DeleteGlobalRef(globalClazz);

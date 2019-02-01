@@ -115,9 +115,9 @@ public class VideoCompress {
 
 
 
-     native boolean videoCompress(String srcUrl, int width, int height, String destUrl);
+     private native boolean videoCompress(String srcUrl, int width, int height, String destUrl);
 
-     native void stop();
+     private native void stop();
 
 
 }
