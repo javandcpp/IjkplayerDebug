@@ -10,8 +10,8 @@ VideoCompressComponent::VideoCompressComponent() {
 
 VideoCompressComponent::~VideoCompressComponent() {
     LOG_E("videoCompressComponent release");
-    if(destPath){
-        delete destPath;
+    if (destPath) {
+        free((void *) destPath);
     }
 }
 
@@ -79,6 +79,7 @@ void VideoCompressComponent::stop() {
 }
 
 void VideoCompressComponent::release() {
+    this->isRunning = false;
     getDemux()->isExit = true;
     getVideoDecode()->isExit = true;
     getAudioDecode()->isExit = true;
@@ -87,11 +88,15 @@ void VideoCompressComponent::release() {
     getFileStreamer()->isExit = true;
     sleep(1);
     delete getDemux();
+    mDemux = NULL;
     delete getVideoDecode();
+    mVideoFfmpegDecode = NULL;
     delete getAudioDecode();
+    mAudioFfmpegDecode = NULL;
     delete getAudioEncode();
+    audioEncoder = NULL;
     delete getVideoEncode();
-    isRunning = false;
+    videoEncoder = NULL;
 }
 
 void closeStreamCallBack(void *p) {
@@ -220,5 +225,5 @@ void VideoCompressComponent::setStopCallBack(void(*pF)(void *)) {
 }
 
 void VideoCompressComponent::setProgressCallBack(void (*fun)(long, long)) {
-    functionP1 =fun;
+    functionP1 = fun;
 }

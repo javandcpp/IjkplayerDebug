@@ -5,7 +5,7 @@
 #include "streamer/FileStreamer.h"
 
 const char *CLASS_NAME = "com/stone/media/VideoCompress";
-VideoCompressComponent *videoCompressComponent = NULL;
+static VideoCompressComponent *videoCompressComponent = nullptr;
 static JavaVM *g_vm;
 static jclass globalClazz = NULL;
 using namespace std;
@@ -31,6 +31,7 @@ void stream_close(void *p) {
             }
             env->DeleteGlobalRef(globalClazz);
             delete videoCompressComponent;
+            videoCompressComponent= NULL;
 
         }
         if (status == JNI_OK) {
@@ -50,6 +51,7 @@ void stream_stop(void *p) {
     }
     if (videoCompressComponent) {
         delete videoCompressComponent;
+        videoCompressComponent=NULL;
     }
 }
 
@@ -112,15 +114,18 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
     globalClazz = (jclass) env->NewGlobalRef(tmp);//这一步很重要必须这么写，否则报错
     progress = env->GetStaticMethodID(globalClazz, "progressFromNative",
                                       "(II)V");
-    if (videoCompressComponent && videoCompressComponent->isRunning) {
-        if (globalClazz) {
-            jmethodID pID = env->GetStaticMethodID(globalClazz, "callbackFromNative", "(Z)V");
-            jboolean i = 0;
+    if (videoCompressComponent) {
+        if(videoCompressComponent->isRunning) {
+            if (globalClazz) {
+                jmethodID pID = env->GetStaticMethodID(globalClazz, "callbackFromNative", "(Z)V");
+                jboolean i = 0;
 
-            env->CallStaticVoidMethod(globalClazz, pID, i);/**/
+                env->CallStaticVoidMethod(globalClazz, pID, i);/**/
+            }
+            mtx.unlock();
+            return 0;
         }
-        mtx.unlock();
-        return 0;
+
     }
     videoCompressComponent = new VideoCompressComponent();
     if (videoCompressComponent) {
@@ -148,8 +153,10 @@ Java_com_stone_media_VideoCompress_stop(JNIEnv
                                         jobject instance) {
     mtx.lock();
 
-    if (videoCompressComponent && videoCompressComponent->isRunning) {
-        videoCompressComponent->stop();
+    if (videoCompressComponent) {
+        if(videoCompressComponent->isRunning) {
+            videoCompressComponent->stop();
+        }
     }
     mtx.unlock();
 

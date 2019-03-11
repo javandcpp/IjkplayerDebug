@@ -10,10 +10,18 @@
         android:id="@+id/sample_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="compress"
+        android:text="compress1"
         android:onClick="compress"
         android:textColor="#FF0000"
        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="compress2"
+        android:onClick="compress2"
+        android:textColor="#FF0000"
+        />
 
     <Button
         android:id="@+id/stop"

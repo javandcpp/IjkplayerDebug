@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
 
     public void compress(View view) {
 
-        MediaProcess.getMediaProcess().getVideoCompress().videoCompress("/mnt/sdcard/test13.mp4", "/mnt/sdcard/output1.mp4", 568, 320, new VideoCompress.CompressListener() {
+        MediaProcess.getMediaProcess().getVideoCompress().videoCompress("/mnt/sdcard/test4.mp4", "/mnt/sdcard/output1.mp4", 568, 320, new VideoCompress.CompressListener() {
             @Override
             public void complete(String url) {
                 Toast.makeText(getApplicationContext(),url,Toast.LENGTH_SHORT).show();
@@ -112,5 +112,25 @@ public class MainActivity extends Activity {
 
     public void stop(View view) {
         MediaProcess.getMediaProcess().getVideoCompress().stopCompress();
+    }
+
+    public void compress2(View view) {
+
+        MediaProcess.getMediaProcess().getVideoCompress().videoCompress("/mnt/sdcard/test.mp4", "/mnt/sdcard/output2.mp4", 568, 320, new VideoCompress.CompressListener() {
+            @Override
+            public void complete(String url) {
+                Toast.makeText(getApplicationContext(),url,Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void isRunning(boolean isRunning) {
+                Toast.makeText(getApplicationContext(),isRunning+"",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void progress(int progress) {
+                tvProgress.setText(progress+"%");
+            }
+        });
     }
 }
