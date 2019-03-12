@@ -6,7 +6,9 @@
 #include "../global_header.h"
 
 void IFFmpegDecode::update(AVData pkt) {
+    mut.lock();
     if (pkt.isAudio != isAudio) {
+        mut.unlock();
         return;
     }
     while (!isExit) {
@@ -16,6 +18,7 @@ void IFFmpegDecode::update(AVData pkt) {
         }
 //        xsleep(1);
 //    }
+    mut.unlock();
 }
 
 void IFFmpegDecode::main() {

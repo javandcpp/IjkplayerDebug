@@ -193,10 +193,11 @@ AVData FFmpegDemux::readMediaData() {
             LOGE("read frame eof");
             AVData avData;
             do {
-                LOG_D("writeaudiopts %lld", writeAudioPts);
-                LOG_D("writevideopts %lld", writeVideoPts);
-                LOG_D("readAudioPts %lld", readAudioPts);
-                LOG_D("readVideoPtS %lld", readVideoPts);
+//                LOG_D("writeaudiopts %lld", writeAudioPts);
+//                LOG_D("writevideopts %lld", writeVideoPts);
+//                LOG_D("readAudioPts %lld", readAudioPts);
+//                LOG_D("readVideoPtS %lld", readVideoPts);
+                xsleep(1);
                 if (writeVideoPts == readVideoPts && readAudioPts == writeAudioPts) {
                     xsleep(2000);
                     ((FileStreamer *) streamer)->ClosePushStream();

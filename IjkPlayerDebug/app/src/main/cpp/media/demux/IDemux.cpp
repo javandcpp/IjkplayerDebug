@@ -21,7 +21,7 @@ void IDemux::main() {
             NativeThread::readAudioPts=data.pts;
             mAudioDecode->update(data);
             LOG_D("readaudio pts %lld",readAudioPts);
-            xsleep(10);
+            xsleep(20);
 
 #if 0
             struct  timeval    endval;

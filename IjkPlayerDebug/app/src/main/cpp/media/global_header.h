@@ -34,7 +34,7 @@ extern "C" {
 #include <mutex>
 
 #define TAG "hw_media"
-#define SWITCH 1
+#define SWITCH 0
 
 typedef void(*functionP)(long,long);
 

@@ -64,7 +64,9 @@ VideoEncoder::~VideoEncoder() {
 }
 
 void VideoEncoder::update(AVData avData) {
+    mtx.lock();
     if (avData.isAudio) {
+        mtx.unlock();
         return;
     }
     while (!isExit) {
@@ -76,6 +78,8 @@ void VideoEncoder::update(AVData avData) {
     }
 //        xsleep(1);
 //    }
+
+    mtx.unlock();
 
 }
 

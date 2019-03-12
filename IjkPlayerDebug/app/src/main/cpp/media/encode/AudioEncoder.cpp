@@ -16,7 +16,9 @@ AudioEncoder::~AudioEncoder() {
 
 
 void AudioEncoder::update(AVData avData) {
+    mtx.lock();
     if (!avData.isAudio) {
+        mtx.unlock();
         return;
     }
     while (!isExit) {
@@ -25,6 +27,7 @@ void AudioEncoder::update(AVData avData) {
              aAudioframeQueue.Size());
         break;
     }
+    mtx.unlock();
 }
 
 
