@@ -2,8 +2,8 @@
 // Created by developer on 2018/12/22.
 //
 
-#ifndef IJKPLAYERDEBUG_FILESTREAMER_H
-#define IJKPLAYERDEBUG_FILESTREAMER_H
+#ifndef IJKPLAYERDEBUG_RtmpStreamer_H
+#define IJKPLAYERDEBUG_RtmpStreamer_H
 
 
 #include "../NativeThread.h"
@@ -18,15 +18,15 @@
 typedef void(*pFunc)(void *);
 
 
-class FileStreamer : public IObserver {
+class RtmpStreamer : public IObserver {
 
 protected:
-    FileStreamer();
+    RtmpStreamer();
 
 public:
 
 
-    virtual ~FileStreamer();
+    virtual ~RtmpStreamer();
 
     AVStream *videoStream = NULL;
 
@@ -50,7 +50,7 @@ public:
 
     std::mutex mtx;
 
-    static FileStreamer *Get();
+    static RtmpStreamer *Get();
 
     int InitStreamer(const char *url);
 
@@ -118,4 +118,4 @@ public:
 };
 
 
-#endif //IJKPLAYERDEBUG_FILESTREAMER_H
+#endif //IJKPLAYERDEBUG_RtmpStreamer_H

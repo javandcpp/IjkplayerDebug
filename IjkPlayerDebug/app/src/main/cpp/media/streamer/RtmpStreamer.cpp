@@ -2,7 +2,7 @@
 // Created by developer on 2018/12/22.
 //
 
-#include "FileStreamer.h"
+#include "RtmpStreamer.h"
 #include "../encode/AudioEncoder.h"
 #include "../encode/VideoEncoder.h"
 #include <iostream>
@@ -11,7 +11,7 @@
 using namespace std;
 
 
-void FileStreamer::update(AVData avData) {
+void RtmpStreamer::update(AVData avData) {
     std::lock_guard<std::mutex> lk(mtx);
     while (!isExit) {
         if (avData.isAudio) {
@@ -28,12 +28,12 @@ void FileStreamer::update(AVData avData) {
     }
 }
 
-FileStreamer::FileStreamer() {
+RtmpStreamer::RtmpStreamer() {
 
 //    pFile=fopen("/mnt/sdcard/test.h264","wb+");
 }
 
-FileStreamer::~FileStreamer() {
+RtmpStreamer::~RtmpStreamer() {
     pthread_mutex_destroy(&mutex);
     if (NULL != audioStream) {
         av_free(audioStream);
@@ -58,12 +58,12 @@ FileStreamer::~FileStreamer() {
 
 }
 
-FileStreamer *FileStreamer::Get() {
-    static FileStreamer fileStreamer;
-    return &fileStreamer;
+RtmpStreamer *RtmpStreamer::Get() {
+    static RtmpStreamer RtmpStreamer;
+    return &RtmpStreamer;
 }
 
-int FileStreamer::InitStreamer(const char *url) {
+int RtmpStreamer::InitStreamer(const char *url) {
     std::lock_guard<std::mutex> lk(mtx);
     this->outputUrl = url;
     int ret = 0;
@@ -934,16 +934,16 @@ int k_av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt) {
     return ret;
 }
 
-//int FileStreamer::setAudioCodecContext(AVCodecParameters *avCodecParameters) {
+//int RtmpStreamer::setAudioCodecContext(AVCodecParameters *avCodecParameters) {
 //    avcodec_parameters_to_context(mVideoCodecContext,avCodecParameters);
 //}
 //
-//int FileStreamer::setVideoCodecContext(AVCodecParameters *avCodecParameters) {
+//int RtmpStreamer::setVideoCodecContext(AVCodecParameters *avCodecParameters) {
 //    avcodec_alloc_context3(avCodecParameters->codec)
 //    avcodec_parameters_to_context(mVideoCodecContext,avCodecParameters);
 //}
 
-int FileStreamer::AddStream(AVCodecContext *avCodecContext) {
+int RtmpStreamer::AddStream(AVCodecContext *avCodecContext) {
 //    std::lock_guard<std::mutex> lk(mtx);
     AVStream *pStream = avformat_new_stream(iAvFormatContext, avCodecContext->codec);
     if (!pStream) {
@@ -991,7 +991,7 @@ int FileStreamer::AddStream(AVCodecContext *avCodecContext) {
 }
 
 
-//int FileStreamer::SendAudioFrame(AVData *originData, int streamIndex) {
+//int RtmpStreamer::SendAudioFrame(AVData *originData, int streamIndex) {
 //    std::lock_guard<std::mutex> lk(mut1);
 //    AVRational stime;
 //    AVRational dtime;
@@ -1025,7 +1025,7 @@ int FileStreamer::AddStream(AVCodecContext *avCodecContext) {
 //
 //}
 
-//int FileStreamer::SendVideoFrame(AVData *originData, int streamIndex) {
+//int RtmpStreamer::SendVideoFrame(AVData *originData, int streamIndex) {
 //    std::lock_guard<std::mutex> lk(mut1);
 //    AVRational stime;
 //    AVRational dtime;
@@ -1067,50 +1067,50 @@ int FileStreamer::AddStream(AVCodecContext *avCodecContext) {
 /**
  * 音频推流任务
  */
-void *FileStreamer::
+void *RtmpStreamer::
 PushAudioStreamTask(void *pObj) {
-    FileStreamer *fileStreamer = (FileStreamer *) pObj;
-//    FileStreamer->isPushStream = true;
+    RtmpStreamer *rtmpStreamer = (RtmpStreamer *) pObj;
+//    RtmpStreamer->isPushStream = true;
 
-//    if (NULL == fileStreamer->audioEncoder) {
+//    if (NULL == RtmpStreamer->audioEncoder) {
 //        return 0;
 //    }
 //    int64_t beginTime = av_gettime();
 
-//    while (!fileStreamer->isExit) {
-    if (fileStreamer->mAudioframeQueue.empty()) {
+//    while (!RtmpStreamer->isExit) {
+    if (rtmpStreamer->mAudioframeQueue.empty()) {
 //            continue;
         return 0;
     }
-//        pthread_mutex_lock(&(fileStreamer->mutex));
-    LOG_E("push audio queue size:%d",fileStreamer->mAudioframeQueue.Size());
-    const shared_ptr<AVData> &ptr = fileStreamer->mAudioframeQueue.wait_and_pop();
+//        pthread_mutex_lock(&(RtmpStreamer->mutex));
+    LOG_E("push audio queue size:%d",rtmpStreamer->mAudioframeQueue.Size());
+    const shared_ptr<AVData> &ptr = rtmpStreamer->mAudioframeQueue.wait_and_pop();
     AVData *pData = ptr.get();
     if (pData && pData->avPacket) {
         AVPacket *packet = pData->avPacket;
 //            av_packet_ref(dst, packet);
 //            av_copy_packet(dst,packet);
 //            if (packet->size > 0) {
-//                fileStreamer->SendFrame(packet, fileStreamer->audioStreamIndex);
+//                RtmpStreamer->SendFrame(packet, RtmpStreamer->audioStreamIndex);
         //notice:双路流需保证音视频PTS递增
-//            if(fileStreamer->videoPts>packet->pts){
-//                packet->pts=packet->pts+(fileStreamer->videoPts-packet->pts)+1;
+//            if(RtmpStreamer->videoPts>packet->pts){
+//                packet->pts=packet->pts+(RtmpStreamer->videoPts-packet->pts)+1;
 //            }
         packet->pts = pData->pts;
 
         packet->dts = packet->pts;
-//        fileStreamer->audioPts = packet->pts;
-//            packet->pts = av_rescale_q(packet->pts, fileStreamer->audioStream->time_base,AV_TIME_BASE_Q);
-//            packet->dts = av_rescale_q(packet->pts, fileStreamer->audioStream->time_base,AV_TIME_BASE_Q);
-//        LOGE("send audio pts:%lld", fileStreamer->audioPts);
-        packet->stream_index = fileStreamer->audioStreamIndex;
+//        RtmpStreamer->audioPts = packet->pts;
+//            packet->pts = av_rescale_q(packet->pts, RtmpStreamer->audioStream->time_base,AV_TIME_BASE_Q);
+//            packet->dts = av_rescale_q(packet->pts, RtmpStreamer->audioStream->time_base,AV_TIME_BASE_Q);
+//        LOGE("send audio pts:%lld", RtmpStreamer->audioPts);
+        packet->stream_index = rtmpStreamer->audioStreamIndex;
         packet->duration = pData->duration;
-        fileStreamer->SendFrame(packet, fileStreamer->audioStreamIndex);
+        rtmpStreamer->SendFrame(packet, rtmpStreamer->audioStreamIndex);
 //            }
 //            av_packet_free(&(*(pData->avPacket)));
 //            av_packet_unref(packet);
     }
-//        pthread_mutex_unlock(&(fileStreamer->mutex));
+//        pthread_mutex_unlock(&(RtmpStreamer->mutex));
 //        av_usleep(1000000);
 //    }
 
@@ -1120,22 +1120,22 @@ PushAudioStreamTask(void *pObj) {
 /**
 * 音频推流任务
 */
-void *FileStreamer::PushVideoStreamTask(void *pObj) {
-    FileStreamer *fileStreamer = (FileStreamer *) pObj;
-    fileStreamer->isPushStream = true;
+void *RtmpStreamer::PushVideoStreamTask(void *pObj) {
+    RtmpStreamer *rtmpStreamer = (RtmpStreamer *) pObj;
+    rtmpStreamer->isPushStream = true;
 
-//    if (NULL == fileStreamer->videoEncoder) {
+//    if (NULL == RtmpStreamer->videoEncoder) {
 //        return 0;
 //    }
 //    int64_t beginTime = av_gettime();
-//    while (!fileStreamer->isExit) {
-    if (fileStreamer->mVideoframeQueue.empty()) {
+//    while (!RtmpStreamer->isExit) {
+    if (rtmpStreamer->mVideoframeQueue.empty()) {
         return 0;
 //            continue;
     }
 //
-    LOG_E("push video queue size:%d",fileStreamer->mVideoframeQueue.Size());
-    const shared_ptr<AVData> &ptr = fileStreamer->mVideoframeQueue.wait_and_pop();
+    LOG_E("push video queue size:%d",rtmpStreamer->mVideoframeQueue.Size());
+    const shared_ptr<AVData> &ptr = rtmpStreamer->mVideoframeQueue.wait_and_pop();
     AVData *pData = ptr.get();
 
 
@@ -1145,8 +1145,8 @@ void *FileStreamer::PushVideoStreamTask(void *pObj) {
 //            av_packet_move_ref(dst,packet);
 //            av_packet_free(&packet);
 
-//            fwrite(packet->data,1,packet->size,fileStreamer->pFile);
-//            fflush(fileStreamer->pFile);
+//            fwrite(packet->data,1,packet->size,RtmpStreamer->pFile);
+//            fflush(RtmpStreamer->pFile);
 //            av_packet_ref(dst, packet);
 //            av_copy_packet(dst,packet);
 //            if (packet->data && packet->size > 0) {
@@ -1154,34 +1154,34 @@ void *FileStreamer::PushVideoStreamTask(void *pObj) {
 //            av_packet_move_ref(avPacket, packet);
 
         //notice:双路流需保证音视频PTS递增
-//            if(fileStreamer->audioPts>packet->pts){
-//                packet->pts=fileStreamer->audioPts+1;
+//            if(RtmpStreamer->audioPts>packet->pts){
+//                packet->pts=RtmpStreamer->audioPts+1;
 //            }
         packet->pts = pData->pts;
         packet->dts = packet->pts;
         packet->duration = pData->duration;
-//        fileStreamer->videoPts = packet->pts;
-        packet->stream_index = fileStreamer->videoStreamIndex;
+//        RtmpStreamer->videoPts = packet->pts;
+        packet->stream_index = rtmpStreamer->videoStreamIndex;
 
 
-//            packet->pts = av_rescale_q(packet->pts, fileStreamer->videoStream->time_base,AV_TIME_BASE_Q);
-//            packet->dts = av_rescale_q(packet->pts, fileStreamer->videoStream->time_base,AV_TIME_BASE_Q);
-//        LOGE("send video pts:%lld", fileStreamer->videoPts);
+//            packet->pts = av_rescale_q(packet->pts, RtmpStreamer->videoStream->time_base,AV_TIME_BASE_Q);
+//            packet->dts = av_rescale_q(packet->pts, RtmpStreamer->videoStream->time_base,AV_TIME_BASE_Q);
+//        LOGE("send video pts:%lld", RtmpStreamer->videoPts);
 //        packet->duration = 0;
-        fileStreamer->SendFrame(packet, fileStreamer->videoStreamIndex);
-//            int ret = av_interleaved_write_frame(fileStreamer->iAvFormatContext,packet);
+        rtmpStreamer->SendFrame(packet, rtmpStreamer->videoStreamIndex);
+//            int ret = av_interleaved_write_frame(RtmpStreamer->iAvFormatContext,packet);
 //            }
 //            av_packet_free(&packet);
 //            av_packet_free(&packet);
     }
-//        pthread_mutex_unlock(&(fileStreamer->mutex));
+//        pthread_mutex_unlock(&(RtmpStreamer->mutex));
 //        av_usleep(1000000);
 //    }
     return 0;
 }
 
 
-void FileStreamer::main() {
+void RtmpStreamer::main() {
 
 //    WriteHead(this);
     while (!isExit) {
@@ -1193,7 +1193,7 @@ void FileStreamer::main() {
 
 }
 
-void FileStreamer::setMetaData(MetaData data) {
+void RtmpStreamer::setMetaData(MetaData data) {
     this->metaData = data;
 }
 
@@ -1307,7 +1307,7 @@ void av_opt_free(void *obj) {
 //    return ret;
 //}
 
-int FileStreamer::ClosePushStream() {
+int RtmpStreamer::ClosePushStream() {
     isExit = true;
 
     if (iAvFormatContext) {
@@ -1337,10 +1337,10 @@ int writeTraier(struct AVFormatContext *avFormatContext) {
 /**
  * notice:AVStream创建完成开始写头信息
  */
-void *FileStreamer::WriteHead(void *pObj) {
-    FileStreamer *fileStreamer = (FileStreamer *) pObj;
+void *RtmpStreamer::WriteHead(void *pObj) {
+    RtmpStreamer *rtmpStreamer = (RtmpStreamer *) pObj;
     int ret = 0;
-    ret = avio_open(&fileStreamer->iAvFormatContext->pb, fileStreamer->outputUrl,
+    ret = avio_open(&rtmpStreamer->iAvFormatContext->pb, rtmpStreamer->outputUrl,
                     AVIO_FLAG_READ_WRITE);
     if (ret < 0) {
         char buf[1024] = {0};
@@ -1353,24 +1353,24 @@ void *FileStreamer::WriteHead(void *pObj) {
 
 //    AVDictionary *opt = NULL;
 //    av_dict_set_int(&opt, "video_track_timescale", 12800, 0);
-    ret = avformat_write_header(fileStreamer->iAvFormatContext, NULL);
+    ret = avformat_write_header(rtmpStreamer->iAvFormatContext, NULL);
     if (ret != 0) {
         char buf[1024] = {0};
         av_strerror(ret, buf, sizeof(buf));
         LOGI("avformat write header failed!: %s", buf);
         return 0;
     }
-//    av_dump_format(fileStreamer->iAvFormatContext, 0, fileStreamer->outputUrl, 1);
-//    fileStreamer->iAvFormatContext->oformat->write_trailer = writeTraier;
-//    fileStreamer->iAvFormatContext->duration=42627L;
-//    fileStreamer->iAvFormatContext->streams[fileStreamer->audioStreamIndex]->duration=av_rescale_q_rnd(42647L,AVRational{1,1000},AVRational{1,48000},AV_ROUND_NEAR_INF);
-//    fileStreamer->iAvFormatContext->streams[fileStreamer->audioStreamIndex]->time_base=(AVRational){1,48000};
+//    av_dump_format(RtmpStreamer->iAvFormatContext, 0, RtmpStreamer->outputUrl, 1);
+//    RtmpStreamer->iAvFormatContext->oformat->write_trailer = writeTraier;
+//    RtmpStreamer->iAvFormatContext->duration=42627L;
+//    RtmpStreamer->iAvFormatContext->streams[RtmpStreamer->audioStreamIndex]->duration=av_rescale_q_rnd(42647L,AVRational{1,1000},AVRational{1,48000},AV_ROUND_NEAR_INF);
+//    RtmpStreamer->iAvFormatContext->streams[RtmpStreamer->audioStreamIndex]->time_base=(AVRational){1,48000};
 
-    fileStreamer->writeHeadFinish = true;
+    rtmpStreamer->writeHeadFinish = true;
     return 0;
 }
 
-int FileStreamer::SendFrame(AVPacket *packet, int streamIndex) {
+int RtmpStreamer::SendFrame(AVPacket *packet, int streamIndex) {
     int64_t pts = 0;
     int64_t duration = packet->duration;
     packet->duration = 0;
@@ -1433,20 +1433,20 @@ int FileStreamer::SendFrame(AVPacket *packet, int streamIndex) {
 }
 
 
-void FileStreamer::setVideoEncoder(VideoEncoder *pEncoder) {
+void RtmpStreamer::setVideoEncoder(VideoEncoder *pEncoder) {
     this->videoEncoder = pEncoder;
 }
 
-void FileStreamer::setAudioEncoder(AudioEncoder *pEncoder) {
+void RtmpStreamer::setAudioEncoder(AudioEncoder *pEncoder) {
     this->audioEncoder = pEncoder;
 }
 
-void FileStreamer::setCloseCallBack(void (*fun)(void *), void *p) {
+void RtmpStreamer::setCloseCallBack(void (*fun)(void *), void *p) {
     mFunctionPoniter = fun;
     this->p = p;
 }
 
-void FileStreamer::setProgressCallBack(functionP p) {
+void RtmpStreamer::setProgressCallBack(functionP p) {
     this->progressCall=p;
 }
 

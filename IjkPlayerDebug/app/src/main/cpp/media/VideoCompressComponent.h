@@ -25,7 +25,7 @@ private:
     FFmpegDecode *mAudioFfmpegDecode = nullptr;
     AudioEncoder *audioEncoder = nullptr;
     VideoEncoder *videoEncoder = nullptr;
-    FileStreamer *fileStreamer = nullptr;
+    RtmpStreamer *rtmpStreamer = nullptr;
 
 
     mutable mutex mut;
@@ -41,7 +41,7 @@ public:
 
     virtual ~VideoCompressComponent();
 
-    FileStreamer *getFileStreamer() const;
+    RtmpStreamer *getRtmpStreamer() const;
 
     bool initialize();
 

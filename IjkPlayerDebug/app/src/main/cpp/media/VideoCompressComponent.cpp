@@ -54,7 +54,7 @@ void closeStream(){
 //        xsleep(1);
 //        if (writeVideoPts == readVideoPts && readAudioPts == writeAudioPts) {
 //            xsleep(2000);
-//            ((FileStreamer *) streamer)->ClosePushStream();
+//            ((RtmpStreamer *) streamer)->ClosePushStream();
 //            isExit = true;
 //            break;
 //        }
@@ -66,7 +66,8 @@ void VideoCompressComponent::onEvent(MediaEvent &e) {
           e.getWriteVideoPts(), e.getWriteAudioPts(), e.getReadVideoPts(), e.getReadAudioPts());
     if (e.getWriteVideoPts() ==e.getReadVideoPts() && e.getWriteAudioPts() == e.getReadAudioPts()) {
         xsleep(2000);
-        fileStreamer->ClosePushStream();
+        rtmpStreamer->ClosePushStream();
+
     }
 }
 
@@ -118,7 +119,7 @@ void VideoCompressComponent::release() {
     getAudioDecode()->isExit = true;
     getAudioEncode()->isExit = true;
     getVideoEncode()->isExit = true;
-    getFileStreamer()->isExit = true;
+    getRtmpStreamer()->isExit = true;
     sleep(1);
 
     if (avFormatContext) {
@@ -266,24 +267,24 @@ bool VideoCompressComponent::openSource(const char *url) {
             pDemux->getVideoParamters()->codecParameters);
 
     //IO
-    fileStreamer = FileStreamer::Get();
-    fileStreamer->setProgressCallBack(functionP1);
-    pDemux->setStreamer(fileStreamer);
-    getFileStreamer()->setCloseCallBack(closeStreamCallBack, this);
+    rtmpStreamer = RtmpStreamer::Get();
+    rtmpStreamer->setProgressCallBack(functionP1);
+    pDemux->setStreamer(rtmpStreamer);
+    getRtmpStreamer()->setCloseCallBack(closeStreamCallBack, this);
 
-    getFileStreamer()->inAudioTimeBase = pDemux->getAudioStream()->time_base;
-    getFileStreamer()->inVideoTimeBase = pDemux->getVideoStream()->time_base;
+    getRtmpStreamer()->inAudioTimeBase = pDemux->getAudioStream()->time_base;
+    getRtmpStreamer()->inVideoTimeBase = pDemux->getVideoStream()->time_base;
 
-    getVideoEncode()->addObserver(getFileStreamer());
-    getAudioEncode()->addObserver(getFileStreamer());
+    getVideoEncode()->addObserver(getRtmpStreamer());
+    getAudioEncode()->addObserver(getRtmpStreamer());
 
 
-    getFileStreamer()->setVideoEncoder(getVideoEncode());
-    getFileStreamer()->setAudioEncoder(getAudioEncode());
+    getRtmpStreamer()->setVideoEncoder(getVideoEncode());
+    getRtmpStreamer()->setAudioEncoder(getAudioEncode());
 
-    getFileStreamer()->InitStreamer(destPath);
-    getFileStreamer()->setMetaData(pDemux->getMetaData());
-    getFileStreamer()->WriteHead(getFileStreamer());
+    getRtmpStreamer()->InitStreamer(destPath);
+    getRtmpStreamer()->setMetaData(pDemux->getMetaData());
+    getRtmpStreamer()->WriteHead(getRtmpStreamer());
 
 
     //视频编码
@@ -295,7 +296,7 @@ bool VideoCompressComponent::openSource(const char *url) {
     //开始解复用
     pDemux->startThread();
     //文件写入
-    getFileStreamer()->startThread();
+    getRtmpStreamer()->startThread();
 
 
     return true;
@@ -317,8 +318,8 @@ void VideoCompressComponent::setMScaleHeight(long mScaleHeight) {
     this->mScaleHeight = mScaleHeight;
 }
 
-FileStreamer *VideoCompressComponent::getFileStreamer() const {
-    return fileStreamer;
+RtmpStreamer *VideoCompressComponent::getRtmpStreamer() const {
+    return rtmpStreamer;
 }
 
 void VideoCompressComponent::setCallback(void(*pF)(void *)) {

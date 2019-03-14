@@ -207,7 +207,7 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     LOGE("avcodec alloc context success!");
 
 
-    long long bitrate = 1024 * 1000;
+    long long bitrate = 800 * 1000;
 
     videoCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER; //全局参数
     videoCodecContext->codec_id = avCodec->id;
@@ -219,7 +219,7 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     videoCodecContext->framerate = (AVRational) {30, 1};
 
     videoCodecContext->max_b_frames = 0;//0表示不使用B Frame
-    videoCodecContext->qmin = 10;
+    videoCodecContext->qmin = 20;
     videoCodecContext->qmax = 40;
     videoCodecContext->qcompress = 0.5;
     videoCodecContext->time_base = (AVRational) {1, 12800};//AUDIO VIDEO 两边时间基数要相同
@@ -229,7 +229,7 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     videoCodecContext->sample_aspect_ratio = AVRational{1, 1};
     videoCodecContext->thread_count = 8;
 //    videoCodecContext->keyint_min=50;
-    videoCodecContext->gop_size = 100;
+    videoCodecContext->gop_size = 10;
     videoCodecContext->compression_level=0;
 
 //    videoCodecContext->level = 41;

@@ -199,7 +199,7 @@ AVData FFmpegDemux::readMediaData() {
     return avData;
 }
 
-void FFmpegDemux::setStreamer(FileStreamer *pStreamer) {
+void FFmpegDemux::setStreamer(RtmpStreamer *pStreamer) {
     this->streamer = pStreamer;
 }
 

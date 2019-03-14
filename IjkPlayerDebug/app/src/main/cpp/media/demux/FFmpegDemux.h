@@ -7,7 +7,7 @@
 
 #include "IDemux.h"
 #include "../global_header.h"
-#include "../streamer/FileStreamer.h"
+#include "../streamer/RtmpStreamer.h"
 #include "../decode/FFmpegDecode.h"
 
 
@@ -54,7 +54,7 @@ public:
     AVParameters *audioAvParameters = NULL;
 
 
-    void setStreamer(FileStreamer *pStreamer);
+    void setStreamer(RtmpStreamer *pStreamer);
 
     int64_t frameCount = 0;
 

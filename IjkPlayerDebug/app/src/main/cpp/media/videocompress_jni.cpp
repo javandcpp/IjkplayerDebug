@@ -2,7 +2,7 @@
 #include <jni.h>
 #include "global_header.h"
 #include "VideoCompressComponent.h"
-#include "streamer/FileStreamer.h"
+#include "streamer/RtmpStreamer.h"
 
 const char *CLASS_NAME = "com/stone/media/VideoCompress";
 static VideoCompressComponent *videoCompressComponent = nullptr;
