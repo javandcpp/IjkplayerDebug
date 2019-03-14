@@ -28,6 +28,7 @@ void IFFmpegDecode::main() {
             continue;
         }
 
+        LOG_E("decode queue size:%d",threadsafeQueue.Size());
         const shared_ptr<AVData> &ptr = threadsafeQueue.wait_and_pop();
         AVData *pData = ptr.get();
         xsleep(1);

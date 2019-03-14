@@ -48,7 +48,6 @@ typedef void(*functionP)(long,long);
 #define LOGE(...) if(0){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
 #define LOG_D(...) if(0){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
 #define LOG_E(...) if(SWITCH){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
-#define LOGF(...) if(SWITCH){__android_log_print(ANDROID_LOG_FATAL,TAG ,__VA_ARGS__);}
 
 
 #endif

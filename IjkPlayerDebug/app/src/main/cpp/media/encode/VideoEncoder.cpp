@@ -99,6 +99,7 @@ void VideoEncoder::main() {
             continue;
         }
 
+        LOG_E("video encode queue size:%d",aVideoframeQueue.Size());
         const shared_ptr<AVData> &ptr = aVideoframeQueue.wait_and_pop();
         AVData *pData = ptr.get();
         int ret = -1;
@@ -258,7 +259,7 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
      */
 
     AVDictionary *opts = NULL;
-    av_dict_set(&opts, "preset", "ultrafast", 0);//编码器的速度会影响推流音视频同步,所以这里需要设置下
+    av_dict_set(&opts, "preset", "veryfast", 0);//编码器的速度会影响推流音视频同步,所以这里需要设置下
     av_dict_set(&opts, "tune", "zerolatency", 0);//如果开0延迟可能会影响视频质量
     av_dict_set(&opts, "profile", "baseline", 0);//I/P帧
 //    av_dict_set(&opts, "x264opts","crf=30:vbv-maxrate=500:vbv-bufsize=3640:keyint=60",0);

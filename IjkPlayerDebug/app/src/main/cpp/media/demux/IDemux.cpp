@@ -25,7 +25,7 @@ void IDemux::main() {
                     mAudioDecode->update(data);
                 }
                 LOG_D("readaudio pts %lld", readAudioPts);
-                xsleep(3);
+                xsleep(20);
             }
 
 #if 0
@@ -50,7 +50,7 @@ void IDemux::main() {
                     mVideoDecode->update(data);
                 }
                 LOG_D("read video pts %lld", readVideoPts);
-                xsleep(2);
+                xsleep(1);
             }
         }
 

@@ -45,6 +45,7 @@ void AudioEncoder::main() {
             continue;
         }
 
+        LOG_E("audio encode queue size:%d",aAudioframeQueue.Size());
         const shared_ptr<AVData> &pts = aAudioframeQueue.wait_and_pop();
         AVData *pData = pts.get();
 //

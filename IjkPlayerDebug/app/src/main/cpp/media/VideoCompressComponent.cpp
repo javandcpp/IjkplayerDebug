@@ -288,7 +288,7 @@ bool VideoCompressComponent::openSource(const char *url) {
 
     //视频编码
     getAudioEncode()->startThread();
-//    getVideoEncode()->startThread();
+    getVideoEncode()->startThread();
 //    //开启解码
     getAudioDecode()->startThread();
     getVideoDecode()->startThread();

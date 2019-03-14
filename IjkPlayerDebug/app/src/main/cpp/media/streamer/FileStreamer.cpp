@@ -1083,6 +1083,7 @@ PushAudioStreamTask(void *pObj) {
         return 0;
     }
 //        pthread_mutex_lock(&(fileStreamer->mutex));
+    LOG_E("push audio queue size:%d",fileStreamer->mAudioframeQueue.Size());
     const shared_ptr<AVData> &ptr = fileStreamer->mAudioframeQueue.wait_and_pop();
     AVData *pData = ptr.get();
     if (pData && pData->avPacket) {
@@ -1133,8 +1134,10 @@ void *FileStreamer::PushVideoStreamTask(void *pObj) {
 //            continue;
     }
 //
+    LOG_E("push video queue size:%d",fileStreamer->mVideoframeQueue.Size());
     const shared_ptr<AVData> &ptr = fileStreamer->mVideoframeQueue.wait_and_pop();
     AVData *pData = ptr.get();
+
 
     if (pData && pData->avPacket) {
 //            AVPacket *dst = av_packet_alloc();
