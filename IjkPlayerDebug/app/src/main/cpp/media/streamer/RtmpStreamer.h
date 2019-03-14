@@ -115,6 +115,8 @@ public:
     void setCloseCallBack(void (*fun)(void *), void *p);
 
     void setProgressCallBack(void (*pFunction)(long, long));
+
+    void release();
 };
 
 

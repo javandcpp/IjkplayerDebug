@@ -106,6 +106,9 @@ bool VideoCompressComponent::initialize() {
 }
 
 void VideoCompressComponent::stop() {
+    if(rtmpStreamer) {
+        rtmpStreamer->ClosePushStream();
+    }
     release();
     if (mpF1) {
         mpF1(0);
@@ -114,18 +117,27 @@ void VideoCompressComponent::stop() {
 
 void VideoCompressComponent::release() {
     this->isRunning = false;
-    getDemux()->isExit = true;
-    getVideoDecode()->isExit = true;
-    getAudioDecode()->isExit = true;
-    getAudioEncode()->isExit = true;
-    getVideoEncode()->isExit = true;
-    getRtmpStreamer()->isExit = true;
+    if(getDemux()) {
+        getDemux()->isExit = true;
+    }
+
+    if(getVideoDecode()) {
+        getVideoDecode()->isExit = true;
+    }
+    if(getAudioDecode()) {
+        getAudioDecode()->isExit = true;
+    }
+    if(getAudioEncode()) {
+        getAudioEncode()->isExit = true;
+    }
+    if(getVideoEncode()) {
+        getVideoEncode()->isExit = true;
+    }
+    if(getRtmpStreamer()) {
+        getRtmpStreamer()->isExit = true;
+    }
     sleep(1);
 
-    if (avFormatContext) {
-        avformat_free_context(avFormatContext);
-        avFormatContext = NULL;
-    }
     if (mDemux) {
         delete mDemux;
         mDemux = NULL;
@@ -151,7 +163,6 @@ void VideoCompressComponent::release() {
 void closeStreamCallBack(void *p) {
     LOG_D("this is callback");
     VideoCompressComponent *videoCompressComponent = (VideoCompressComponent *) p;
-    videoCompressComponent->release();
     if (videoCompressComponent->mPf) {
         videoCompressComponent->mPf(0);
     }

@@ -33,28 +33,32 @@ RtmpStreamer::RtmpStreamer() {
 //    pFile=fopen("/mnt/sdcard/test.h264","wb+");
 }
 
-RtmpStreamer::~RtmpStreamer() {
-    pthread_mutex_destroy(&mutex);
-    if (NULL != audioStream) {
+void RtmpStreamer::release() {
+    LOG_E("RTMP STREAMER RELEASE");
+    if (audioStream) {
         av_free(audioStream);
         audioStream = NULL;
     }
-    if (NULL != videoStream) {
+    if (videoStream) {
         av_free(videoStream);
         videoStream = NULL;
     }
-    if (NULL != mAudioCodecContext) {
+    if (mAudioCodecContext) {
         avcodec_free_context(&mAudioCodecContext);
         mAudioCodecContext = NULL;
     }
-    if (NULL != mVideoCodecContext) {
+    if (mVideoCodecContext) {
         avcodec_free_context(&mVideoCodecContext);
         mVideoCodecContext = NULL;
     }
-    if (NULL != iAvFormatContext) {
+    if (iAvFormatContext) {
         avformat_free_context(iAvFormatContext);
         iAvFormatContext = NULL;
     }
+}
+
+RtmpStreamer::~RtmpStreamer() {
+
 
 }
 

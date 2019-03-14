@@ -17,26 +17,26 @@ void stream_close(void *p) {
     JNIEnv *env = NULL;
       LOG_E("stream close");
     if (g_vm != NULL) {
-        jint status = g_vm->AttachCurrentThread(&env, NULL);
+//        jint status = g_vm->AttachCurrentThread(&env, NULL);
         if (globalClazz) {
-            jmethodID jMethodComplete = env->GetStaticMethodID(globalClazz, "completeFromNative",
-                                                               "(Ljava/lang/String;)V");
-            if (videoCompressComponent) {
-                jstring pJstring = env->NewStringUTF(videoCompressComponent->destPath);
-                env->CallStaticVoidMethod(globalClazz, jMethodComplete,
-                                          pJstring);
-                env->CallStaticVoidMethod(globalClazz, progress,
-                                          100, (int)0);
-                env->DeleteLocalRef(pJstring);
-            }
-            env->DeleteGlobalRef(globalClazz);
-            delete videoCompressComponent;
-            videoCompressComponent= NULL;
+//            jmethodID jMethodComplete = env->GetStaticMethodID(globalClazz, "completeFromNative",
+//                                                               "(Ljava/lang/String;)V");
+//            if (videoCompressComponent) {
+//                jstring pJstring = env->NewStringUTF(videoCompressComponent->destPath);
+//                env->CallStaticVoidMethod(globalClazz, jMethodComplete,
+//                                          pJstring);
+//                env->CallStaticVoidMethod(globalClazz, progress,
+//                                          100, (int)0);
+//                env->DeleteLocalRef(pJstring);
+//            }
+//            env->DeleteGlobalRef(globalClazz);
+//            delete videoCompressComponent;
+//            videoCompressComponent= NULL;
 
         }
-        if (status == JNI_OK) {
-            g_vm->DetachCurrentThread();
-        }
+//        if (status == JNI_OK) {
+//            g_vm->DetachCurrentThread();
+//        }
     }
 }
 
