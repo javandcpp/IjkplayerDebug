@@ -111,7 +111,7 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
     strcpy(path,destPath);
 
     jclass tmp = env->FindClass(CLASS_NAME);
-    globalClazz = (jclass) env->NewGlobalRef(tmp);//这一步很重要必须这么写，否则报错
+    globalClazz = (jclass) env->NewGlobalRef(tmp);
     progress = env->GetStaticMethodID(globalClazz, "progressFromNative",
                                       "(II)V");
     if (videoCompressComponent) {

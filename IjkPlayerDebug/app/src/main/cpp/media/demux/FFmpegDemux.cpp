@@ -183,6 +183,8 @@ AVData FFmpegDemux::readMediaData() {
     }
 
     if (avData.isAudio) {
+        //AAC PTS=sample rate/1024*n;
+        //MP3 PTS= ....../1152
 //        audioPts += 1024;
         avData.pts = pkt->pts;
         LOGD("audio pts:%lld   pts:%lld", avData.pts, audioPts);
@@ -214,7 +216,7 @@ int FFmpegDemux::getVideoStreamIndex() const {
 }
 
 void FFmpegDemux::setVideoStreamIndex(int videoStreamIndex) {
-    FFmpegDemux::videoStreamIndex = videoStreamIndex;
+    this->videoStreamIndex = videoStreamIndex;
 }
 
 int FFmpegDemux::getAudioStreamIndex() const {
@@ -222,7 +224,7 @@ int FFmpegDemux::getAudioStreamIndex() const {
 }
 
 void FFmpegDemux::setAudioStreamIndex(int audioStreamIndex) {
-    FFmpegDemux::audioStreamIndex = audioStreamIndex;
+    this->audioStreamIndex = audioStreamIndex;
 }
 
 AVStream *FFmpegDemux::getAudioStream() const {
