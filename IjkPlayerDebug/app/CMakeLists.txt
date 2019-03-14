@@ -67,6 +67,7 @@ file(GLOB media_stream_cpp "src/main/cpp/media/streamer/*.cpp")
 
 file(GLOB ffmpeg "src/main/cpp/ffmpeg/*.c")
 
+file(GLOB event "src/main/cpp/event/*.hpp")
 
 add_library(ffmpeg SHARED IMPORTED)
 set_target_properties(ffmpeg
@@ -99,6 +100,7 @@ add_library( # Sets the name of the library.
             ${media_audio_cpp}
             ${media_encode_cpp}
             ${media_stream_cpp}
+
             )
 
 # Searches for a specified prebuilt library and stores the path as a

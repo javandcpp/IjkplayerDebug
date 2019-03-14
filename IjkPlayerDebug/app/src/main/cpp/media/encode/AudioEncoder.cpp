@@ -7,7 +7,7 @@
 
 
 AudioEncoder::AudioEncoder() {
-    pFile = fopen("/mnt/sdcard/test1.aac", "wb+");
+//    pFile = fopen("/mnt/sdcard/test1.aac", "wb+");
 }
 
 AudioEncoder::~AudioEncoder() {
@@ -90,13 +90,16 @@ void AudioEncoder::main() {
                 }
 
                 frameCount++;
+                if(pFile){
+                  fwrite(avPacket->data, 1, avPacket->size, pFile);
+                fflush(pFile);
+                }
 #endif
                 AVData avData;
                 AVPacket *avPacket = av_packet_alloc();
                 av_packet_move_ref(avPacket, &audioPacket);//此处data指针指向重新分配的内存，并复制其他属性
                 LOGD("audio encode sucess  pts:%lld", pData->pts);
-                fwrite(avPacket->data, 1, avPacket->size, pFile);
-                fflush(pFile);
+
 
                 avData.pts = pData->pts;
                 avData.avPacket = avPacket;

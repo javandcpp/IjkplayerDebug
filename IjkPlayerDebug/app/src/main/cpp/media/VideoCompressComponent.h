@@ -10,13 +10,15 @@
 #include "demux/FFmpegDemux.h"
 #include "encode/AudioEncoder.h"
 #include "encode/VideoEncoder.h"
+
+
+
 #include <mutex>
 
 using namespace std;
 
 typedef void(*pF)(void *);
-
-class VideoCompressComponent {
+class VideoCompressComponent : public EventHandler<MediaEvent> {
 private:
     FFmpegDemux *mDemux = nullptr;
     FFmpegDecode *mVideoFfmpegDecode = nullptr;
@@ -24,6 +26,7 @@ private:
     AudioEncoder *audioEncoder = nullptr;
     VideoEncoder *videoEncoder = nullptr;
     FileStreamer *fileStreamer = nullptr;
+
 
     mutable mutex mut;
 
@@ -68,11 +71,13 @@ public:
 
     long getMScaleHeight();
 
+    virtual bool open(const char *url);
+
     pF mPf = nullptr;
 
     pF mpF1 = nullptr;
 
-    functionP functionP1= nullptr;
+    functionP functionP1 = nullptr;
 
     void setCallback(void(*pF)(void *));
 
@@ -85,6 +90,13 @@ public:
     void setStopCallBack(void(*pF)(void *));
 
     void setProgressCallBack(void (*fun)(long, long));
+
+    AVFormatContext *avFormatContext = NULL;
+
+    virtual void onEvent(MediaEvent &e);
+
+
+    HandlerRegistration *pRegistration = NULL;
 };
 
 

@@ -128,6 +128,7 @@ Java_com_stone_media_VideoCompress_videoCompress(JNIEnv *env, jobject instance, 
 
     }
     videoCompressComponent = new VideoCompressComponent();
+
     if (videoCompressComponent) {
         videoCompressComponent->setMScaleWidth(widthPram);
         videoCompressComponent->setMScaleHeight(heightParma);

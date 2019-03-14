@@ -16,34 +16,43 @@ void IDemux::main() {
 #endif
     while (!isExit) {
         AVData data = readMediaData();
-        if(data.isAudio){
-            LOGD("audio stream   pts:%ld",data.pts);
-            NativeThread::readAudioPts=data.pts;
-            mAudioDecode->update(data);
-            LOG_D("readaudio pts %lld",readAudioPts);
-            xsleep(20);
+        if(data.size>0) {
+            if (data.isAudio) {
+                LOGD("audio stream   pts:%ld", data.pts);
 
-#if 0
-            struct  timeval    endval;
-            gettimeofday(&endval,NULL);
-            long diff = 1000000 * (endval.tv_sec-audioStart.tv_sec)+ endval.tv_usec-audioStart.tv_usec;
-            LOG_E("diff:%ld",diff);
-            if(diff/1000000>=3){
-                long i = diff / 1000000;
-                LOG_E("interval time:%ld  audio decodeframecount:%d",i,audioFrameCount/i);
-                audioFrameCount=0;
-                audioStart.tv_sec=endval.tv_sec;
-                audioStart.tv_usec=endval.tv_usec;
+                NativeThread::readAudioPts = data.pts;
+                if (mAudioDecode) {
+                    mAudioDecode->update(data);
+                }
+                LOG_D("readaudio pts %lld", readAudioPts);
+                xsleep(3);
             }
 
-            audioFrameCount++;
+#if 0
+                struct  timeval    endval;
+                gettimeofday(&endval,NULL);
+                long diff = 1000000 * (endval.tv_sec-audioStart.tv_sec)+ endval.tv_usec-audioStart.tv_usec;
+                LOG_E("diff:%ld",diff);
+                if(diff/1000000>=3){
+                    long i = diff / 1000000;
+                    LOG_E("interval time:%ld  audio decodeframecount:%d",i,audioFrameCount/i);
+                    audioFrameCount=0;
+                    audioStart.tv_sec=endval.tv_sec;
+                    audioStart.tv_usec=endval.tv_usec;
+                }
+
+                audioFrameCount++;
 #endif
-        }else{
-            LOGD("video stream   pts:%ld",data.pts);
-            NativeThread::readVideoPts=data.pts;
-            mVideoDecode->update(data);
-            LOG_D("readview pts %lld",readVideoPts);
-            xsleep(1);
+            else {
+                LOGD("video stream   pts:%ld", data.pts);
+                NativeThread::readVideoPts = data.pts;
+                if (mVideoDecode) {
+                    mVideoDecode->update(data);
+                }
+                LOG_D("read video pts %lld", readVideoPts);
+                xsleep(2);
+            }
+        }
 
 #if 0
             struct  timeval    endval;
@@ -66,5 +75,5 @@ void IDemux::main() {
 //        if (data.size > 0) {
 //            notifyObserver(data);
 //        }
-    }
+
 }

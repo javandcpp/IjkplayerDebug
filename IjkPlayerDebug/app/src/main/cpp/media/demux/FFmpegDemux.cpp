@@ -15,25 +15,24 @@ static double r2d(AVRational avRational) {
                                                              (double) avRational.den;
 }
 
+
 FFmpegDemux::FFmpegDemux() {
     if (!isFirst) {
         initAVCodec();
-
         isFirst = false;
     }
 }
 
 FFmpegDemux::~FFmpegDemux() {
     LOG_E("ffmpegDemux release");
-    if (avFormatContext) {
-        avformat_free_context(avFormatContext);
-        avFormatContext = nullptr;
-    }
+
     if (audioAvParameters) {
         delete audioAvParameters;
+        audioAvParameters = NULL;
     }
     if (videoAvParameters) {
         delete videoAvParameters;
+        videoAvParameters = NULL;
     }
 }
 
@@ -41,10 +40,15 @@ MetaData FFmpegDemux::getMetaData() {
     MetaData metaData;
     metaData.duration = mVideoDuration;
     metaData.video_rotate = mVideoRotate;
-    metaData.video_width=video_src_width;
-    metaData.video_height=video_src_height;
+    metaData.video_width = video_src_width;
+    metaData.video_height = video_src_height;
 
     return metaData;
+}
+
+
+void FFmpegDemux::setAvFormatContext(AVFormatContext *avformatContext) {
+    this->avFormatContext = avformatContext;
 }
 
 
@@ -80,10 +84,9 @@ static int custom_interrupt_callback(void *arg) {
 }
 
 
-double get_rotation(AVStream *st)
-{
+double FFmpegDemux::get_rotation(AVStream *st) {
     AVDictionaryEntry *rotate_tag = av_dict_get(st->metadata, "rotate", NULL, 0);
-    uint8_t* displaymatrix = av_stream_get_side_data(st,
+    uint8_t *displaymatrix = av_stream_get_side_data(st,
                                                      AV_PKT_DATA_DISPLAYMATRIX, NULL);
     double theta = 0;
 
@@ -94,11 +97,11 @@ double get_rotation(AVStream *st)
             theta = 0;
     }
     if (displaymatrix && !theta)
-        theta = -av_display_rotation_get((int32_t*) displaymatrix);
+        theta = -av_display_rotation_get((int32_t *) displaymatrix);
 
-    theta -= 360*floor(theta/360 + 0.9/360);
+    theta -= 360 * floor(theta / 360 + 0.9 / 360);
 
-    if (fabs(theta - 90*round(theta/90)) > 2)
+    if (fabs(theta - 90 * round(theta / 90)) > 2)
         av_log(NULL, AV_LOG_WARNING, "Odd rotation angle.\n"
                 "If you want to help, upload a sample "
                 "of this file to ftp://upload.ffmpeg.org/incoming/ "
@@ -107,58 +110,6 @@ double get_rotation(AVStream *st)
     return theta;
 }
 
-bool FFmpegDemux::open(const char *url) {
-    int ret = 0;
-    int rotate = 0;
-    double d = 0.0;
-
-    AVDictionaryEntry *m = NULL;
-
-
-    avFormatContext = avformat_alloc_context();
-    if (!avFormatContext) {
-        LOGE("Could not allocate context.\n");
-    }
-    avFormatContext->interrupt_callback.callback = custom_interrupt_callback;
-    avFormatContext->interrupt_callback.opaque = this;
-    if ((ret = avformat_open_input(&avFormatContext, url, 0, 0)) < 0) {
-        LOGE("avformat open input failed  :%s!", av_err2str(ret));
-        goto fail;
-    }
-    LOGD("avformat open input successful!");
-    if ((ret = avformat_find_stream_info(avFormatContext, 0)) < 0) {
-        LOGE("avformat find stream info failed:  %s", av_err2str(ret));
-        goto fail;
-    }
-
-
-    setVideoStreamIndex(av_find_best_stream(avFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, 0, 0));
-    setAudioStreamIndex(av_find_best_stream(avFormatContext, AVMEDIA_TYPE_AUDIO, -1, -1, 0, 0));
-
-
-    getRotate();
-    getDuration();
-
-    audioStream = avFormatContext->streams[audioStreamIndex];
-    audioPtsRatio = audioStream->nb_frames / audioStream->codecpar->channels;;
-
-    videoStream = avFormatContext->streams[videoStreamIndex];
-    video_src_width=videoStream->codecpar->width;
-    video_src_height=videoStream->codecpar->height;
-
-    d = get_rotation(videoStream);
-    LOG_E("d %lf", d);
-    videoPtsRatio = videoStream->time_base.den / videoStream->r_frame_rate.num;
-
-    LOGD("find stream index  videoStream:%d   audioStream:%d", getVideoStreamIndex(),
-         getAudioStreamIndex());
-
-
-    return true;
-
-    fail:
-    return false;
-}
 
 AVParameters *FFmpegDemux::getAudioParameters() {
     if (!avFormatContext || getAudioStreamIndex() < 0) NULL;
@@ -183,30 +134,22 @@ AVParameters *FFmpegDemux::getVideoParamters() {
  * @return
  */
 AVData FFmpegDemux::readMediaData() {
-    if (!avFormatContext)return AVData();
+    if (!avFormatContext) {
+        return AVData();
+    }
 
     AVData avData;
     AVPacket *pkt = av_packet_alloc();
     int re = av_read_frame(avFormatContext, pkt);
     if (re != 0) {
         if (re == AVERROR_EOF) {
-            LOGE("read frame eof");
+//            while(!isExit) {
+//                xsleep(100);
             AVData avData;
-            do {
-//                LOG_D("writeaudiopts %lld", writeAudioPts);
-//                LOG_D("writevideopts %lld", writeVideoPts);
-//                LOG_D("readAudioPts %lld", readAudioPts);
-//                LOG_D("readVideoPtS %lld", readVideoPts);
-                xsleep(1);
-                if (writeVideoPts == readVideoPts && readAudioPts == writeAudioPts) {
-                    xsleep(2000);
-                    ((FileStreamer *) streamer)->ClosePushStream();
-                    isExit = true;
-                    break;
-                }
-
-            } while (!isExit);
-
+            MediaEvent mediaEvent((Object &) *this, writeVideoPts, writeAudioPts, readVideoPts,
+                                  readAudioPts);
+            EventBus::FireEvent(mediaEvent);
+//            }
             return avData;
         }
         char buf[100] = {0};

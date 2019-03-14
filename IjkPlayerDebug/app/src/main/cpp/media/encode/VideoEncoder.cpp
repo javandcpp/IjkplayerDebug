@@ -12,7 +12,7 @@
 
 VideoEncoder::VideoEncoder() {
 
-    pFILE = fopen("/mnt/sdcard/testdecode.h264", "wb+");
+//    pFILE = fopen("/mnt/sdcard/testdecode.h264", "wb+");
 
 }
 

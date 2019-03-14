@@ -33,16 +33,20 @@ extern "C" {
 
 #include <mutex>
 
+
+#include "../event/EventBus.hpp"
+#include "../event/MediaEvent.hpp"
+
 #define TAG "hw_media"
-#define SWITCH 0
+#define SWITCH 1
 
 typedef void(*functionP)(long,long);
 
-#define LOGD(...) if(SWITCH){ __android_log_print(ANDROID_LOG_DEBUG,TAG ,__VA_ARGS__);}
-#define LOGI(...) if(1){__android_log_print(ANDROID_LOG_INFO,TAG ,__VA_ARGS__);}
+#define LOGD(...) if(0){ __android_log_print(ANDROID_LOG_DEBUG,TAG ,__VA_ARGS__);}
+#define LOGI(...) if(0){__android_log_print(ANDROID_LOG_INFO,TAG ,__VA_ARGS__);}
 #define LOGW(...) if(SWITCH){__android_log_print(ANDROID_LOG_WARN,TAG ,__VA_ARGS__);}
-#define LOGE(...) if(SWITCH){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
-#define LOG_D(...) if(SWITCH){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
+#define LOGE(...) if(0){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
+#define LOG_D(...) if(0){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
 #define LOG_E(...) if(SWITCH){__android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__);}
 #define LOGF(...) if(SWITCH){__android_log_print(ANDROID_LOG_FATAL,TAG ,__VA_ARGS__);}
 

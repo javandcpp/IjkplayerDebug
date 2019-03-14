@@ -22,7 +22,7 @@ public:
 
     void *streamer = nullptr;
 
-    virtual bool open(const char *url);
+
 
     virtual AVParameters *getVideoParamters();
 
@@ -34,7 +34,6 @@ public:
 
     virtual ~FFmpegDemux();
 
-    AVFormatContext *avFormatContext = NULL;
 
     int getVideoStreamIndex() const;
 
@@ -65,13 +64,13 @@ public:
 
     char *mVideoRotate = nullptr;
 
-    int videoRotate=0;
+    int videoRotate = 0;
 
     int64_t mVideoDuration = 0;
 
-    int video_src_width=0;
+    int video_src_width = 0;
 
-    int video_src_height=0;
+    int video_src_height = 0;
 
     int audioPtsRatio = 0;
 
@@ -89,15 +88,23 @@ public:
     void addAudioDecode(FFmpegDecode *pDecode);
 
 
+    int audioStreamIndex = -1;
+
+    int videoStreamIndex = -1;
+
+    double get_rotation(AVStream *st);
+
+    void setAvFormatContext(AVFormatContext *avformatContext);
+
+
 
 protected:
 
-    int videoStreamIndex = -1;
-    int audioStreamIndex = -1;
 
     void initAVCodec();
 
 
+    AVFormatContext *avFormatContext=NULL;
 };
 
 

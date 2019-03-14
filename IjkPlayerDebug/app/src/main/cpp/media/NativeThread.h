@@ -6,11 +6,13 @@
 #define XMEDIAPLAYER_NATIVETHREAD_H
 
 
+#include "../event/Object.hpp"
+
 void xsleep(int millseconds);
 
 
 
-class NativeThread {
+class NativeThread :public Object{
 
 
 public:

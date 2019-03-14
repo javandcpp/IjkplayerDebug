@@ -67,7 +67,7 @@ int FileStreamer::InitStreamer(const char *url) {
     std::lock_guard<std::mutex> lk(mtx);
     this->outputUrl = url;
     int ret = 0;
-    ret = avformat_alloc_output_context2(&iAvFormatContext, NULL, NULL, url);
+    ret = avformat_alloc_output_context2(&iAvFormatContext, NULL, "flv", url);
 
     if (ret < 0) {
         char buf[1024] = {0};
@@ -1307,7 +1307,7 @@ void av_opt_free(void *obj) {
 int FileStreamer::ClosePushStream() {
     isExit = true;
 
-    if (NULL != iAvFormatContext) {
+    if (iAvFormatContext) {
 //        vflush_encoder(iAvFormatContext,videoStreamIndex);
         av_write_trailer(iAvFormatContext);
         avio_close(iAvFormatContext->pb);
@@ -1338,7 +1338,7 @@ void *FileStreamer::WriteHead(void *pObj) {
     FileStreamer *fileStreamer = (FileStreamer *) pObj;
     int ret = 0;
     ret = avio_open(&fileStreamer->iAvFormatContext->pb, fileStreamer->outputUrl,
-                    AVIO_FLAG_WRITE);
+                    AVIO_FLAG_READ_WRITE);
     if (ret < 0) {
         char buf[1024] = {0};
         av_strerror(ret, buf, sizeof(buf));
@@ -1420,9 +1420,9 @@ int FileStreamer::SendFrame(AVPacket *packet, int streamIndex) {
                   duration);
         }
     } else {
-//        char buf[1024] = {0};
-//        av_strerror(ret, buf, sizeof(buf));
-//        LOG_D("stream index %d writer frame failed! :%s", streamIndex, buf);
+        char buf[1024] = {0};
+        av_strerror(ret, buf, sizeof(buf));
+        LOG_D("stream index %d writer frame failed! :%s", streamIndex, buf);
     }
 
 

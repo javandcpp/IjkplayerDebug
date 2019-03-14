@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
 
     public void compress(View view) {
 
-        MediaProcess.getMediaProcess().getVideoCompress().videoCompress("/mnt/sdcard/test.mp4", "/mnt/sdcard/output1.mp4", 568, 320, new VideoCompress.CompressListener() {
+        MediaProcess.getMediaProcess().getVideoCompress().videoCompress("/mnt/sdcard/input.mp4", "rtmp://10.0.5.62:1935/rtmplive/room", 568, 320, new VideoCompress.CompressListener() {
             @Override
             public void complete(String url) {
                 Toast.makeText(getApplicationContext(),url,Toast.LENGTH_SHORT).show();

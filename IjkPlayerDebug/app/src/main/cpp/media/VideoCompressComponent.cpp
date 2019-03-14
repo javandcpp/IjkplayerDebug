@@ -3,17 +3,27 @@
 //
 #include "VideoCompressComponent.h"
 #include "demux/FFmpegDemux.h"
+#include "../event/EventBus.cpp"
+
 
 VideoCompressComponent::VideoCompressComponent() {
-
+    pRegistration = EventBus::AddHandler<MediaEvent>(*this);
 }
 
 VideoCompressComponent::~VideoCompressComponent() {
     LOG_E("videoCompressComponent release");
+
     if (destPath) {
         free((void *) destPath);
+        destPath=NULL;
+    }
+    if(pRegistration){
+        pRegistration->removeHandler();
+        delete pRegistration;
+        pRegistration=NULL;
     }
 }
+
 
 FFmpegDemux *VideoCompressComponent::getDemux() {
     return mDemux;
@@ -33,6 +43,31 @@ AudioEncoder *VideoCompressComponent::getAudioEncode() {
 
 VideoEncoder *VideoCompressComponent::getVideoEncode() {
     return videoEncoder;
+}
+
+void closeStream(){
+//    do {
+////                LOG_D("writeaudiopts %lld", writeAudioPts);
+////                LOG_D("writevideopts %lld", writeVideoPts);
+////                LOG_D("readAudioPts %lld", readAudioPts);
+////                LOG_D("readVideoPtS %lld", readVideoPts);
+//        xsleep(1);
+//        if (writeVideoPts == readVideoPts && readAudioPts == writeAudioPts) {
+//            xsleep(2000);
+//            ((FileStreamer *) streamer)->ClosePushStream();
+//            isExit = true;
+//            break;
+//        }
+//    } while (!isExit);
+}
+
+void VideoCompressComponent::onEvent(MediaEvent &e) {
+    LOG_E("onEvent: writevideo:%lld,writeaudio:%lld,readvideo:%lld,readaudio:%lld",
+          e.getWriteVideoPts(), e.getWriteAudioPts(), e.getReadVideoPts(), e.getReadAudioPts());
+    if (e.getWriteVideoPts() ==e.getReadVideoPts() && e.getWriteAudioPts() == e.getReadAudioPts()) {
+        xsleep(2000);
+        fileStreamer->ClosePushStream();
+    }
 }
 
 bool VideoCompressComponent::initialize() {
@@ -55,19 +90,17 @@ bool VideoCompressComponent::initialize() {
     if (!videoEncoder) {
         videoEncoder = new VideoEncoder();
     }
-    if (mDemux) {
-        if (mVideoFfmpegDecode) {
-            mDemux->addVideoDecode(mVideoFfmpegDecode);
-            mVideoFfmpegDecode->addObserver(videoEncoder);
-        }
-
-        if (mAudioFfmpegDecode) {
-            mDemux->addAudioDecode(mAudioFfmpegDecode);//添加音频解码
-            mAudioFfmpegDecode->addObserver(audioEncoder);// 添加音频编码
-        }
-    } else {
-        return false;
+    if (mVideoFfmpegDecode) {
+        mDemux->addVideoDecode(mVideoFfmpegDecode);
+        mVideoFfmpegDecode->addObserver(videoEncoder);
     }
+
+    if (mAudioFfmpegDecode) {
+        mDemux->addAudioDecode(mAudioFfmpegDecode);//添加音频解码
+        mAudioFfmpegDecode->addObserver(audioEncoder);// 添加音频编码
+    }
+
+
     return true;
 }
 
@@ -87,16 +120,31 @@ void VideoCompressComponent::release() {
     getVideoEncode()->isExit = true;
     getFileStreamer()->isExit = true;
     sleep(1);
-    delete getDemux();
-    mDemux = NULL;
-    delete getVideoDecode();
-    mVideoFfmpegDecode = NULL;
-    delete getAudioDecode();
-    mAudioFfmpegDecode = NULL;
-    delete getAudioEncode();
-    audioEncoder = NULL;
-    delete getVideoEncode();
-    videoEncoder = NULL;
+
+    if (avFormatContext) {
+        avformat_free_context(avFormatContext);
+        avFormatContext = NULL;
+    }
+    if (mDemux) {
+        delete mDemux;
+        mDemux = NULL;
+    }
+    if (mVideoFfmpegDecode) {
+        delete mVideoFfmpegDecode;
+        mVideoFfmpegDecode = NULL;
+    }
+    if (mAudioFfmpegDecode) {
+        delete mAudioFfmpegDecode;
+        mAudioFfmpegDecode = NULL;
+    }
+    if (audioEncoder) {
+        delete audioEncoder;
+        audioEncoder = NULL;
+    }
+    if (videoEncoder) {
+        delete videoEncoder;
+        videoEncoder = NULL;
+    }
 }
 
 void closeStreamCallBack(void *p) {
@@ -109,37 +157,98 @@ void closeStreamCallBack(void *p) {
 
 }
 
+bool VideoCompressComponent::open(const char *url) {
+    int ret = 0;
+    int rotate = 0;
+    double d = 0.0;
+
+    AVDictionaryEntry *m = NULL;
+
+
+    avFormatContext = avformat_alloc_context();
+    if (!avFormatContext) {
+        LOGE("Could not allocate context.\n");
+    }
+    avFormatContext->interrupt_callback.opaque = this;
+    if ((ret = avformat_open_input(&avFormatContext, url, 0, 0)) < 0) {
+        LOGE("avformat open input failed  :%s!", av_err2str(ret));
+        goto fail;
+    }
+    LOGD("avformat open input successful!");
+    if ((ret = avformat_find_stream_info(avFormatContext, 0)) < 0) {
+        LOGE("avformat find stream info failed:  %s", av_err2str(ret));
+        goto fail;
+    }
+
+    getDemux()->setAvFormatContext(avFormatContext);
+
+    getDemux()->setVideoStreamIndex(
+            av_find_best_stream(avFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, 0, 0));
+    getDemux()->setAudioStreamIndex(
+            av_find_best_stream(avFormatContext, AVMEDIA_TYPE_AUDIO, -1, -1, 0, 0));
+
+
+    getDemux()->getRotate();
+    getDemux()->getDuration();
+
+
+    getDemux()->audioStream = avFormatContext->streams[getDemux()->audioStreamIndex];
+    getDemux()->audioPtsRatio = getDemux()->audioStream->nb_frames /
+                                     getDemux()->audioStream->codecpar->channels;;
+
+    getDemux()->videoStream = avFormatContext->streams[getDemux()->videoStreamIndex];
+    getDemux()->video_src_width = getDemux()->videoStream->codecpar->width;
+    getDemux()->video_src_height = getDemux()->videoStream->codecpar->height;
+
+    d = getDemux()->get_rotation(getDemux()->videoStream);
+    LOG_E("d %lf", d);
+    getDemux()->videoPtsRatio = getDemux()->videoStream->time_base.den /
+                                     getDemux()->videoStream->r_frame_rate.num;
+
+    LOGD("find stream index  videoStream:%d   audioStream:%d",
+         getDemux()->getVideoStreamIndex(),
+         getDemux()->getAudioStreamIndex());
+
+
+    return true;
+
+    fail:
+    return false;
+}
+
 bool VideoCompressComponent::openSource(const char *url) {
     FFmpegDemux *pDemux = getDemux();
     if (!pDemux) {
         return false;
     }
 
-    pDemux->open(url);
+    open(url);
     int rotate = 0;
     const MetaData metaData = pDemux->getMetaData();
-    if (metaData.video_rotate) {
-        rotate = atoi(metaData.video_rotate);
-    }
+//    if (metaData.video_rotate) {
+//        rotate = atoi(metaData.video_rotate);
+//    }
 
-    if (rotate == 90 || rotate == 270) {
-        getVideoDecode()->setVideoScaleHeight(getMScaleHeight());
-        getVideoDecode()->setVideoScaleWidth(getMScaleWidth());
-        getVideoEncode()->setVideoEncodeWidth(getMScaleWidth());
-        getVideoEncode()->setVideoEncodeHeight(getMScaleHeight());
-    } else {
-        if (metaData.video_width < metaData.video_height) {
-            getVideoDecode()->setVideoScaleWidth(getMScaleHeight());
-            getVideoDecode()->setVideoScaleHeight(getMScaleWidth());
-            getVideoEncode()->setVideoEncodeWidth(getMScaleHeight());
-            getVideoEncode()->setVideoEncodeHeight(getMScaleWidth());
-        } else {
-            getVideoDecode()->setVideoScaleHeight(getMScaleHeight());
-            getVideoDecode()->setVideoScaleWidth(getMScaleWidth());
-            getVideoEncode()->setVideoEncodeWidth(getMScaleWidth());
-            getVideoEncode()->setVideoEncodeHeight(getMScaleHeight());
-        }
-    }
+//    if (rotate == 90 || rotate == 270) {
+    getVideoDecode()->setVideoScaleHeight(getMScaleHeight());
+    getVideoDecode()->setVideoScaleWidth(getMScaleWidth());
+    getVideoEncode()->setVideoEncodeWidth(getMScaleWidth());
+    getVideoEncode()->setVideoEncodeHeight(getMScaleHeight());
+//    } else {
+//        if (metaData.video_width < metaData.video_height) {
+//            getVideoDecode()->setVideoScaleWidth(getMScaleHeight());
+//            getVideoDecode()->setVideoScaleHeight(getMScaleWidth());
+//            getVideoEncode()->setVideoEncodeWidth(getMScaleHeight());
+//            getVideoEncode()->setVideoEncodeHeight(getMScaleWidth());
+//        } else {
+//            getVideoDecode()->setVideoScaleHeight(getMScaleHeight());
+//            getVideoDecode()->setVideoScaleWidth(getMScaleWidth());
+//            getVideoEncode()->setVideoEncodeWidth(getMScaleWidth());
+//            getVideoEncode()->setVideoEncodeHeight(getMScaleHeight());
+//        }
+//    }
+
+
 
     //打开音视频解码器
     if (!getAudioDecode()->openCodec(*(pDemux->getAudioParameters()))) {
@@ -152,9 +261,9 @@ bool VideoCompressComponent::openSource(const char *url) {
 
 //        音频编码
     getAudioEncode()->InitEncode(
-            getDemux()->getAudioParameters()->codecParameters);
+            pDemux->getAudioParameters()->codecParameters);
     getVideoEncode()->InitEncode(
-            getDemux()->getVideoParamters()->codecParameters);
+            pDemux->getVideoParamters()->codecParameters);
 
     //IO
     fileStreamer = FileStreamer::Get();
@@ -179,12 +288,12 @@ bool VideoCompressComponent::openSource(const char *url) {
 
     //视频编码
     getAudioEncode()->startThread();
-    getVideoEncode()->startThread();
-    //开启解码
+//    getVideoEncode()->startThread();
+//    //开启解码
     getAudioDecode()->startThread();
     getVideoDecode()->startThread();
     //开始解复用
-    getDemux()->startThread();
+    pDemux->startThread();
     //文件写入
     getFileStreamer()->startThread();
 
