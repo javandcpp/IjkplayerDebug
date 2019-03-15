@@ -219,8 +219,8 @@ int VideoEncoder::InitEncode(AVCodecParameters *avCodecParameters) {
     videoCodecContext->framerate = (AVRational) {30, 1};
 
     videoCodecContext->max_b_frames = 0;//0表示不使用B Frame
-    videoCodecContext->qmin = 20;
-    videoCodecContext->qmax = 40;
+    videoCodecContext->qmin = 10;
+    videoCodecContext->qmax = 50;
     videoCodecContext->qcompress = 0.5;
     videoCodecContext->time_base = (AVRational) {1, 12800};//AUDIO VIDEO 两边时间基数要相同
     videoCodecContext->time_base.den=30;
