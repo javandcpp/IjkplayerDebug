@@ -144,7 +144,7 @@ public class InfoHudViewHolder {
                     long tcpSpeed = mp.getTcpSpeed();
                     long bitRate = mp.getBitRate();
                     long seekLoadDuration = mp.getSeekLoadDuration();
-                    String mHostIpInfo = mp.getHostIpInfo();
+//                    String mHostIpInfo = mp.getHostIpInfo();
 
 
                     setRowValue(R.string.v_cache, String.format(Locale.US, "%s, %s", formatedDurationMilli(videoCachedDuration), formatedSize(videoCachedBytes)));
@@ -154,11 +154,11 @@ public class InfoHudViewHolder {
                     setRowValue(R.string.seek_load_cost, String.format(Locale.US, "%d ms", seekLoadDuration));
                     setRowValue(R.string.tcp_speed, String.format(Locale.US, "%s", formatedSpeed(tcpSpeed, 1000)));
                     setRowValue(R.string.bit_rate, String.format(Locale.US, "%.2f kbs", bitRate / 1000f));
-                    if(null!=mHostIpInfo&& !TextUtils.isEmpty(mHostIpInfo)){
-                        String[] hostIp = mHostIpInfo.split(",");
-                        setRowValue(R.string.hostname,hostIp[0]);
-                        setRowValue(R.string.ip,hostIp[1]);
-                    }
+//                    if(null!=mHostIpInfo&& !TextUtils.isEmpty(mHostIpInfo)){
+//                        String[] hostIp = mHostIpInfo.split(",");
+//                        setRowValue(R.string.hostname,hostIp[0]);
+//                        setRowValue(R.string.ip,hostIp[1]);
+//                    }
 
                     mHandler.removeMessages(MSG_UPDATE_HUD);
                     mHandler.sendEmptyMessageDelayed(MSG_UPDATE_HUD, 500);

@@ -42,6 +42,8 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
+
+
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -53,6 +55,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+
 import tv.danmaku.ijk.media.player.annotations.AccessedByNative;
 import tv.danmaku.ijk.media.player.annotations.CalledByNative;
 import tv.danmaku.ijk.media.player.misc.IAndroidIO;
@@ -61,13 +64,8 @@ import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 import tv.danmaku.ijk.media.player.misc.IjkTrackInfo;
 import tv.danmaku.ijk.media.player.pragma.DebugLog;
 
-import static java.lang.System.currentTimeMillis;
 
-/**
- * @author bbcallen
- * <p>
- * Java wrapper of ffplay.
- */
+
 public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private final static String TAG = IjkMediaPlayer.class.getName();
 
@@ -80,7 +78,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private static final int MEDIA_TIMED_TEXT = 99;
     private static final int MEDIA_ERROR = 100;
     private static final int MEDIA_INFO = 200;
-    private static final int MEDIA_IP = 300;
+    private static final int MEDIA_MESSAGE_BITRATE_INFO = 201;
 
     private static final int MEDIA_WHAT_BEGIN = 1000;
     private static final int MEDIA_WHAT_END = 2000;
@@ -174,14 +172,14 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private int mVideoSarNum;
     private int mVideoSarDen;
 
-    private String mHostIpInfo;
-
     private String mDataSource;
 
     private boolean mPostMessage;
 
     private static long mStartTime = 0;
     private static long mEndTime = 0;
+    private Thread mMessageThread;
+    private boolean dnsCancheClear;
 
     private static void postExtraEventFromNative(Object ijkmediaplayer_ref, int what, int extra, int reserved, String obj) {
         IjkMediaPlayer sp = (IjkMediaPlayer) ((WeakReference) ijkmediaplayer_ref).get();
@@ -189,6 +187,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
             return;
         }
 
+        //Log.i(TAG, "halimin2018 ==========> event: what=" + what + ", extra=" + extra + ", str=" + obj.toString());
 
         if (sp.mEventHandler != null) {
             Message m = sp.mEventHandler.obtainMessage(what, extra, reserved, obj);
@@ -196,7 +195,31 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         }
     }
 
+    /*
+    private class EventHandler extends Handler
+    {
+        private IjkMediaPlayer mIjkMediaPlayer;
 
+        public EventHandler(IjkMediaPlayer player, Looper looper)
+        {
+            super(looper);
+            mIjkMediaPlayer = player;
+        }
+
+        @Override
+        public void handleMessage(Message msg)
+        {
+            Log.i(TAG, "halimin2018 message: what=" + msg.what + ", extra=" + msg.arg1);
+
+            switch (msg.what)
+            {
+
+
+                default:
+                    break;
+            }
+        }
+    }*/
 
     /**
      * Default library loader
@@ -256,6 +279,11 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      */
     public IjkMediaPlayer(IjkLibLoader libLoader) {
         initPlayer(libLoader);
+        setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "dns_cache_clear", 1);
+        setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "reconnect", 5);
+        setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "framedrop", 1);
+        setOption(IjkMediaPlayer.OPT_CATEGORY_CODEC, "skip_loop_filter", 48);
+
     }
 
     private void initPlayer(IjkLibLoader libLoader) {
@@ -503,7 +531,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      * @param length the length in bytes of the data to be played
      * @throws IllegalStateException if it is called in an invalid state
      */
-    private void setDataSource(FileDescriptor fd, long offset, long length)
+    public void setDataSource(FileDescriptor fd, long offset, long length)
             throws IOException, IllegalArgumentException, IllegalStateException {
         // FIXME: handle offset, length
         setDataSource(fd);
@@ -512,6 +540,14 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     public void setDataSource(IMediaDataSource mediaDataSource)
             throws IllegalArgumentException, SecurityException, IllegalStateException {
         _setDataSource(mediaDataSource);
+    }
+
+
+
+    public void switchCodec(String codec) {
+        if (null != codec) {
+
+        }
     }
 
     public void setAndroidIOCallback(IAndroidIO androidIO)
@@ -548,12 +584,14 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         stayAwake(true);
         _start();
 
+        StartPostLocalMessage();
     }
 
     private native void _start() throws IllegalStateException;
 
     @Override
     public void stop() throws IllegalStateException {
+        StopPostLocalMessage();
         stayAwake(false);
         _stop();
 
@@ -726,6 +764,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      */
     @Override
     public void release() {
+        StopPostLocalMessage();
         stayAwake(false);
         updateSurfaceScreenOn();
         resetListeners();
@@ -931,13 +970,11 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         return true;
     }
 
+
+
     private native String _getVideoCodecInfo();
 
     private native String _getAudioCodecInfo();
-
-    public String getHostIpInfo(){
-        return mHostIpInfo;
-    }
 
     public void setOption(int category, String name, String value) {
         _setOption(category, name, value);
@@ -994,9 +1031,14 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         _setPropertyLong(FFP_PROP_INT64_SHARE_CACHE_DATA, (long) share);
     }
 
+    public void setDnsCacheClear(boolean dnsCancheClear) {
+        if (dnsCancheClear) {
+            setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "dns_cache_clear", 1);
+        }
+    }
+
     private static class EventHandler extends Handler {
         private final WeakReference<IjkMediaPlayer> mWeakPlayer;
-
 
         public EventHandler(IjkMediaPlayer mp, Looper looper) {
             super(looper);
@@ -1011,6 +1053,19 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                 return;
             }
 
+            ///////////////////////////////////////////////////////////////////////
+            //halimin added
+            if (msg.what >= MEDIA_WHAT_BEGIN && msg.what <= MEDIA_WHAT_END) {
+//                if (msg.what == MEDIA_EXTRAINFO_TRACE_HTTP_DOWNLOAD_RATE) {
+//                    mStartTime = System.currentTimeMillis() / 1000;
+//                }
+                if (player.isPlaying()) {
+                  //  player.notifyOnExtraInfo(msg.what, msg.arg1, msg.obj.toString(), "");
+                }
+                return;
+            }
+
+            ///////////////////////////////////////////////////////////////////////
 
             switch (msg.what) {
                 case MEDIA_PREPARED:
@@ -1087,14 +1142,17 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                     player.notifyOnVideoSizeChanged(player.mVideoWidth, player.mVideoHeight,
                             player.mVideoSarNum, player.mVideoSarDen);
                     break;
-                case MEDIA_IP:
-                    Log.e("Media_ip",msg.obj.toString());
-//                    player.notifyIpFind((String) msg.obj);
-                    player.mHostIpInfo=msg.obj.toString();
+                case MEDIA_MESSAGE_BITRATE_INFO:
+                    long audioCachedBytes = player.getAudioCachedBytes();
+                    long videoCachedBytes = player.getVideoCachedBytes();
+                    float speed = player.formatedSpeed(player.getTcpSpeed(), 1000) / 1000;
+                    String speedString = String.format("VideoCached:%d Bytes AudioCached %d Bytes TcpBitRate:%.1f kbps", videoCachedBytes, audioCachedBytes, speed);
+                 //   player.notifyOnExtraInfo(MEDIA_EXTRAINFO_TRACE_HTTP_DOWNLOAD_RATE, 0, speedString, "");
+
                     break;
 
                 default:
-                    DebugLog.e(TAG, "Unknown message type " + msg.what);
+//                    DebugLog.e(TAG, "Unknown message type " + msg.what);
             }
         }
     }
@@ -1190,7 +1248,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
     @CalledByNative
     private static boolean onNativeInvoke(Object weakThiz, int what, Bundle args) {
-        DebugLog.ifmt(TAG, "onNativeInvoke %d", what);
+//        DebugLog.ifmt(TAG, "onNativeInvoke %d", what);
         if (weakThiz == null || !(weakThiz instanceof WeakReference<?>))
             throw new IllegalStateException("<null weakThiz>.onNativeInvoke()");
 
@@ -1328,6 +1386,87 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         }
     }
 
+    private void StartPostLocalMessage() {
+        if (null == mMessageThread) {
+            mPostMessage = true;
+            Log.i("postMessage", mPostMessage + "  start");
+            mMessageThread = new Thread() {
+                @Override
+                public void run() {
+                    while (mPostMessage) {
+                        if (!isPlaying()) {
+                            continue;
+                        }
+                        String strFreeMem = native_getFreeMemory();
+//                        if (null != strFreeMem) {
+//                            notifyOnExtraInfo(MEDIA_EXTRAINFO_TRACE_FREE_MEMORY, 0, "free memory:" + strFreeMem, "");
+//                        }
+//
+//                        String strUsedCPU = native_getUsedCPU();
+//                        if (null != strUsedCPU) {
+//                            notifyOnExtraInfo(MEDIA_EXTRAINFO_TRACE_USED_CPU, 0, "used cpu:" + strUsedCPU, "");
+//                        }
+//
+//                        String nativeProcUsedCPU = native_getProcUsedCPU();
+//                        if (null != nativeProcUsedCPU) {
+//                            notifyOnExtraInfo(MEDIA_EXTRAINFO_TRACE_PROC_USED_CPU, 0, "process used cpu:" + nativeProcUsedCPU, "");
+//                        }
+
+                        if (null != mEventHandler) {
+                            Message message = mEventHandler.obtainMessage();
+                            message.what = MEDIA_MESSAGE_BITRATE_INFO;
+                            mEventHandler.sendMessageDelayed(message, 1000);
+                            message = mEventHandler.obtainMessage();
+                            message.what = MEDIA_MESSAGE_BITRATE_INFO;
+                            mEventHandler.sendMessageDelayed(message, 4000);
+                            message = mEventHandler.obtainMessage();
+                            message.what = MEDIA_MESSAGE_BITRATE_INFO;
+                            mEventHandler.sendMessageDelayed(message, 7000);
+                        }
+
+                        try {
+                            Thread.sleep(10000);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+            };
+        }
+        if (null != mMessageThread && !mMessageThread.isAlive()) {
+            mMessageThread.start();
+        }
+    }
+
+    private void stopMessageSendThread() {
+        mPostMessage = false;
+        if (null != mMessageThread) {
+            try {
+//                mMessageThread.join();
+//                mMessageThread = null;
+                Log.i("postMessage", mPostMessage + "  stop");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private float formatedSpeed(long bytes, long elapsed_milli) {
+        float bytes_per_sec = ((float) bytes) * 1000.f / elapsed_milli;
+        return bytes_per_sec;
+    }
+
+
+    private void StopPostLocalMessage() {
+        stopMessageSendThread();
+    }
+
+    private native String native_getFreeMemory();
+
+    private native String native_getUsedCPU();
+
+    private native String native_getProcUsedCPU();
 
     public static native void native_profileBegin(String libName);
 
