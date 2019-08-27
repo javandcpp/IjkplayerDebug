@@ -70,9 +70,9 @@ public class SampleMediaListFragment extends Fragment {
 
 //        mAdapter.addItem("https://cdn.kaishuhezi.com/kstory/story/audio/e79311b2-999d-4894-a703-345be52cb2c8.mp3","音频测试");
 //        mAdapter.addItem("https://cdn.kaishuhezi.com/kstory/microcourse/video/f1075c88-459f-4ce8-8f19-3268ec010014.mp4","视频测试");
-        mAdapter.addItem("/mnt/sdcard/index.m3u8","testm3u8");
-        mAdapter.addItem("https://cdn.kaishuhezi.com/test/20190807_class/index.m3u8","m3u8 online");
-        mAdapter.addItem("https://test-hlm.kaishustory.com/testhalimin/20190807_class/index2.m3u8","m3u8 online  NO KEY");
+//        mAdapter.addItem("/mnt/sdcard/index.m3u8","testm3u8");
+//        mAdapter.addItem("https://cdn.kaishuhezi.com/test/20190807_class/index.m3u8","m3u8 online");
+//        mAdapter.addItem("https://test-hlm.kaishustory.com/testhalimin/20190807_class/index2.m3u8","m3u8 online  NO KEY");
 
     }
 
